@@ -9,6 +9,7 @@ export class EventsController {
         try {
             if (role === 1) { // Organizador
                 const query = 'SELECT * FROM Event WHERE OrganizerID = ? ORDER BY DateTime ASC';
+                console.log("Getting events of ", email, " with role ", role)
                 pool.query(
                     query,
                     email,
@@ -17,7 +18,7 @@ export class EventsController {
                         return res.json(rows);
                     }
                 );
-            } else if (role === 2) { // Alumno
+            } else if (role === 2) { // TODO
                 const [studentEvents] = await pool.query(
                     `SELECT e.* FROM Event e
                      WHERE e.ID NOT IN (

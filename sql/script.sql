@@ -106,11 +106,11 @@ INSERT INTO Event (Title, Description, DateTime, Location, Capacity, EventTypeID
 -- Inserción de notificaciones para los eventos
 INSERT INTO Notifications (EventID, UserEmail, Message) VALUES 
 (1, 'ana.martinez@ucm.es', 'Recordatorio: Taller de Inteligencia Artificial el 20 de noviembre.'),
-(2, 'luis.sanchez@ucm.es', 'Recordatorio: Conferencia sobre Robótica el 25 de noviembre.'),
-(3, 'carlos.lopez@ucm.es', 'Recordatorio: Seminario de Programación en Python el 1 de diciembre.'),
-(4, 'maria.garcia@ucm.es', 'Recordatorio: Taller de Machine Learning el 5 de diciembre.'),
-(5, 'juan.perez@ucm.es', 'Recordatorio: Conferencia de Big Data el 10 de diciembre.'),
-(3, 'laura.ramos@ucm.es', 'Recordatorio: Seminario de Programación en Python el 1 de diciembre.');
+(2, 'ana.martinez@ucm.es', 'Recordatorio: Conferencia sobre Robótica el 25 de noviembre.'),
+(3, 'ana.martinez@ucm.es', 'Recordatorio: Seminario de Programación en Python el 1 de diciembre.'),
+(4, 'ana.martinez@ucm.es', 'Recordatorio: Taller de Machine Learning el 5 de diciembre.'),
+(5, 'ana.martinez@ucm.es', 'Recordatorio: Conferencia de Big Data el 10 de diciembre.'),
+(3, 'ana.martinez@ucm.es', 'Recordatorio: Seminario de Programación en Python el 1 de diciembre.');
 
 -- Inserción de usuarios apuntados a varios eventos
 INSERT INTO Enrollment (EventID, UserEmail) VALUES 
