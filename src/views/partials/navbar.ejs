@@ -1,0 +1,43 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+    <!-- Botón del menú hamburguesa a la izquierda -->
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Logo y Título a la Izquierda (solo en pantallas grandes) -->
+    <a class="navbar-brand d-none d-lg-flex" href="/">
+        <img src="/public/img/logo.png" width="30" height="30" class="d-inline-block align-top" alt="Logo">
+        EventosUniv
+    </a>
+
+    <!-- Logo sin título (solo en pantallas pequeñas) -->
+    <a class="navbar-brand d-flex d-lg-none mx-auto" href="/">
+        <img src="/public/img/logo.png" width="30" height="30" class="d-inline-block align-top" alt="Logo">
+    </a>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mx-auto">  
+            <li class="nav-item mr-3">
+                <a class="nav-link" href="/">Inicio</a> 
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/events">Eventos</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="d-flex align-items-center">
+        <a href="#" class="mr-3">
+            <img src="/public/img/notifications-false.svg" width="30" height="30" alt="Notificaciones">
+        </a>
+        <div class="dropdown position-static">
+            <a class="nav-link" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <img src="/public/img/user-icon.svg" width="30" height="30" alt="Usuario">
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                <a class="dropdown-item" href="/profile">Perfil</a>
+                <a class="dropdown-item text-danger" href="#">Salir</a>
+            </div>
+        </div>
+    </div>
+</nav>

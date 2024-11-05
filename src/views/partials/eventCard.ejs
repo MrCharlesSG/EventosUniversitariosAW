@@ -1,0 +1,11 @@
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title"><%= event.Title %></h5>
+        <h6 class="card-subtitle mb-2 text-muted"><%= new Date(event.DateTime).toLocaleDateString() %> - <%= new Date(event.DateTime).toLocaleTimeString() %></h6>
+        <p class="card-text"><%= event.Description %></p>
+        <p class="card-text"><strong>Ubicación:</strong> <%= event.Location %></p>
+        <p class="card-text"><strong>Capacidad:</strong> <%= event.Capacity %></p>
+        <a href="#" class="card-link">Detalles</a>
+        <a href="#" class="card-link">Inscribirse</a>
+    </div>
+</div>
