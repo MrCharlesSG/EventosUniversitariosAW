@@ -3,9 +3,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="eventModalLabel">Detalles del Evento</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                
             </div>
             <div class="modal-body">
                 <h4 id="modalTitle"></h4>
@@ -13,12 +11,11 @@
                 <p><strong>Fecha:</strong> <span id="modalDate"></span></p>
                 <p><strong>Ubicación:</strong> <span id="modalLocation"></span></p>
             </div>
+               
             <div class="modal-footer">
-                <!-- Botón para editar evento (solo si es organizador) -->
-                <button type="button" id="editButton" class="btn btn-primary" style="display: none;">Editar Evento</button>
-                <!-- Botón para apuntarse/desapuntarse (solo si es usuario) -->
-                <button type="button" id="subscribeButton" class="btn btn-success" style="display: none;">Apuntarse</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <% if(role == 1){ %>
+                    <a href="#" type="button" id="editButton" class="btn btn-primary">Editar Evento</a>
+                <% } %>  
             </div>
         </div>
     </div>

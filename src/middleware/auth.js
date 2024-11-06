@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { isNormalUser, isOrganizer } from '../utils/auth-utils.js';
 
 const JWT_SECRET = process.env.JWT_SECRET_KEY || "1234";
 
@@ -21,12 +22,11 @@ export const isAuthenticated = (req, res, next) => {
     });
 };
 
-export const isUser = (req, res, next) => {
+export const isAuthenticatedUser = (req, res, next) => {
     isAuthenticated(req, res, () => {
         const { role } = req.user;
-        const USER_ROLE_ID = 2;
 
-        if (role === USER_ROLE_ID) {
+        if (isNormalUser(role)) {
             next();
         } else {
             console.log("Is not a user")
@@ -35,12 +35,11 @@ export const isUser = (req, res, next) => {
     });
 };
 
-export const isOrganizer = (req, res, next) => {
+export const isAuthenticatedOrganizer = (req, res, next) => {
     isAuthenticated(req, res, () => {
         const { role } = req.user;
-        const ORGANIZER_ROLE_ID = 1; 
 
-        if (role === ORGANIZER_ROLE_ID) {
+        if (isOrganizer(role)) {
             next();
         } else {
             console.log("Is not a organizer")

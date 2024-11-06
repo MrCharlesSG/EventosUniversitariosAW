@@ -9,8 +9,11 @@ function fetchEvents() {
         .then(response => response.json())
         .then(data => {
             data.forEach(event => {
+                console.log("The event ", event)
                 const eventItem = `
                     <li class="event-item" 
+                        data-id="${event.ID}" 
+                        data-organizer="${event.OrganizerID}"
                         data-title="${event.Title}" 
                         data-description="${event.Description}" 
                         data-date="${new Date(event.DateTime).toLocaleString()}" 
@@ -38,51 +41,25 @@ function fetchEvents() {
 
 function showModal(event) {
     const item = event.currentTarget;
-
+    console.log("The item ", item)
     const title = item.getAttribute('data-title');
     const description = item.getAttribute('data-description');
     const date = item.getAttribute('data-date');
     const location = item.getAttribute('data-location');
+    const eventId = item.getAttribute('data-id'); // Obtener el ID del evento
 
+    // Rellenar el modal con los datos del evento
     document.getElementById('modalTitle').textContent = title;
     document.getElementById('modalDescription').textContent = description;
     document.getElementById('modalDate').textContent = date;
     document.getElementById('modalLocation').textContent = location;
 
+
+    // Modificar el href del botón de editar para incluir el eventID como parámetro en la URL
+    const editButton = document.getElementById('editButton');
+    editButton.href = `/events/form?eventID=${eventId}`;
+
+    // Mostrar el modal
     $('#eventModal').modal('show');
 }
 
-
-
-function whatButtonsToShow(){
-    const token = document.cookie.split('; ').find(row => row.startsWith('token=')).split('=')[1];
-    let userRole = null;
-
-    if (token) {
-        const decodedToken = jwt.decode(token);
-        userRole = decodedToken.role; // Asegúrate que 'role' es la clave correcta
-    }
-
-    const editButton = document.getElementById('editButton');
-    const subscribeButton = document.getElementById('subscribeButton');
-
-    if (userRole === 1) { // Rol de organizador
-        editButton.style.display = 'block'; // Mostrar el botón de editar
-        subscribeButton.style.display = 'none'; // Ocultar el botón de apuntarse
-        editButton.onclick = () => {
-            console.log(`Editando el evento con ID: ${eventId}`);
-            // Aquí puedes redirigir a la página de edición o abrir un formulario de edición
-        };
-    } else if (userRole === 2) { // Rol de usuario
-        editButton.style.display = 'none'; // Ocultar el botón de editar
-        subscribeButton.style.display = 'block'; // Mostrar el botón de apuntarse
-        subscribeButton.onclick = () => {
-            console.log(`Apuntándose al evento con ID: ${eventId}`);
-            // Aquí puedes implementar la lógica para apuntarse o desapuntarse del evento
-        };
-    } else {
-        // Si el usuario no tiene rol, ocultar ambos botones
-        editButton.style.display = 'none';
-        subscribeButton.style.display = 'none';
-    }
-}

@@ -54,14 +54,26 @@
             font-size: 0.9rem;
             color: #6c757d;
         }
+
+        .add-event-btn {
+            position: fixed;
+            bottom: 5px;
+            left: 5px;
+        }
     </style>
 </head>
 <body>
 
     <%- include("partials/navbar") %>
 
-    <div class="container mt-5">
-        <h1>Eventos Universitarios</h1>
+    <div class="container mt-5 pt-2">
+        <h1>
+            <% if(role == 1){ %>
+                Tus Eventos
+            <% } else { %>  
+                Eventos Universitarios
+            <% } %>  
+        </h1>
         <div class="list-container">
             <ul id="event-list" class="list-unstyled">
 
@@ -70,10 +82,19 @@
         <%- include("partials/footer") %>
     </div>
 
-    <%- include("partials/eventModal") %>
+    <% if(role == 1){ %>
+        <a href="/events/form" class=" btn btn-primary add-event-btn">
+            Organizar Evento
+        </a>
+    <% } %>  
+    
+
+    <%- include("partials/eventModal", { role: role }) %>
+    
 
     <script src="/public/scripts/events.js"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

@@ -7,12 +7,16 @@
     <title>Eventos Universitarios</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/public/css/bootstrap-styles" >
 </head>
 <body>
     <!-- Incluir la barra de navegación -->
-    <%- include("partials/navbar") %>
+    <%- include("partials/navbar", {}) %>
 
     <h1>Los eventos Universitarios</h1>
+
+    
+    <%- include("partials/footer") %>
 
     <!-- Bootstrap JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
