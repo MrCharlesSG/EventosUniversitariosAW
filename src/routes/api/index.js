@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { authRouter, enrollRouter } from "./auth.js";
-import { eventsRouter } from "./events.js";
 import { isAuthenticated } from "../../middleware/auth.js";
+import { authRouter } from "./auth.js";
+import { eventsRouter } from "./events.js";
 import { notificationRouter } from "./notifications.js";
+import { enrollRouter } from "./enroll.js";
 
 
 export const apiRouter = Router();

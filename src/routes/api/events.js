@@ -15,5 +15,3 @@ eventsRouter.delete("/:id/cancel",isTheAuthenticatedUserAOrganizer, EventsContro
 
 eventsRouter.post("/",isTheAuthenticatedUserAOrganizer, EventsController.createEvent)
 
-eventsRouter.post("/enroll", EventsController.enrollEvent)
-

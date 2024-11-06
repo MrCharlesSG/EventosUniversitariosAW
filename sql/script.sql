@@ -9,6 +9,8 @@ CREATE TABLE IF NOT EXISTS Faculty (
     University VARCHAR(255) NOT NULL
 );
 
+
+
 CREATE TABLE IF NOT EXISTS Role (
     ID INT PRIMARY KEY AUTO_INCREMENT,
     Name VARCHAR(50) NOT NULL
@@ -43,29 +45,37 @@ CREATE TABLE IF NOT EXISTS Event (
     Location VARCHAR(255),
     Capacity INT,
     EventTypeID INT,
+    OrganizerID VARCHAR(255),
+    FOREIGN KEY (OrganizerID) REFERENCES User(Email),
     FOREIGN KEY (EventTypeID) REFERENCES EventType(ID)
 );
+
 
 CREATE TABLE IF NOT EXISTS Notifications (
     ID INT PRIMARY KEY AUTO_INCREMENT,
     EventID INT,
     UserEmail VARCHAR(255),
+    Date DATETIME NOT NULL,
+    Checked TINYINT(1) NOT NULL,
     Message TEXT NOT NULL,
     FOREIGN KEY (EventID) REFERENCES Event(ID),
     FOREIGN KEY (UserEmail) REFERENCES User(Email)
 );
 
+
 CREATE TABLE IF NOT EXISTS Enrollment (
-    ID INT PRIMARY KEY AUTO_INCREMENT,
     EventID INT,
     UserEmail VARCHAR(255),
+    PRIMARY KEY (EventID, UserEmail),
     FOREIGN KEY (EventID) REFERENCES Event(ID),
     FOREIGN KEY (UserEmail) REFERENCES User(Email)
 );
 
 -- Inserción de datos en Facultad
-INSERT INTO Faculty (Name, University) VALUES 
-('Facultad de Ingeniería', 'Universidad Complutense de Madrid');
+INSERT INTO Faculty (Name, University) VALUES
+('Facultad de Ingeniería', 'Universidad Complutense de Madrid'),
+('Facultad de Biología', 'Universidad Complutense de Madrid'),
+('Facultad de Filosofia', 'Universidad Autonoma de Madrid');
 
 -- Inserción de roles limitados
 INSERT INTO Role (Name) VALUES  
@@ -74,9 +84,9 @@ INSERT INTO Role (Name) VALUES
 
 -- Inserción de tipos de eventos permitidos
 INSERT INTO EventType (Name) VALUES 
-('taller'),
-('conferencia'),
-('seminario');
+('Taller'),
+('Conferencia'),
+('Seminario');
 
 -- Inserción de usuarios (2 organizadores y varios usuarios)
 INSERT INTO User (Email, FullName, Phone, FacultyID) VALUES 
@@ -96,21 +106,14 @@ INSERT INTO UserAuthentication (Email, RoleID, Password) VALUES -- password "use
 ('laura.ramos@ucm.es', 2, '$2a$12$h0HcS2QDb/7zPASbLa2GoOTSRP6CWK0oX7pCK.dPjkM6L5N4pNovi'); -- Usuario
 
 -- Inserción de varios eventos
-INSERT INTO Event (Title, Description, DateTime, Location, Capacity, EventTypeID) VALUES 
-('Taller de Inteligencia Artificial', 'Introducción a la IA y sus aplicaciones.', '2024-11-20 10:00:00', 'Aula 101, Facultad de Ingeniería', 30, 1),
-('Conferencia sobre Robótica', 'Exploración de la robótica moderna.', '2024-11-25 09:00:00', 'Auditorio, Facultad de Ingeniería', 100, 2),
-('Seminario de Programación en Python', 'Seminario avanzado sobre Python para ingenieros.', '2024-12-01 15:00:00', 'Sala de Conferencias, Facultad de Ingeniería', 50, 3),
-('Taller de Machine Learning', 'Introducción al Machine Learning.', '2024-12-05 10:00:00', 'Aula 102, Facultad de Ingeniería', 30, 1),
-('Conferencia de Big Data', 'Conferencia sobre técnicas avanzadas de Big Data.', '2024-12-10 09:00:00', 'Auditorio, Facultad de Ingeniería', 80, 2);
-
--- Inserción de notificaciones para los eventos
-INSERT INTO Notifications (EventID, UserEmail, Message) VALUES 
-(1, 'ana.martinez@ucm.es', 'Recordatorio: Taller de Inteligencia Artificial el 20 de noviembre.'),
-(2, 'ana.martinez@ucm.es', 'Recordatorio: Conferencia sobre Robótica el 25 de noviembre.'),
-(3, 'ana.martinez@ucm.es', 'Recordatorio: Seminario de Programación en Python el 1 de diciembre.'),
-(4, 'ana.martinez@ucm.es', 'Recordatorio: Taller de Machine Learning el 5 de diciembre.'),
-(5, 'ana.martinez@ucm.es', 'Recordatorio: Conferencia de Big Data el 10 de diciembre.'),
-(3, 'ana.martinez@ucm.es', 'Recordatorio: Seminario de Programación en Python el 1 de diciembre.');
+INSERT INTO Event (Title, Description, DateTime, Location, Capacity, EventTypeID, OrganizerID) VALUES 
+('Taller de Inteligencia Artificial', 'Introducción a la IA y sus aplicaciones.', '2024-11-20 10:00:00', 'Aula 101, Facultad de Ingeniería', 30, 1, 'luis.sanchez@ucm.es'),
+('Conferencia sobre Robótica', 'Exploración de la robótica moderna.', '2024-11-25 09:00:00', 'Auditorio, Facultad de Ingeniería', 100, 2, 'luis.sanchez@ucm.es'),
+('Seminario de Programación en Python', 'Seminario avanzado sobre Python para ingenieros.', '2024-12-01 14:00:00', 'Sala de Conferencias, Facultad de Ingeniería', 50, 3, 'ana.martinez@ucm.es'),
+('Taller de Machine Learning', 'Introducción al Machine Learning.', '2024-12-05 10:00:00', 'Aula 102, Facultad de Ingeniería', 30, 1, 'ana.martinez@ucm.es'),
+('Conferencia de Big Data', 'Conferencia sobre técnicas avanzadas de Big Data.', '2024-11-08 04:00:00', 'Auditorio, Facultad de Ingeniería', 80, 2, 'luis.sanchez@ucm.es'),
+('La ética en las TIC', 'Conferencia sobre cómo hacer discusiones éticas con tu jefe, amigos, profesores...', '2024-11-14 01:30:00', 'Laboratorio 4, Facultad de Ingeniería', 33, 2, 'ana.martinez@ucm.es'),
+('Como no jugar', 'Seminario de cómo se hacen ciertos materiales de semiconductores correctamente sin destruir la facultad', '2024-11-14 01:30:00', 'Laboratorio 4, Facultad de Ingeniería', 33, 3, 'ana.martinez@ucm.es');
 
 -- Inserción de usuarios apuntados a varios eventos
 INSERT INTO Enrollment (EventID, UserEmail) VALUES 
@@ -129,3 +132,23 @@ INSERT INTO Enrollment (EventID, UserEmail) VALUES
 (5, 'maria.garcia@ucm.es'),
 (5, 'juan.perez@ucm.es'),
 (5, 'laura.ramos@ucm.es');
+
+
+INSERT INTO Notifications (EventID, UserEmail, Date, Checked, Message) VALUES
+-- Notificación de recordatorio para el taller de IA
+(1, 'carlos.lopez@ucm.es', '2024-11-19 10:00:00', FALSE, 'Recordatorio: Mañana es el Taller de Inteligencia Artificial. ¡No faltes!'),
+
+-- Notificación de cambio de ubicación para la conferencia sobre Robótica
+(2, 'carlos.lopez@ucm.es', '2024-11-20 12:00:00', FALSE, 'Actualización: La conferencia sobre robótica se trasladó a la sala principal.'),
+
+-- Notificación de cancelación de evento para el seminario de Python
+(3, 'ana.martinez@ucm.es', '2024-11-22 15:00:00', FALSE, 'Aviso: El Seminario de Programación en Python ha sido cancelado. Disculpe las molestias.'),
+
+-- Notificación de apertura de nuevas plazas en el Taller de Machine Learning
+(4, 'ana.martinez@ucm.es', '2024-12-01 08:00:00', FALSE, 'Notificación: Se han abierto nuevas plazas para el Taller de Machine Learning.'),
+
+-- Notificación de recordatorio para la Conferencia de Big Data
+(5, 'carlos.lopez@ucm.es', '2024-11-07 08:00:00', FALSE, 'Recordatorio: Mañana es la Conferencia de Big Data. ¡Nos vemos allí!'),
+
+-- Notificación de actualización de horario para evento "exchange 22rreasdasd"
+(7, 'ana.martinez@ucm.es', '2024-11-12 09:00:00', FALSE, 'Actualización: El evento "exchange 22rreasdasd" ahora comenzará a las 09:00 en lugar de las 01:30.');

@@ -3,24 +3,34 @@ import { isNormalUser, isOrganizer } from "../utils/auth-utils.js";
 
 export class EventsController {
     static async getAll(req, res) {
-
         try {
-            
-                const query = 'SELECT * FROM Event ORDER BY DateTime ASC';
-                console.log("Getting all events")
-                pool.query(
-                    query,
-                    (err, rows) => {
-                        if(err) return res.status(500).json({ message: err.message });
-                        return res.json(rows);
-                    }
-                );
-           
+            const userEmail = req.user.email; 
+            const query = `
+                SELECT 
+                    Event.*, 
+                    CASE 
+                        WHEN Enrollment.UserEmail IS NOT NULL THEN true 
+                        ELSE false 
+                    END AS isEnrolled
+                FROM Event
+                LEFT JOIN Enrollment ON Event.ID = Enrollment.EventID AND Enrollment.UserEmail = ?
+                ORDER BY Event.DateTime ASC
+            `;
+    
+            console.log("Getting all events with enrollment status");
+    
+            pool.query(query, [userEmail], (err, rows) => {
+                if (err) return res.status(500).json({ message: err.message });
+                return res.json(rows);
+            });
         } catch (error) {
             console.error("Error retrieving events:", error);
             res.status(500).json({ error: "Error retrieving events" });
         }
     }
+    
+
+
     static async getOrganizersEvents(req, res) {
         const { role, email } = req.user;
         try {
