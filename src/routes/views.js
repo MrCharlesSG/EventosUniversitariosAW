@@ -11,14 +11,26 @@ const __dirname = path.dirname(__filename);
 export const viewsRouter = Router();
 
 viewsRouter.get('/', isAuthenticated, (req, res) => {
-    res.render('index');
+    res.render('index', { 
+        role: req.user.role
+    });
 });
 
 viewsRouter.get('/events', isAuthenticated, (req, res) => {
     res.render('events', { 
-        role: req.user.role
+        role: req.user.role,
+        user: req.user.email,
+        isMyEvents: false
     });
 });
+
+viewsRouter.get("/myevents", isAuthenticated, (req, res) => {
+    res.render('events', { 
+        role: req.user.role,
+        user: req.user.email,
+        isMyEvents: true
+    });
+})
 
 viewsRouter.get("/auth/login", redirectIfAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, '../views/login.html'));
@@ -41,6 +53,7 @@ viewsRouter.get("/events/form", isAuthenticatedOrganizer, async (req, res) => {
                     (err, row) => {
                         if(err || row.length==0) return res.status(404).json({ error: "Evento no encontrado" });
                         res.render('event-form', { 
+                            role: req.user.role,
                             eventTypeList,  
                             event:row[0],           
                         });
@@ -48,6 +61,7 @@ viewsRouter.get("/events/form", isAuthenticatedOrganizer, async (req, res) => {
                 )
             }else{
                 res.render('event-form', { 
+                    role: req.user.role,
                     eventTypeList,  
                     event:null,           
                 });

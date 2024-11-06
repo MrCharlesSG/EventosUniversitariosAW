@@ -48,6 +48,17 @@ export const isAuthenticatedOrganizer = (req, res, next) => {
     });
 };
 
+export const isTheAuthenticatedUserAOrganizer = (req, res, next) => {
+    
+        const { role } = req.user;
+
+        if (isOrganizer(role)) {
+            next();
+        } else {
+            console.log("Is not a organizer")
+            res.status(403).json({ error: "Acceso denegado, no eres organizador" });
+        }
+};
 
 export const redirectIfAuthenticated = (req, res, next) => {
     const token = req.cookies.token; 

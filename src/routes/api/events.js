@@ -1,14 +1,19 @@
 import { Router } from "express";
 import { EventsController } from "../../controllers/events.js";
+import { isAuthenticated, isTheAuthenticatedUserAOrganizer } from "../../middleware/auth.js";
 
 
 export const eventsRouter = Router();
 
 eventsRouter.get("/", EventsController.getAll)
 
-eventsRouter.post("/:id/update", EventsController.updateEvent)
+eventsRouter.get("/user", isTheAuthenticatedUserAOrganizer, EventsController.getOrganizersEvents )
 
-eventsRouter.delete("/:id/cancel", EventsController.cancelEvent)
+eventsRouter.post("/:id/update",isTheAuthenticatedUserAOrganizer, EventsController.updateEvent)
 
-eventsRouter.post("/", EventsController.createEvent)
+eventsRouter.delete("/:id/cancel",isTheAuthenticatedUserAOrganizer, EventsController.cancelEvent)
+
+eventsRouter.post("/",isTheAuthenticatedUserAOrganizer, EventsController.createEvent)
+
+eventsRouter.post("/enroll", EventsController.enrollEvent)
 

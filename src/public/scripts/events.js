@@ -1,11 +1,16 @@
 
 document.addEventListener('DOMContentLoaded', fetchEvents);
 
+
 function fetchEvents() {
     const eventList = document.getElementById('event-list');
     eventList.innerHTML = '';
+    const currentPath = window.location.pathname;
 
-    fetch('/api/events') 
+    const apiUrl = currentPath.includes('myevents') ? '/api/events/user' : '/api/events';
+    console.log("Llamando a la API:", apiUrl, " por user ", currentUserId);
+    
+    fetch(apiUrl) 
         .then(response => response.json())
         .then(data => {
             data.forEach(event => {
@@ -46,20 +51,19 @@ function showModal(event) {
     const description = item.getAttribute('data-description');
     const date = item.getAttribute('data-date');
     const location = item.getAttribute('data-location');
-    const eventId = item.getAttribute('data-id'); // Obtener el ID del evento
-
-    // Rellenar el modal con los datos del evento
+    const organizer = item.getAttribute('data-organizer');
+    const eventId = item.getAttribute('data-id'); 
+    
     document.getElementById('modalTitle').textContent = title;
     document.getElementById('modalDescription').textContent = description;
     document.getElementById('modalDate').textContent = date;
     document.getElementById('modalLocation').textContent = location;
+    document.getElementById('modalOrganizer').textContent = organizer;
 
 
-    // Modificar el href del botón de editar para incluir el eventID como parámetro en la URL
     const editButton = document.getElementById('editButton');
-    editButton.href = `/events/form?eventID=${eventId}`;
+    if(editButton && editButton.href) editButton.href = `/events/form?eventID=${eventId}`;
 
-    // Mostrar el modal
     $('#eventModal').modal('show');
 }
 

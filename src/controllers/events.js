@@ -3,10 +3,26 @@ import { isNormalUser, isOrganizer } from "../utils/auth-utils.js";
 
 export class EventsController {
     static async getAll(req, res) {
+
+        try {
+            
+                const query = 'SELECT * FROM Event ORDER BY DateTime ASC';
+                console.log("Getting all events")
+                pool.query(
+                    query,
+                    (err, rows) => {
+                        if(err) return res.status(500).json({ message: err.message });
+                        return res.json(rows);
+                    }
+                );
+           
+        } catch (error) {
+            console.error("Error retrieving events:", error);
+            res.status(500).json({ error: "Error retrieving events" });
+        }
+    }
+    static async getOrganizersEvents(req, res) {
         const { role, email } = req.user;
-
-        let events = []; 
-
         try {
             if (isOrganizer(role)) { 
                 const query = 'SELECT * FROM Event WHERE OrganizerID = ? ORDER BY DateTime ASC';
@@ -19,19 +35,6 @@ export class EventsController {
                         return res.json(rows);
                     }
                 );
-            } else if (isNormalUser(role)) { // TODO
-                const [studentEvents] = await pool.query(
-                    `SELECT e.* FROM Event e
-                     WHERE e.ID NOT IN (
-                         SELECT id FROM Enrollment WHERE UserEmail = ?
-                     )
-                     AND e.Capacity > (
-                         SELECT COUNT(*) FROM Enrollment WHERE id = e.ID
-                     )
-                     ORDER BY e.DateTime ASC`,
-                    [email]
-                );
-                events = studentEvents;
             } else {
                 return res.status(403).json({ error: "Acceso denegado" });
             }
@@ -150,4 +153,6 @@ export class EventsController {
             res.status(500).json({ error: "Error al actualizar el evento" });
         }
     }
+
+
 }
