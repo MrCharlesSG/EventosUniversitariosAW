@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= event ? "Editar Evento" : "Crear Evento" %></title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #343a40;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .back-button {
+            position: relative;
+            top: -70px;
+        }
+        .danger-zone {
+            border-radius: 5px;
+            margin: auto;
+            background-color: rgb(255, 220, 220);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+    </style>
+</head>
+<body>
+
+    <%- include("partials/navbar", {role:role}) %>
+
+    <div class="container mt-5 pt-2">
+        <div class="row justify-content-center">
+            <div class=" col-12 col-lg-9 ">
+                <h2 class=" text-center"><%= event ? "Editar Evento" : "Crear Evento" %></h2>
+                <button class="btn back-button btn-outline-primary" onclick="window.history.back()">
+                    <i class="fas fa-arrow-left"></i> 
+                </button>
+                    
+            </div>
+        </div>
+        <%- include("partials/eventForm", {event}) %>
+        <div class="container mt-4">
+            <h3>Participantes Confirmados</h3>
+            <ul id="confirmedEmailsList" class="list-group mb-4"></ul>
+            
+            <h3>Participantes en Espera</h3>
+            <ul id="waitingEmailsList" class="list-group"></ul>
+        </div>
+        
+        <% if (event) { %>
+            <form class="danger-zone border border-danger mt-3 p-3 col-12 col-lg-9" id="cancelEventForm" action="/api/events/<%= event.ID %>/cancel" method="POST">
+                <h5 class=" w-100 text-danger text-center">Zona de Peligro</h5>
+                <button  type="submit" class="btn w-100 btn-danger">Eliminar Evento</button>
+            </form>
+            <% } %>
+
+        <%- include("partials/footer") %>
+    </div>
+
+    <script>
+        // Verifica si el evento tiene un ID y realiza fetch de los correos electrónicos si es así
+        const eventID = "<%= event ? event.ID : '' %>";
+        if (eventID) {
+            const baseURL = `http://localhost:3000/api/enroll/${eventID}`;
+    
+            // Función para renderizar correos electrónicos en una lista
+            function renderEmails(emails, listElementId) {
+                const listElement = document.getElementById(listElementId);
+                listElement.innerHTML = '';
+                emails.forEach(email => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'list-group-item';
+                    listItem.textContent = email;
+                    listElement.appendChild(listItem);
+                });
+            }
+    
+            // Fetch de correos confirmados
+            fetch(`${baseURL}/confirm/emails`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Error al obtener correos confirmados: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const confirmedEmails = data.confirmed || [];
+                    renderEmails(confirmedEmails, 'confirmedEmailsList');
+                })
+                .catch(error => {
+                    console.error("Error al obtener correos confirmados:", error);
+                    document.getElementById('confirmedEmailsList').innerHTML = '<li class="list-group-item text-danger">Error al cargar correos confirmados</li>';
+                });
+    
+            // Fetch de correos en espera
+            fetch(`${baseURL}/waiting/emails`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Error al obtener correos en espera: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const waitingEmails = data.waiting || [];
+                    renderEmails(waitingEmails, 'waitingEmailsList');
+                })
+                .catch(error => {
+                    console.error("Error al obtener correos en espera:", error);
+                    document.getElementById('waitingEmailsList').innerHTML = '<li class="list-group-item text-danger">Error al cargar correos en espera</li>';
+                });
+        }
+    </script>
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -34,7 +34,7 @@ function fetchEvents() {
                 eventList.innerHTML += eventItem;
             });
 
-            // Agregar un evento de clic a cada elemento de lista
+            
             const items = eventList.querySelectorAll('.event-item');
             items.forEach(item => {
                 item.addEventListener('click', showModal);
@@ -62,7 +62,7 @@ function showModal(event) {
 
 
     const editButton = document.getElementById('editButton');
-    if(editButton && editButton.href) editButton.href = `/events/form?eventID=${eventId}`;
+    if(editButton && editButton.href) editButton.href = `/events/info?eventID=${eventId}`;
 
     $('#eventModal').modal('show');
 }

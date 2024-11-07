@@ -10,5 +10,8 @@ enrollRouter.get("/isEnroll/:idEvent", EnrollController.isEnrolled)
 
 enrollRouter.delete("/:idEvent", EnrollController.unenroll)
 
+enrollRouter.get("/:idEvent/confirm/emails", EnrollController.getConfirmedEmails)
+enrollRouter.get("/:idEvent/waiting/emails", EnrollController.getWaitingEmails)
+
 
 

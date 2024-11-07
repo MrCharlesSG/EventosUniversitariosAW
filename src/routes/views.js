@@ -32,6 +32,16 @@ viewsRouter.get("/myevents", isAuthenticated, (req, res) => {
     });
 })
 
+viewsRouter.get("/notifications", isAuthenticated, (req, res) => {
+    res.render('notifications',{
+        role: req.user.role,
+        user: req.user.email,
+        
+    })
+})
+
+
+
 viewsRouter.get("/auth/login", redirectIfAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, '../views/login.html'));
 });
@@ -78,7 +88,7 @@ viewsRouter.get("/profile", isAuthenticated, (req, res) => {
     });
 });
 
-viewsRouter.get("/events/form", isAuthenticatedOrganizer, async (req, res) => {
+viewsRouter.get("/events/info", isAuthenticatedOrganizer, async (req, res) => {
     pool.query(
         "SELECT * FROM EventType",
         (err, eventTypeList) => {
@@ -94,7 +104,7 @@ viewsRouter.get("/events/form", isAuthenticatedOrganizer, async (req, res) => {
                     eventID,
                     (err, row) => {
                         if(err || row.length==0) return res.status(404).json({ error: "Evento no encontrado" });
-                        res.render('event-form', { 
+                        res.render('event-info', { 
                             role: req.user.role,
                             eventTypeList,  
                             event:row[0],           
@@ -102,12 +112,27 @@ viewsRouter.get("/events/form", isAuthenticatedOrganizer, async (req, res) => {
                     }
                 )
             }else{
-                res.render('event-form', { 
-                    role: req.user.role,
-                    eventTypeList,  
-                    event:null,           
-                });
+                res.status(404).json({ error: "Vista no encontrada" });
             }
+        }
+    );
+});
+
+
+
+viewsRouter.get("/events/add", isAuthenticatedOrganizer, async (req, res) => {
+    pool.query(
+        "SELECT * FROM EventType",
+        (err, eventTypeList) => {
+            if(err) {
+                console.error("Error al cargar el formulario: ", err);
+                res.status(500).json({ error: "Error al cargar el formulario" });
+            }
+            res.render('event-add', { 
+                role: req.user.role,
+                eventTypeList,           
+            });                
+            
         }
     );
 });

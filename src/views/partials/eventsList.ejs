@@ -1,0 +1,189 @@
+<style>
+    .list-container {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+    }
+    .event-item {
+        border-bottom: 1px solid #ddd;
+        padding: 15px;
+        cursor: pointer;
+        display: flex;
+        border-radius: 8px;
+        flex-direction: column;
+        margin-bottom: 5px;
+    }
+    .event-item:hover {
+        background-color: #f1f1f1;
+    }
+    .event-title {
+        font-weight: bold;
+        color: #007bff;
+        font-size: 1.25rem;
+    }
+    .event-description {
+        font-size: 1rem;
+        color: #6c757d;
+    }
+    .event-details {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+
+    .add-event-btn {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+    }
+</style>
+
+
+
+<div class="list-container">
+    <ul id="event-list" class="list-unstyled">
+
+    </ul>
+</div>
+
+
+<%- include("eventModal", { role: role, user:user }) %>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', fetchEvents);
+
+    const currentUserId = '<%= user %>';
+
+    function fetchEvents() {
+        const eventList = document.getElementById('event-list');
+        eventList.innerHTML = '';
+        const currentPath = window.location.pathname;
+        const apiUrl = currentPath.includes('myevents') ? '/api/events/user' : '/api/events';
+        
+        console.log("Llamando a la API:", apiUrl, " por user ", currentUserId);
+        
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(event => {
+                    console.log("The event ", event);
+                    let badgeClass = '';
+                    let badgeText = '';
+                    if (event.OrganizerID !== currentUserId) {
+                        badgeClass = event.isEnrolled ? 'badge-success' : 'badge-danger';
+                        badgeText = event.isEnrolled ? 'Enrolled' : 'Not Enrolled';
+                    }
+                    
+                    const eventItem = `
+                        <li class="event-item" 
+                            data-id="${event.ID}" 
+                            data-organizer="${event.OrganizerID}"
+                            data-title="${event.Title}" 
+                            data-description="${event.Description}" 
+                            data-date="${new Date(event.DateTime).toLocaleString()}" 
+                            data-location="${event.Location}" 
+                            data-enrolled="${event.isEnrolled}">
+                            <div class="event-title">${event.Title} ${badgeText ? `<span class="badge ${badgeClass}">${badgeText}</span>` : ''}</div>
+                            <div class="event-description">${event.Description}</div>
+                            <div class="event-details">
+                                <span><img src="/public/img/calendar-icon.svg" width="13" height="13" alt="Calendar"> ${new Date(event.DateTime).toLocaleString()}</span>
+                                <span><img src="/public/img/ubication-icon.svg" width="13" height="13" alt="Ubicacion"> ${event.Location}</span>
+                            </div>
+                        </li>
+                    `;
+                        eventList.innerHTML += eventItem;
+                    });
+
+                // Agregar un evento de clic a cada elemento de lista
+                const items = eventList.querySelectorAll('.event-item');
+                items.forEach(item => {
+                    item.addEventListener('click', showModal);
+                });
+            })
+            .catch(error => console.error('Error al cargar eventos:', error));
+    }
+
+    function showModal(event) {
+        const item = event.currentTarget;
+        const title = item.getAttribute('data-title');
+        const description = item.getAttribute('data-description');
+        const date = item.getAttribute('data-date');
+        const location = item.getAttribute('data-location');
+        const organizer = item.getAttribute('data-organizer');
+        const eventId = item.getAttribute('data-id');
+        const isEnrolled = item.getAttribute('data-enrolled') != 1? false:true;
+        console.log("Is enrolled ", isEnrolled)
+
+        document.getElementById('modalTitle').textContent = title;
+        document.getElementById('modalDescription').textContent = description;
+        document.getElementById('modalDate').textContent = date;
+        document.getElementById('modalLocation').textContent = location;
+        document.getElementById('modalOrganizer').textContent = organizer;
+
+        const editButton = document.getElementById('editButton');
+        const signUpButton = document.getElementById('signUpButton');
+        const dropOutButton = document.getElementById('dropOutButton');
+
+        if (organizer === currentUserId) {
+            editButton.style.display = 'inline-block';
+            signUpButton.style.display = 'none';
+            dropOutButton.style.display = 'none';
+            if (editButton && editButton.href) {
+                editButton.href = `/events/info?eventID=${eventId}`;
+            }
+        } else {
+            editButton.style.display = 'none';
+            console.log
+            if (isEnrolled) {
+                signUpButton.style.display = 'none';
+                dropOutButton.style.display = 'inline-block';
+            } else {
+                signUpButton.style.display = 'inline-block';
+                dropOutButton.style.display = 'none';
+            }
+        }
+
+        signUpButton.onclick = () => enrollEvent(eventId);
+        dropOutButton.onclick = () => unenrollEvent(eventId);
+        $('#eventModal').modal('show');
+    }
+
+
+    function enrollEvent(eventId) {
+        console.log("unenrolling...")
+        fetch(`/api/enroll/${eventId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                document.getElementById('signUpButton').style.display = 'none';
+                document.getElementById('dropOutButton').style.display = 'inline-block';
+            }
+        })
+        .catch(error => console.error('Error al inscribirse en el evento:', error));
+    }
+
+    function unenrollEvent(eventId) {
+        console.log("unenrolling...")
+        fetch(`/api/enroll/${eventId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                document.getElementById('signUpButton').style.display = 'inline-block';
+                document.getElementById('dropOutButton').style.display = 'none';
+            }
+        })
+        .catch(error => console.error('Error al cancelar la inscripción del evento:', error));
+    }
+</script>

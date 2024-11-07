@@ -1,33 +1,45 @@
 document.addEventListener('DOMContentLoaded', () => {
     const notificationsButton = document.getElementById('notificationsButton');
-    notificationsButton.addEventListener('click', fetchNotifications);
+    notificationsButton.addEventListener('click', fetchNotificationsAndCheck);
 });
 
-function fetchNotifications() {
+function fetchNotificationsAndCheck() {
     const notificationsContent = document.getElementById('notificationsContent');
     notificationsContent.innerHTML = 'Cargando notificaciones...';
-
-    fetch('/api/notifications') 
+    console.log("To fetch notifications ")
+    fetch('/api/notifications/andCheck') 
         .then(response => response.json())
         .then(data => {
             notificationsContent.innerHTML = '';
-            
+
             if (data) {
                 console.log("the notifications ", data)
                 if (data.length > 0) {
                     data.forEach(notification => {
+                        const notificationDate = new Date(notification.Date).toLocaleDateString('es-ES', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+
                         const notificationItem = `
-                            <div class="notification-item">
-                                <strong>${notification.EventTitle}</strong>
-                                <p>${notification.Message}</p>
-                                <small>${new Date(notification.EventDateTime).toLocaleString()}</small>
+                            <div class="notification-item ${notification.Checked ? 'read' : 'unread'}">
+                                <div class="d-flex align-items-center">
+                                    <div class="notification-message">
+                                        <strong>${notification.Message}</strong> 
+                                    </div>
+                                </div>
+                                <div class="notification-meta d-flex flex-wrap justify-content-between">
+                                    <span><strong>Remitente:</strong> ${notification.Sender}</span>
+                                    <span><strong>Fecha:</strong> ${notificationDate}</span>
+                                </div>
                             </div>
                         `;
                         notificationsContent.innerHTML += notificationItem;
                         console.log("The notification  inserted ", notification)
                     });
                 } else {
-                    notificationsContent.innerHTML = '<p>No tienes notificaciones.</p>';
+                    notificationsContent.innerHTML = '<p>No tienes notificaciones sin ver.</p>';
                 }
             } else {
                 notificationsContent.innerHTML = '<p>Error al cargar las notificaciones.</p>';

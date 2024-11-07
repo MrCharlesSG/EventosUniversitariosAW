@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificaciones</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #343a40;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .list-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: -20px;
+        }
+
+        .notification-meta {
+            font-size: 0.875rem;
+            color: #6c757d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-meta span {
+            margin-right: 10px;
+        }
+
+        .read {
+            background-color: #e9ecef;
+        }
+
+        .back-button {
+            position: relative;
+            top: -40px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar placeholder -->
+    <%- include("partials/navbar", { role: role }) %>
+
+    <div class="container mt-5 pt-2">
+        <div class="row justify-content-center">
+            <div class=" col-12 col-lg-8 ">
+                <h2 class=" text-center">Notifications</h2>
+                <button class="btn back-button btn-outline-primary" onclick="window.history.back()">
+                    <i class="fas fa-arrow-left"></i> 
+                    <span class="d-none d-lg-inline">Regresar</span>
+                </button>
+                    
+            </div>
+        </div>
+        <div class="row justify-content-center big-container">
+            <div class="col-12 col-lg-8">
+                <div class="list-container">
+                    <ul id="notification-list" class="list-unstyled">
+                        <!-- Las notificaciones se agregarán aquí mediante JavaScript -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer placeholder -->
+    <%- include("partials/footer") %>
+
+    <!-- Bootstrap and jQuery scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        function fetchNotifications() {
+            const notificationList = document.getElementById("notification-list");
+            notificationList.innerHTML = "Cargando notificaciones..."; 
+            fetch('/api/notifications') 
+            .then(response => response.json())
+            .then(data => {
+                notificationList.innerHTML = '';
+                if(data){
+                    if (data.length === 0) {
+                        notificationList.innerHTML = '<li class="text-center">No tienes notificaciones.</li>';
+                    } else {
+                        data.forEach(notification => {
+                            const notificationDate = new Date(notification.Date).toLocaleString("es-ES", {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+    
+                            const notificationItem = `
+                                <li class="notification-item read">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <h5 class="notification-message text-primary">${notification.Message}</h5>
+                                            <div class="notification-meta d-flex flex-wrap justify-content-between">
+                                                <span><strong>De:</strong> ${notification.Sender}</span>
+                                                <span><strong>Fecha:</strong> ${notificationDate}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            `;
+    
+                            notificationList.innerHTML += notificationItem;
+                        });
+                
+                    }
+                }else {
+                    notificationsContent.innerHTML = '<p>Error al cargar las notificaciones.</p>';
+                }
+            })
+        }
+
+        window.onload = fetchNotifications;
+    </script>
+</body>
+
+</html>

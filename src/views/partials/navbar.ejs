@@ -3,13 +3,11 @@
         <span class="navbar-toggler-icon"></span>
     </button>
 
-    <!-- Logo y Título a la Izquierda (solo en pantallas grandes) -->
     <a class="navbar-brand d-none d-lg-flex" href="/">
         <img src="/public/img/logo.png" width="30" height="30" class="d-inline-block align-top" alt="Logo">
         EventosUniv
     </a>
 
-    <!-- Logo sin título (solo en pantallas pequeñas) -->
     <a class="navbar-brand d-flex d-lg-none mx-auto" href="/">
         <img src="/public/img/logo.png" width="30" height="30" class="d-inline-block align-top" alt="Logo">
     </a>
@@ -49,6 +47,8 @@
     </div>
 </nav>
 
+
+<!--Logout confirmation-->
 <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -68,6 +68,34 @@
     </div>
 </div>
 
+
+<!--notificaciones-->
+<style>
+
+.modal-content {
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+.notification-item {
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 15px;
+    background-color: white;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.notification-meta {
+    font-size: 0.875rem;
+    color: #6c757d;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+</style>
+
 <div class="modal fade" id="notificationsModal" tabindex="-1" aria-labelledby="notificationsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -81,7 +109,7 @@
                 Cargando notificaciones...
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <a href="/notifications" class="btn btn-primary w-100">Ver Todas</a>
             </div>
         </div>
     </div>

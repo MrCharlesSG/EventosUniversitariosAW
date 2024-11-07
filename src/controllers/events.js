@@ -14,6 +14,7 @@ export class EventsController {
                     END AS isEnrolled
                 FROM Event
                 LEFT JOIN Enrollment ON Event.ID = Enrollment.EventID AND Enrollment.UserEmail = ?
+                WHERE Event.Active = 1
                 ORDER BY Event.DateTime ASC
             `;
     
@@ -35,7 +36,7 @@ export class EventsController {
         const { role, email } = req.user;
         try {
             if (isOrganizer(role)) { 
-                const query = 'SELECT * FROM Event WHERE OrganizerID = ? ORDER BY DateTime ASC';
+                const query = 'SELECT * FROM Event WHERE OrganizerID = ? and Active=1 ORDER BY DateTime ASC';
                 console.log("Getting events of ", email, " with role ", role)
                 pool.query(
                     query,
@@ -71,7 +72,7 @@ export class EventsController {
             pool.query(
                 query,
                 [title, description, dateTime, location, capacity, eventTypeID, email],
-                (err, result) => {
+                (err) => {
                     if(err) return res.status(500).json({ message: err.message });
                     res.status(201).redirect('/events');
                 }
@@ -98,9 +99,9 @@ export class EventsController {
             pool.query(
                 "SELECT * FROM Event WHERE ID = ? AND OrganizerID = ?",
                 [id, email],
-                (err, result) => {
+                (err, eventOfDb) => {
                     if(err) return res.status(500).json({ message: err.message });
-                    if (result.length === 0) {
+                    if (eventOfDb.length === 0) {
                         return res.status(404).json({ error: "Evento no encontrado o no tienes permiso para editarlo" });
                     }
                     const query = `
@@ -111,11 +112,25 @@ export class EventsController {
                     pool.query(
                         query,
                         [title, description, dateTime, location, capacity, eventTypeID, id, email],
-                        (err, result) => {
+                        (err) => {
                             if(err) return res.status(500).json({ message: err.message });
+                            
                             //Notify everyone of event updated
-                            res.status(201).redirect('/events');
-                        }
+                            const getUsersQuery = "SELECT UserEmail FROM Enrollment WHERE EventID = ?";
+                            pool.query(getUsersQuery, [id], (err, users) => {
+                                if (err) return res.status(500).json({ message: err.message });
+
+                                users.forEach(user => {
+                                    const notificationQuery = "INSERT INTO Notifications (UserEmail, Sender, Message, Date, Checked) VALUES (?, ?, ?, NOW(), 0)";
+                                    const message = `El evento '${title}' ha sido modificado.`;
+                                    pool.query(notificationQuery, [user.UserEmail, email, message], (err) => {
+                                        if (err) console.error("Error al crear la notificación:", err);
+                                    });
+                                });
+
+                                res.status(201).redirect('/events');
+                            });
+                            }
                     );
                 }
                 
@@ -139,20 +154,35 @@ export class EventsController {
             pool.query(
                 "SELECT * FROM Event WHERE ID = ? AND OrganizerID = ?",
                 [id, email],
-                (err, result) => {
+                (err, eventOfDb) => {
                     if(err) return res.status(500).json({ message: err.message });
-                    if (result.length === 0) {
+                    if (eventOfDb.length === 0) {
                         return res.status(404).json({ error: "Evento no encontrado o no tienes permiso para editarlo" });
                     }
-                    console.log("Deleting as an organizer ", email, " the event ", result[0].Title)
-                    const query = "DELETE FROM Event WHERE ID = ? AND OrganizerID = ?";
+                    console.log("Deleting as an organizer ", email, " the event ", eventOfDb[0].Title)
+                    const query = "UPDATE Event SET Active = 0 WHERE ID = ? AND OrganizerID = ?";
                     pool.query(
                         query,
                         [id, email],
-                        (err, result) => {
+                        (err) => {
                             if(err) return res.status(500).json({ message: err.message });
-                            //NOTIFY evryone of canceled event
-                            res.status(201).redirect('/events');
+                            const getUsersQuery = "SELECT UserEmail FROM Enrollment WHERE EventID = ?";
+                            pool.query(getUsersQuery, [id], (err, users) => {
+                                if (err) return res.status(500).json({ message: err.message });
+
+                                // NTOFICASR
+                                users.forEach(user => {
+                                    const notificationQuery = `
+                                        INSERT INTO Notifications (UserEmail, Sender, Message, Date, Checked)
+                                        VALUES (?, ?, ?, NOW(), 0)
+                                    `;
+                                    const message = `El evento '${eventOfDb[0].Title}' ha sido cancelado.`;
+                                    pool.query(notificationQuery, [user.UserEmail, email, message], (err) => {
+                                        if (err) console.error("Error al crear la notificación:", err);
+                                    });
+                                });
+                                res.status(201).redirect('/events');
+                            });
                         }
                     );
                 }
