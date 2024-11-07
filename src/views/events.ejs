@@ -203,7 +203,6 @@
             .then(response => response.json())
             .then(data => {
                 if (data.message) {
-                    alert(data.message); // Notificación de éxito
                     document.getElementById('signUpButton').style.display = 'none';
                     document.getElementById('dropOutButton').style.display = 'inline-block';
                 }
@@ -222,7 +221,6 @@
             .then(response => response.json())
             .then(data => {
                 if (data.message) {
-                    alert(data.message); // Notificación de éxito
                     document.getElementById('signUpButton').style.display = 'inline-block';
                     document.getElementById('dropOutButton').style.display = 'none';
                 }

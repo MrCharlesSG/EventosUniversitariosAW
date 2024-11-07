@@ -10,7 +10,7 @@
         body {
             background-color: #f8f9fa;
         }
-        h1 {
+        h2 {
             font-size: 2.5rem;
             font-weight: 700;
             color: #343a40;
@@ -40,6 +40,12 @@
         .big-container {
             margin-top: -60px;
         }
+        .danger-zone {
+            border-radius: 5px;
+            margin: auto;
+            background-color: rgb(255, 220, 220);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
         
     </style>
 </head>
@@ -50,14 +56,15 @@
     <div class="container mt-5 pt-2">
         <div class="row justify-content-center">
             <div class=" col-12 col-lg-9 ">
-                <h1 class=""><%= event ? "Editar Evento" : "Crear Evento" %></h1>
-
-                    <a href="/events" class="btn btn-primary back-button">
-                        <i class="fas fa-arrow-left"></i> Regresar
-                    </a>
+                <h2 class=" text-center"><%= event ? "Editar Evento" : "Crear Evento" %></h2>
+                <button class="btn back-button btn-outline-primary" onclick="window.history.back()">
+                    <i class="fas fa-arrow-left"></i> 
+                    <span class="d-none d-lg-inline">Regresar</span>
+                </button>
+                    
             </div>
         </div>
-        <!-- Utilizamos las clases de Bootstrap para definir el tamaño del formulario -->
+
         <div class="row justify-content-center big-container">
             <div class="col-12 col-lg-9">
                 <div class="form-container">
@@ -138,24 +145,20 @@
                             </select>
                         </div>
 
-                        <% if (event) { %>
                         <div class="d-flex justify-content-between">
-                            <form action="/api/events/<%= event.ID %>/cancel" method="POST">
-                                <button type="submit" class="btn btn-danger w-25 mr-3">
-                                    Eliminar
-                                </button>
-                            </form>
-                            <button type="submit" class="btn btn-success w-75">
-                                Actualizar Evento
+                            <button type="submit" class="btn btn-success w-100">
+                                <%= event ? "Editar Evento" : "Crear Evento" %>
                             </button>
                         </div>
-                        <% } else { %>
-                            <button type="submit" class="btn btn-success w-100">
-                                Crear Evento
-                            </button>
-                        <% } %>
+                        
                     </form>
                 </div>
+                <% if (event) { %>
+                <form class="danger-zone border border-danger mt-3 p-3 w-100" id="cancelEventForm" action="/api/events/<%= event.ID %>/cancel" method="POST">
+                    <h5 class=" w-100 text-danger text-center">Zona de Peligro</h5>
+                    <button  type="submit" class="btn w-100 btn-danger">Eliminar Evento</button>
+                </form>
+                <% } %>
             </div>
         </div>
 

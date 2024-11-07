@@ -1,9 +1,7 @@
+import bcrypt from 'bcrypt';
 import { pool } from "../config/db.js";
 import { validateUserCredentials } from "../schemas/user.js";
-import jwt from "jsonwebtoken";
-import bcrypt from 'bcrypt';
 
-const JWT_SECRET = process.env.JWT_SECRET_KEY || "1234";
 
 export class AuthController {
 
@@ -19,30 +17,138 @@ export class AuthController {
 
         verifyPassword(email, password, (err, result) => {
             if (err) {
-                return res.status(500).json({ error: "Error connecting to the database" });
+                return res.status(500).json({ error: err.message });
             }
 
             if (!result.isMatch) {
-                return res.status(401).json({ error: "Invalid email or password" });
+                return res.status(401).json({ error: "Correo o contraseña invalida" });
             }
 
             const { RoleID } = result;
 
-            const token = jwt.sign({ email, role: RoleID }, JWT_SECRET, { expiresIn: "1h" });
-            res.cookie('token', token, { httpOnly: true });
+            req.session.user = { email, role: RoleID };
             return res.redirect('/');
+        });
+    }
+
+    static async logout(req, res) {
+        console.log("Loging out")
+        req.session.destroy((err) => {
+            if (err) {
+                console.error("Error al cerrar sesión:", err);
+                return res.status(500).json({ error: "Error al cerrar sesión" });
+            }
+            res.clearCookie('connect.sid');
+            console.log("Redirecting")
+            return res.redirect('/auth/login');
         });
     }
 
     
 
     static async register(req, res) {
-        // TODO: Implementación del registro
+        const { email, fullName, phone, facultyID, password, roleID } = req.body;
+
+        if (!email || !fullName || !password || !roleID) {
+            return res.status(400).json({ error: "Faltan datos obligatorios" });
+        }
+
+        try {
+            const selectUserQuery = "SELECT * FROM User WHERE Email = ?";
+            const insertUserQuery = "INSERT INTO User (Email, FullName, Phone, FacultyID) VALUES (?, ?, ?, ?)";
+            const insertAuthQuery = "INSERT INTO UserAuthentication (Email, Password, RoleID) VALUES (?, ?, ?)";
+
+
+            pool.query(selectUserQuery, email, (err, existingUser) => {
+                if(err) return res.status(500).json({error: err.message});
+                if (existingUser.length > 0) {
+                    return res.status(400).json({ error: "El usuario ya está registrado" });
+                }
+
+                pool.query(
+                    insertUserQuery, 
+                    [email, fullName, phone, facultyID],
+                    (err, _) => {
+                        if(err) return res.status(500).json({error: err.message});
+                        
+                        bcrypt.hash(password, 10, (err, hashedPassword) => { 
+                            if(err) return res.status(500).json({error: err.message});
+                            
+                            pool.query(
+                                insertAuthQuery,
+                                [email, hashedPassword, roleID],
+                                (err, _) => {
+                                    if(err) return res.status(500).json({error: err.message});
+                                    req.session.user = { email, role: roleID };
+                                    return res.redirect('/');
+                                }
+                            )
+                        })
+                    }
+                )
+            })
+        } catch (error) {
+            console.error("Error en el registro:", error);
+            res.status(500).json({ error: "Error en el servidor" });
+        }
+    }
+
+    static async modifyUserInfo(req, res) {
+        const { email } = req.session.user;  // Usamos el email desde la sesión del usuario autenticado
+        const { fullName, phone, facultyID } = req.body;
+
+        // Validación de los datos
+        if (!fullName && !phone && !facultyID) {
+            return res.status(400).json({ error: "No se proporcionaron datos para actualizar." });
+        }
+
+        try {
+            let updateQuery = "UPDATE User SET ";
+            let updateValues = [];
+
+            if (fullName) {
+                updateQuery += "FullName = ?, ";
+                updateValues.push(fullName);
+            }
+
+            if (phone) {
+                updateQuery += "Phone = ?, ";
+                updateValues.push(phone);
+            }
+
+            if (facultyID) {
+                updateQuery += "FacultyID = ?, ";
+                updateValues.push(facultyID);
+            }
+
+            updateQuery = updateQuery.slice(0, -2);
+
+            updateQuery += " WHERE Email = ?";
+
+            updateValues.push(email);
+
+            console.log("Modifying user, this are the values to update ", updateValues)
+
+            pool.query(updateQuery, updateValues, (err, result) => {
+                if (err) {
+                    return res.status(500).json({ error: err.message });
+                }
+
+                if (result.affectedRows > 0) {
+                    return res.status(200).json({ message: "Información actualizada con éxito." });
+                } else {
+                    return res.status(404).json({ error: "No se encontró el usuario o no se hicieron cambios." });
+                }
+            });
+        } catch (error) {
+            console.error("Error al actualizar la información del usuario:", error);
+            res.status(500).json({ error: "Error en el servidor" });
+        }
     }
 }
 
 
-export const verifyPassword = (email, plainPassword, callback) => {
+const verifyPassword = (email, plainPassword, callback) => {
     pool.getConnection((err, connection) => {
         if (err) {
             console.error('Error connecting to the database:', err);
@@ -76,7 +182,7 @@ export const verifyPassword = (email, plainPassword, callback) => {
                     return;
                 }
 
-                // Pasamos también el RoleID si la contraseña es correcta
+               
                 callback(null, isMatch ? { isMatch, RoleID } : { isMatch: false });
             });
         });

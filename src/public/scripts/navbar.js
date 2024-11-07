@@ -5,14 +5,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function fetchNotifications() {
     const notificationsContent = document.getElementById('notificationsContent');
-    notificationsContent.innerHTML = 'Cargando notificaciones...'; // Mensaje de carga inicial
+    notificationsContent.innerHTML = 'Cargando notificaciones...';
 
     fetch('/api/notifications') 
         .then(response => response.json())
         .then(data => {
-            notificationsContent.innerHTML = ''; // Limpiar contenido previo
+            notificationsContent.innerHTML = '';
             
             if (data) {
+                console.log("the notifications ", data)
                 if (data.length > 0) {
                     data.forEach(notification => {
                         const notificationItem = `
@@ -23,6 +24,7 @@ function fetchNotifications() {
                             </div>
                         `;
                         notificationsContent.innerHTML += notificationItem;
+                        console.log("The notification  inserted ", notification)
                     });
                 } else {
                     notificationsContent.innerHTML = '<p>No tienes notificaciones.</p>';

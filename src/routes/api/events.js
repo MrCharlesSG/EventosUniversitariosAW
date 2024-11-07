@@ -11,7 +11,7 @@ eventsRouter.get("/user", isTheAuthenticatedUserAOrganizer, EventsController.get
 
 eventsRouter.post("/:id/update",isTheAuthenticatedUserAOrganizer, EventsController.updateEvent)
 
-eventsRouter.delete("/:id/cancel",isTheAuthenticatedUserAOrganizer, EventsController.cancelEvent)
+eventsRouter.post("/:id/cancel",isTheAuthenticatedUserAOrganizer, EventsController.cancelEvent)
 
 eventsRouter.post("/",isTheAuthenticatedUserAOrganizer, EventsController.createEvent)
 

@@ -4,22 +4,13 @@ import { isNormalUser, isOrganizer } from '../utils/auth-utils.js';
 const JWT_SECRET = process.env.JWT_SECRET_KEY || "1234";
 
 export const isAuthenticated = (req, res, next) => {
-    const token = req.cookies.token;
-
-    if (!token) {
-        console.log("There is no token")
+    if (!req.session.user) {
+        console.log("No active session");
         return res.redirect('/auth/login');
     }
 
-    jwt.verify(token, JWT_SECRET, (err, decoded) => {
-        if (err) {
-            console.log("Error verifying token, ", err.message)
-            return res.redirect('/auth/login');
-        }
-
-        req.user = decoded;
-        next();
-    });
+    req.user = req.session.user;
+    next();
 };
 
 export const isAuthenticatedUser = (req, res, next) => {
