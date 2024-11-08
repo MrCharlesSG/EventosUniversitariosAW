@@ -1,4 +1,5 @@
 import { pool } from "../config/db.js";
+import { NotificationsController } from "./notifications.js";
 
 export class EnrollController {
     static async isEnrolled(req, res) {
@@ -16,56 +17,42 @@ export class EnrollController {
     static async enroll(req, res) {
         const { email } = req.user;
         const { idEvent } = req.params;
-
+    
         try {
-            // Verificar si el evento existe
             const eventQuery = "SELECT * FROM Event WHERE ID = ?";
-            pool.query(eventQuery, [idEvent], (err, result) => {
+            const updateEnrollementQuery = "UPDATE Enrollment SET Status = ?, QueueDateTime = NULL WHERE EventID = ? AND UserEmail = ?";
+    
+            pool.query(eventQuery, idEvent, (err, eventResult) => {
                 if (err) return res.status(500).json({ message: err.message });
-
-                if (result.length === 0) {
-                    return res.status(404).json({ error: "Evento no encontrado" });
-                }
-
-                const event = result[0];
-
-                // ya inscrito
+                if (eventResult.length === 0) return res.status(400).json({ error: "No existe este evento" });
+    
+                const event = eventResult[0];
                 isEnrolledQuery(idEvent, email, (err, enrollmentResult) => {
                     if (err) return res.status(500).json({ message: err.message });
-
-                    if (enrollmentResult.length > 0) {
-                        return res.status(400).json({ error: "Ya estás inscrito en este evento" });
+    
+                    if (enrollmentResult.length !== 0) {
+                        const enrollmentStatus = enrollmentResult[0].Status;
+                        if (enrollmentStatus !== 'cancelled') return res.status(400).json({ error: "Ya estás inscrito a este evento" });
+    
+                        checkCapacityQuery(event, (thereIsSpace) => {
+                            pool.query(updateEnrollementQuery, [thereIsSpace ? 'confirmed' : 'waiting', idEvent, email], (err) => {
+                                if (err) return res.status(500).json({ message: err.message });
+                                return res.status(200).json({ message: thereIsSpace ? "El usuario ha sido inscrito" : "El usuario está en cola" });
+                            });
+                        }, (message) => res.status(500).json({ message }));
+                    } else {
+                        enrollQuery(event, email,
+                            (result) => {
+                                const message = "El usuario " + email + " se ha inscrito a " + event.Title;
+                                NotificationsController.sendOrganizerNotification(
+                                    idEvent, email, message,
+                                    () => res.status(200).json(result),
+                                    (message) => res.status(500).json({ message })
+                                );
+                            },
+                            (message) => res.status(500).json({ message })
+                        );
                     }
-
-                    // en cola
-                    const checkCapacityQuery = "SELECT COUNT(*) AS enrolledCount FROM Enrollment WHERE EventID = ? AND Status = 'confirmed'";
-                    pool.query(checkCapacityQuery, [idEvent], (err, countResult) => {
-                        if (err) return res.status(500).json({ message: err.message });
-
-                        const enrolledCount = countResult[0].enrolledCount;
-
-                        
-                        if (enrolledCount >= event.Capacity) {
-                            // en espera
-                            const queueQuery = `
-                                INSERT INTO Enrollment (EventID, UserEmail, Status, QueueDateTime) 
-                                VALUES (?, ?, 'waiting', NOW())
-                            `;
-                            pool.query(queueQuery, [idEvent, email], (err) => {
-                                if (err) return res.status(500).json({ message: err.message });
-
-                                res.status(201).json({ message: "Inscripción en cola de espera", eventId: idEvent });
-                            });
-                        } else {
-                            // confirmado
-                            const enrollQuery = "INSERT INTO Enrollment (EventID, UserEmail, Status) VALUES (?, ?, 'confirmed')";
-                            pool.query(enrollQuery, [idEvent, email], (err) => {
-                                if (err) return res.status(500).json({ message: err.message });
-
-                                res.status(201).json({ message: "Inscripción exitosa al evento", eventId: idEvent });
-                            });
-                        }
-                    });
                 });
             });
         } catch (error) {
@@ -77,48 +64,62 @@ export class EnrollController {
     static async unenroll(req, res) {
         const { email } = req.user;
         const { idEvent } = req.params;
-
+    
         try {
+            const promoteQuery = "SELECT * FROM Enrollment WHERE EventID = ? AND Status = 'waiting' ORDER BY QueueDateTime ASC LIMIT 1";
+            const updateEnrollmentQuery = "UPDATE Enrollment SET Status = ?, QueueDateTime = NULL WHERE EventID = ? AND UserEmail = ?";
+            const eventQuery = "SELECT * FROM Event WHERE ID = ?";
+    
             isEnrolledQuery(idEvent, email, (err, enrollmentResult) => {
                 if (err) return res.status(500).json({ message: err.message });
-
-                if (enrollmentResult.length === 0) {
-                    return res.status(400).json({ error: "No estás inscrito en este evento" });
+                if (enrollmentResult.length === 0 || enrollmentResult[0].Status === 'cancelled') {
+                    return res.status(400).json({ error: "El usuario no está inscrito al evento" });
                 }
-
-                const unenrollQuery = "DELETE FROM Enrollment WHERE EventID = ? AND UserEmail = ?";
-                pool.query(unenrollQuery, [idEvent, email], (err, deleteResult) => {
+    
+                // get Event info
+                pool.query(eventQuery, [idEvent], (err, eventResult) => {
                     if (err) return res.status(500).json({ message: err.message });
-
-                    // Tras liberar el lugar, promover el primer usuario en espera
-                    const promoteQuery = `
-                        SELECT * FROM Enrollment WHERE EventID = ? AND Status = 'waiting' 
-                        ORDER BY QueueDateTime ASC LIMIT 1
-                    `;
-                    pool.query(promoteQuery, [idEvent], (err, queueResult) => {
+                    if (eventResult.length === 0) return res.status(400).json({ error: "Evento no encontrado" });
+    
+                    const event = eventResult[0];
+                    console.log("The event where ", email, " whant to unenroll ", event);
+    
+                    // set state to cancelled
+                    pool.query(updateEnrollmentQuery, ['cancelled', idEvent, email], (err) => {
                         if (err) return res.status(500).json({ message: err.message });
-
-                        if (queueResult.length > 0) {
-                            const userInQueue = queueResult[0];
-                            const updateStatusQuery = `
-                                UPDATE Enrollment 
-                                SET Status = 'confirmed', QueueDateTime = NULL 
-                                WHERE EventID = ? AND UserEmail = ?
-                            `;
-                            pool.query(updateStatusQuery, [idEvent, userInQueue.UserEmail], (err, updateResult) => {
-                                if (err) return res.status(500).json({ message: err.message });
-                                
-                                res.status(200).json({ 
-                                    message: "Se ha cancelado la inscripción del evento y el primer usuario en espera ha sido promovido", 
-                                    eventId: idEvent 
+    
+                        // notify organizer 
+                        const organizerMessage = `El usuario ${email} se ha desapuntado del evento ${event.Title}.`;
+                        NotificationsController.sendOrganizerNotification(
+                            idEvent, email, organizerMessage,
+                            () => {
+                                console.log("desapuntado con exito , checkin en cola");
+                                pool.query(promoteQuery, [idEvent], (err, queueResult) => {
+                                    if (err) return res.status(500).json({ message: err.message });
+    
+                                    if (queueResult.length > 0) {
+                                        // Promote 
+                                        console.log("hay cola ");
+                                        const promoteUser = queueResult[0].UserEmail;
+                                        pool.query(updateEnrollmentQuery, ['confirmed', idEvent, promoteUser], (err) => {
+                                            if (err) return res.status(500).json({ message: err.message });
+                                            console.log("promoting ", promoteUser);
+                                            // Notify user
+                                            const userMessage = `Te has movido de la cola a inscrito en el evento ${event.Title}.`;
+                                            NotificationsController.sendNotificationToUser(
+                                                event.OrganizerID, promoteUser, userMessage,
+                                                () => res.status(200).json({ message: `Usuario ${email} se ha desapuntado y ${promoteUser} se ha inscrito.` }),
+                                                (message) => res.status(500).json({ message })
+                                            );
+                                        });
+                                    } else {
+                                        console.log("No hay cola ");
+                                        return res.status(200).json({ message: `Usuario ${email} se ha desapuntado del evento ${idEvent}.` });
+                                    }
                                 });
-                            });
-                        } else {
-                            res.status(200).json({ 
-                                message: "Se ha cancelado la inscripción del evento", 
-                                eventId: idEvent 
-                            });
-                        }
+                            },
+                            (message) => res.status(500).json({ message })
+                        );
                     });
                 });
             });
@@ -127,6 +128,7 @@ export class EnrollController {
             res.status(500).json({ error: "Error al cancelar la inscripción al evento" });
         }
     }
+    
 
     static async getConfirmedEmails(req, res) {
         const { idEvent } = req.params;
@@ -179,3 +181,28 @@ const isEnrolledQuery = (idEvent, email, callback) => {
     pool.query(checkEnrollmentQuery, [idEvent, email], callback);
 };
 
+
+const enrollQuery = (event, email, callback, callbackError) => {
+    const enrollConfirmed = "INSERT INTO Enrollment (EventID, UserEmail, Status) VALUES (?, ?, 'confirmed')";
+    const enrollWaiting = "INSERT INTO Enrollment (EventID, UserEmail, Status, QueueDateTime) VALUES (?, ?, 'waiting', NOW())";
+
+    checkCapacityQuery(event, (thereIsSpace) => {
+        pool.query(thereIsSpace ? enrollConfirmed : enrollWaiting, [event.ID, email], 
+            (err) => {
+                if (err) return callbackError(err.message);
+                callback({ message: thereIsSpace ? "Usuario añadido correctamente" : "Usuario en cola" });
+            }
+        );
+    }, callbackError);
+};
+
+const checkCapacityQuery = (event, callback, errorCallback) => {
+    const queryCheckCapacity = "SELECT COUNT(*) AS enrolledCount FROM Enrollment WHERE EventID = ? AND Status = 'confirmed'";
+    pool.query(queryCheckCapacity, [event.ID], (err, capacityResult) => {
+        if (err) return errorCallback(err.message);
+
+        const capacity = capacityResult[0].enrolledCount;
+        const thereIsSpace = capacity < event.Capacity;  // Corrected logic
+        callback(thereIsSpace);
+    });
+};

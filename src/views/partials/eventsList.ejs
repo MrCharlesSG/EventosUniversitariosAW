@@ -71,11 +71,23 @@
                     console.log("The event ", event);
                     let badgeClass = '';
                     let badgeText = '';
+
                     if (event.OrganizerID !== currentUserId) {
-                        badgeClass = event.isEnrolled ? 'badge-success' : 'badge-danger';
-                        badgeText = event.isEnrolled ? 'Enrolled' : 'Not Enrolled';
+                        switch (event.Status) {
+                            case 'confirmed':
+                                badgeClass = 'badge-success';
+                                badgeText = 'Enrolled';
+                                break;
+                            case 'waiting':
+                                badgeClass = 'badge-warning';
+                                badgeText = 'Waiting';
+                                break;
+                            default:
+                                badgeClass = 'badge-danger';
+                                badgeText = 'Not Enrolled';
+                        }
                     }
-                    
+
                     const eventItem = `
                         <li class="event-item" 
                             data-id="${event.ID}" 
@@ -84,7 +96,7 @@
                             data-description="${event.Description}" 
                             data-date="${new Date(event.DateTime).toLocaleString()}" 
                             data-location="${event.Location}" 
-                            data-enrolled="${event.isEnrolled}">
+                            data-enrollment-status="${event.Status}">
                             <div class="event-title">${event.Title} ${badgeText ? `<span class="badge ${badgeClass}">${badgeText}</span>` : ''}</div>
                             <div class="event-description">${event.Description}</div>
                             <div class="event-details">
@@ -93,8 +105,8 @@
                             </div>
                         </li>
                     `;
-                        eventList.innerHTML += eventItem;
-                    });
+                    eventList.innerHTML += eventItem;
+                });
 
                 // Agregar un evento de clic a cada elemento de lista
                 const items = eventList.querySelectorAll('.event-item');
@@ -113,7 +125,28 @@
         const location = item.getAttribute('data-location');
         const organizer = item.getAttribute('data-organizer');
         const eventId = item.getAttribute('data-id');
-        const isEnrolled = item.getAttribute('data-enrolled') != 1? false:true;
+        const enrollmentStatus = item.getAttribute('data-enrollment-status');
+        const isEnrolled = enrollmentStatus === 'confirmed' || enrollmentStatus === 'waiting';
+        let userStatus = '';
+
+        // Determine the user's status
+        if (organizer === currentUserId) {
+            userStatus = 'Organizer'; // The user is the organizer
+        } else {
+            switch (enrollmentStatus) {
+                case 'confirmed':
+                    userStatus = 'Enrolled'; // The user is enrolled
+                    break;
+                case 'waiting':
+                    userStatus = 'Waiting'; // The user is on the waiting list
+                    break;
+                case 'not enrolled':
+                    userStatus = 'Not Enrolled'; // The user is not enrolled
+                    break;
+                default:
+                    userStatus = 'Not Enrolled'; // Default to not enrolled
+            }
+        }
         console.log("Is enrolled ", isEnrolled)
 
         document.getElementById('modalTitle').textContent = title;
@@ -121,6 +154,8 @@
         document.getElementById('modalDate').textContent = date;
         document.getElementById('modalLocation').textContent = location;
         document.getElementById('modalOrganizer').textContent = organizer;
+        document.getElementById('modalUserStatus').textContent = userStatus; 
+
 
         const editButton = document.getElementById('editButton');
         const signUpButton = document.getElementById('signUpButton');
@@ -135,7 +170,6 @@
             }
         } else {
             editButton.style.display = 'none';
-            console.log
             if (isEnrolled) {
                 signUpButton.style.display = 'none';
                 dropOutButton.style.display = 'inline-block';
@@ -150,9 +184,9 @@
         $('#eventModal').modal('show');
     }
 
-
     function enrollEvent(eventId) {
-        console.log("unenrolling...")
+        console.log("Enrolling...");
+
         fetch(`/api/enroll/${eventId}`, {
             method: 'POST',
             headers: {
@@ -170,7 +204,8 @@
     }
 
     function unenrollEvent(eventId) {
-        console.log("unenrolling...")
+        console.log("Unenrolling...");
+
         fetch(`/api/enroll/${eventId}`, {
             method: 'DELETE',
             headers: {

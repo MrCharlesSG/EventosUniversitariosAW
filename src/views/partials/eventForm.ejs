@@ -1,23 +1,19 @@
 <style>
     .form-container {
         background-color: white;
-        border-radius: 8px;
+        border-radius: 5px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        padding: 20px;
     }
     .form-group label {
         font-weight: bold;
     }
 
-    .big-container {
-        margin-top: -60px;
-    }
+
 </style>
 
 
-<div class="row justify-content-center big-container">
-    <div class="col-12 col-lg-9">
-        <div class="form-container">
+<div class="row justify-content-center">
+        <div class="form-container p-4 w-100 ">
             <form action="<%= event ? `/api/events/${event.ID}/update` : '/api/events/' %>" method="POST">
                 <div class="form-group">
                     <label for="title">Título del Evento</label>
@@ -103,5 +99,4 @@
                 
             </form>
         </div>
-    </div>
 </div>

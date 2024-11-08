@@ -1,27 +1,20 @@
 import { pool } from "../config/db.js";
 import { isNormalUser, isOrganizer } from "../utils/auth-utils.js";
+import { NotificationsController } from "./notifications.js";
 
 export class EventsController {
     static async getAll(req, res) {
         try {
             const userEmail = req.user.email; 
-            const query = `
-                SELECT 
-                    Event.*, 
-                    CASE 
-                        WHEN Enrollment.UserEmail IS NOT NULL THEN true 
-                        ELSE false 
-                    END AS isEnrolled
-                FROM Event
-                LEFT JOIN Enrollment ON Event.ID = Enrollment.EventID AND Enrollment.UserEmail = ?
-                WHERE Event.Active = 1
-                ORDER BY Event.DateTime ASC
-            `;
+            const getEventsQuery = "SELECT * from Event LEFT JOIN Enrollment ON Event.ID = Enrollment.EventID AND Enrollment.UserEmail = ? WHERE Event.Active = 1  ORDER BY Event.DateTime ASC"
+
     
-            console.log("Getting all events with enrollment status");
-    
-            pool.query(query, [userEmail], (err, rows) => {
-                if (err) return res.status(500).json({ message: err.message });
+            console.log("Getting all events with enrollment status ");    
+            pool.query(getEventsQuery, userEmail, (err, rows) => {
+                if (err) {
+                    console.log(err)
+                    return res.status(500).json({ message: err.message });
+                }
                 return res.json(rows);
             });
         } catch (error) {
@@ -54,6 +47,7 @@ export class EventsController {
             res.status(500).json({ error: "Error retrieving events" });
         }
     }
+
 
     static async createEvent(req, res) {
         const { role, email } = req.user;
@@ -109,28 +103,22 @@ export class EventsController {
                         SET Title = ?, Description = ?, DateTime = ?, Location = ?, Capacity = ?, EventTypeID = ?
                         WHERE ID = ? AND OrganizerID = ?
                     `;
+                    //update event
                     pool.query(
                         query,
                         [title, description, dateTime, location, capacity, eventTypeID, id, email],
                         (err) => {
                             if(err) return res.status(500).json({ message: err.message });
-                            
-                            //Notify everyone of event updated
-                            const getUsersQuery = "SELECT UserEmail FROM Enrollment WHERE EventID = ?";
-                            pool.query(getUsersQuery, [id], (err, users) => {
-                                if (err) return res.status(500).json({ message: err.message });
 
-                                users.forEach(user => {
-                                    const notificationQuery = "INSERT INTO Notifications (UserEmail, Sender, Message, Date, Checked) VALUES (?, ?, ?, NOW(), 0)";
-                                    const message = `El evento '${title}' ha sido modificado.`;
-                                    pool.query(notificationQuery, [user.UserEmail, email, message], (err) => {
-                                        if (err) console.error("Error al crear la notificación:", err);
-                                    });
-                                });
-
+                            //NOtify
+                            const title = eventOfDb[0].Title
+                            const message = "Se ha modificado este evento: " + title
+                            NotificationsController.sendNotificaionOfModificatedEvent(id, email,message , () => {
                                 res.status(201).redirect('/events');
+                            }, (message) => {
+                                res.status(500).json(message)
                             });
-                            }
+                        }
                     );
                 }
                 
@@ -166,22 +154,11 @@ export class EventsController {
                         [id, email],
                         (err) => {
                             if(err) return res.status(500).json({ message: err.message });
-                            const getUsersQuery = "SELECT UserEmail FROM Enrollment WHERE EventID = ?";
-                            pool.query(getUsersQuery, [id], (err, users) => {
-                                if (err) return res.status(500).json({ message: err.message });
-
-                                // NTOFICASR
-                                users.forEach(user => {
-                                    const notificationQuery = `
-                                        INSERT INTO Notifications (UserEmail, Sender, Message, Date, Checked)
-                                        VALUES (?, ?, ?, NOW(), 0)
-                                    `;
-                                    const message = `El evento '${eventOfDb[0].Title}' ha sido cancelado.`;
-                                    pool.query(notificationQuery, [user.UserEmail, email, message], (err) => {
-                                        if (err) console.error("Error al crear la notificación:", err);
-                                    });
-                                });
+                            const message = "El evento " + eventOfDb[0].title + " ha sido cancelado."
+                            NotificationsController.sendNotificaionFromOrganizer(id, email,message , () => {
                                 res.status(201).redirect('/events');
+                            }, (message) => {
+                                res.status(500).json(message)
                             });
                         }
                     );
