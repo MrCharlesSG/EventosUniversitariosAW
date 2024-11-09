@@ -113,10 +113,10 @@ export class NotificationsController {
         });
     }
 
-    static sendNotificationToUser(organizer, receiber, message, callback, errorCallback) {
+    static sendNotificationToUser(sender, receiber, message, callback, errorCallback) {
         const notificationQuery = "INSERT INTO Notifications (Sender, Date, Message) VALUES (?, NOW(), ?)";
     
-        pool.query(notificationQuery, [organizer, message], (err, result) => {
+        pool.query(notificationQuery, [sender, message], (err, result) => {
             if (err) {
                 console.error("Error al crear la notificación:", err);
                 return errorCallback("Error al crear la notificación: " + err.message);
@@ -130,7 +130,7 @@ export class NotificationsController {
                     return errorCallback("Error al asociar la notificación con el usuario: " + err.message);
                 }
     
-                console.log(`Notificación enviada al usuario: ${receiber} from ${organizer}`);
+                console.log(`Notificación enviada al usuario: ${receiber} from ${sender}`);
                 callback(); 
             });
         });

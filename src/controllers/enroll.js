@@ -21,34 +21,53 @@ export class EnrollController {
         try {
             const eventQuery = "SELECT * FROM Event WHERE ID = ?";
             const updateEnrollementQuery = "UPDATE Enrollment SET Status = ?, QueueDateTime = NULL WHERE EventID = ? AND UserEmail = ?";
-    
+            
             pool.query(eventQuery, idEvent, (err, eventResult) => {
                 if (err) return res.status(500).json({ message: err.message });
                 if (eventResult.length === 0) return res.status(400).json({ error: "No existe este evento" });
     
                 const event = eventResult[0];
+                console.log("Enrolling ", email, "to event ", eventResult[0].Title)
                 isEnrolledQuery(idEvent, email, (err, enrollmentResult) => {
-                    if (err) return res.status(500).json({ message: err.message });
+                    if (err) {
+                        console.log(err)
+                        return res.status(500).json({ message: err.message });
+                    }
     
                     if (enrollmentResult.length !== 0) {
                         const enrollmentStatus = enrollmentResult[0].Status;
                         if (enrollmentStatus !== 'cancelled') return res.status(400).json({ error: "Ya estás inscrito a este evento" });
-    
+                        
                         checkCapacityQuery(event, (thereIsSpace) => {
                             pool.query(updateEnrollementQuery, [thereIsSpace ? 'confirmed' : 'waiting', idEvent, email], (err) => {
                                 if (err) return res.status(500).json({ message: err.message });
+                                console.log("Updating enrollement to ", thereIsSpace ? 'confirmed' : 'waiting')
+
+                                const message = "El usuario " + email + 
+                                (thereIsSpace ? ' se ha inscrito de nuevo a tu evento: ' : ' esta en la cola de tu evento: ')
+                                 + event.Title;
+
+                                console.log("Notifying Of correct enroll to organizer ", message)
+                                NotificationsController.sendNotificationToUser(
+                                    email, event.OrganizerID, message,
+                                    () => res.status(200),
+                                    (message) => res.status(500).json({ message })
+
+                                )
                                 return res.status(200).json({ message: thereIsSpace ? "El usuario ha sido inscrito" : "El usuario está en cola" });
                             });
                         }, (message) => res.status(500).json({ message }));
                     } else {
                         enrollQuery(event, email,
-                            (result) => {
-                                const message = "El usuario " + email + " se ha inscrito a " + event.Title;
-                                NotificationsController.sendOrganizerNotification(
-                                    idEvent, email, message,
-                                    () => res.status(200).json(result),
+                            (message) => {
+
+                                console.log("Notifying Of correct enroll to organizer ", message)
+                                NotificationsController.sendNotificationToUser(
+                                    email, event.OrganizerID, message,
+                                    () => res.status(200),
                                     (message) => res.status(500).json({ message })
-                                );
+
+                                )
                             },
                             (message) => res.status(500).json({ message })
                         );
@@ -190,7 +209,11 @@ const enrollQuery = (event, email, callback, callbackError) => {
         pool.query(thereIsSpace ? enrollConfirmed : enrollWaiting, [event.ID, email], 
             (err) => {
                 if (err) return callbackError(err.message);
-                callback({ message: thereIsSpace ? "Usuario añadido correctamente" : "Usuario en cola" });
+                console.log("Enrrolled correctyly ")
+                const message = "El usuario " + email + 
+                                (thereIsSpace ? ' se ha inscrito a tu evento: ' : ' esta en la cola de tu evento: ')
+                                 + event.Title;
+                callback(message);
             }
         );
     }, callbackError);

@@ -6,16 +6,20 @@
             </div>
             <div class="modal-body">
                 <h4 id="modalTitle"></h4>
+                
                 <p id="modalDescription"></p>
+                
                 <p><strong>Fecha:</strong> <span id="modalDate"></span></p>
                 <p><strong>Ubicación:</strong> <span id="modalLocation"></span></p>
-                <p><strong>Organizer:</strong> <span id="modalOrganizer"></span></p>
-                <p><strong>Status:</strong> <span id="modalUserStatus"></span></p>
+                <p><strong>Tipo de Evento:</strong> <span id="modalEventType"><img src="/public/img/event-type-icon.svg" width="13" height="13" alt="Event Type"> <span></span></span></p>
+                <p><strong>Inscritos:</strong> <span id="modalEnrollmentCount"></span> / <span id="modalCapacity"></span> plazas</p>
+                <p><strong>Organizador:</strong> <span id="modalOrganizer"></span></p>
+                <p><strong>Tu Estado:</strong> <span id="modalUserStatus"></span></p>
             </div>
             <div class="modal-footer">
-                <a href="#" type="button" id="editButton" class="btn btn-primary w-full" style="display: none;">Editar Evento</a>
-                <a href="#" type="button" id="signUpButton" class="btn btn-success w-full" style="display: none;">Apuntarse al Evento</a>
-                <a href="#" type="button" id="dropOutButton" class="btn btn-danger w-full" style="display: inline-block;">Desapuntarse al Evento</a>
+                <a href="#" type="button" id="editButton" class="btn btn-primary w-100" style="display: none;">Editar Evento</a>
+                <a href="#" type="button" id="signUpButton" class="btn btn-success w-100" style="display: none;">Apuntarse al Evento</a>
+                <a href="#" type="button" id="dropOutButton" class="btn btn-danger w-100" style="display: none;">Desapuntarse del Evento</a>
             </div>
         </div>
     </div>

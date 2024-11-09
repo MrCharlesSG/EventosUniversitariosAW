@@ -6,7 +6,34 @@ export class EventsController {
     static async getAll(req, res) {
         try {
             const userEmail = req.user.email; 
-            const getEventsQuery = "SELECT * from Event LEFT JOIN Enrollment ON Event.ID = Enrollment.EventID AND Enrollment.UserEmail = ? WHERE Event.Active = 1  ORDER BY Event.DateTime ASC"
+            const getEventsQuery = `
+            SELECT 
+                e.Title, 
+                e.Description, 
+                e.DateTime, 
+                e.ID, 
+                e.Location, 
+                e.Capacity, 
+                e.OrganizerID,
+                enr.Status,
+                et.Name AS EventType, 
+                (
+                    SELECT COUNT(*) AS EnrollmentCount 
+                    FROM enrollment en 
+                    WHERE en.EventID = e.ID 
+                    AND en.Status IN ('confirmed', 'waiting')
+                ) AS EnrollmentCount
+            FROM 
+                Event e
+            LEFT JOIN 
+                Enrollment enr ON e.ID = enr.EventID AND enr.UserEmail = ?
+            LEFT JOIN 
+                eventtype et ON et.ID = e.EventTypeID
+            WHERE 
+                e.Active = 1  AND e.DateTime >= NOW()
+            ORDER BY 
+                e.DateTime ASC;
+            `;
 
     
             console.log("Getting all events with enrollment status ");    
@@ -29,7 +56,31 @@ export class EventsController {
         const { role, email } = req.user;
         try {
             if (isOrganizer(role)) { 
-                const query = 'SELECT * FROM Event WHERE OrganizerID = ? and Active=1 ORDER BY DateTime ASC';
+                const query = `
+                SELECT 
+                    e.Title, 
+                    e.Description, 
+                    e.DateTime, 
+                    e.ID, 
+                    e.Location, 
+                    e.Capacity, 
+                    e.OrganizerID,
+                    et.Name AS EventType, 
+                    (
+                        SELECT COUNT(*) AS EnrollmentCount 
+                        FROM enrollment en 
+                        WHERE en.EventID = e.ID 
+                        AND en.Status IN ('confirmed', 'waiting')
+                    ) AS EnrollmentCount
+                FROM 
+                    Event e
+                LEFT JOIN 
+                    eventtype et ON et.ID = e.EventTypeID
+                WHERE 
+                    e.Active = 1  AND e.OrganizerID = ?
+                ORDER BY 
+                    e.DateTime ASC;
+                `;
                 console.log("Getting events of ", email, " with role ", role)
                 pool.query(
                     query,
