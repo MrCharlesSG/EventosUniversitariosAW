@@ -94,10 +94,9 @@ export class AuthController {
     }
 
     static async modifyUserInfo(req, res) {
-        const { email } = req.session.user;  // Usamos el email desde la sesión del usuario autenticado
+        const { email } = req.session.user;  
         const { fullName, phone, facultyID } = req.body;
 
-        // Validación de los datos
         if (!fullName && !phone && !facultyID) {
             return res.status(400).json({ error: "No se proporcionaron datos para actualizar." });
         }

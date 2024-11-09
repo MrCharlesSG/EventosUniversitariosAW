@@ -43,9 +43,17 @@ viewsRouter.get("/notifications", isAuthenticated, (req, res) => {
 
 
 viewsRouter.get("/auth/login", redirectIfAuthenticated, (req, res) => {
-    res.sendFile(path.join(__dirname, '../views/login.html'));
+   res.render('login')
 });
 
+viewsRouter.get("/auth/forgot-password", redirectIfAuthenticated, (req, res) => {
+    res.render('forgot-password')
+ });
+
+ viewsRouter.get("/auth/reset-password/:token", (req, res) => {
+    const { token } = req.params;
+    res.render('reset-password', { token });
+});
 viewsRouter.get("/auth/register", redirectIfAuthenticated, (req, res) => {
     
     pool.query("SELECT ID, Name FROM Faculty", (err, faculties) => {

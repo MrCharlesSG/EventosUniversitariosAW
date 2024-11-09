@@ -1,10 +1,13 @@
-import express, { json } from 'express';
-import { viewsRouter } from './routes/views.js';
 import cookieParser from 'cookie-parser';
+import dotenv from 'dotenv';
+import express, { json } from 'express';
+import session from 'express-session';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { apiRouter } from './routes/api/index.js';
-import session from 'express-session';
+import { viewsRouter } from './routes/views.js';
+
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
