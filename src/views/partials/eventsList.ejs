@@ -76,15 +76,15 @@
                         switch (event.Status) {
                             case 'confirmed':
                                 badgeClass = 'badge-success';
-                                badgeText = 'Enrolled';
+                                badgeText = 'Inscrito';
                                 break;
                             case 'waiting':
                                 badgeClass = 'badge-warning';
-                                badgeText = 'Waiting';
+                                badgeText = 'En Cola';
                                 break;
                             default:
                                 badgeClass = 'badge-danger';
-                                badgeText = 'Not Enrolled';
+                                badgeText = 'No Inscrito';
                         }
                     }
                     const enrollmentInfo = `${event.EnrollmentCount} / ${event.Capacity} inscritos`;
@@ -139,17 +139,17 @@
         let userStatus = '';
         
         if (organizer === currentUserId) {
-            userStatus = 'Organizer';
+            userStatus = 'Organizador';
         } else {
             switch (enrollmentStatus) {
                 case 'confirmed':
-                    userStatus = 'Enrolled';
+                    userStatus = 'Inscrito';
                     break;
                 case 'waiting':
-                    userStatus = 'Waiting';
+                    userStatus = 'En Cola';
                     break;
                 default:
-                    userStatus = 'Not Enrolled';
+                    userStatus = 'Not Inscrito';
             }
         }
     

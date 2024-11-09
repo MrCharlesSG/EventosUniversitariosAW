@@ -40,7 +40,7 @@
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
                 <a class="dropdown-item" href="/profile">Perfil</a>
                 <a class="dropdown-item text-danger" href="#" id="logoutButton" data-toggle="modal" data-target="#logoutModal">
-                    Salir
+                    Cerrar Sessión
                 </a>
             </div>
         </div>
@@ -54,15 +54,12 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="logoutModalLabel">Seguro que quieres salir</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span>&times;</span>
-                </button>
             </div>
             <div class="modal-body" id="logoutContent">
                 Si sales tendras que iniciar sesion de nuevo
             </div>
-            <form class="modal-footer" action="/api/auth/logout" method="POST">
-                <button type="submit" class="btn btn-danger" data-dismiss="modal">Salir</button>
+            <form class=" modal-footer w-100" id="logoutForm" action="/api/auth/logout" method="POST">
+                <button  type="submit" class="btn w-100 btn-danger">Cerrar Sesión</button>
             </form>
         </div>
     </div>
@@ -101,9 +98,6 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="notificationsModalLabel">Notificaciones</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span>&times;</span>
-                </button>
             </div>
             <div class="modal-body" id="notificationsContent">
                 Cargando notificaciones...
