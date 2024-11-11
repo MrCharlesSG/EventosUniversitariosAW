@@ -100,3 +100,48 @@
             </form>
         </div>
 </div>
+
+<div aria-live="polite" aria-atomic="true" style="position: relative;">
+    <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; top: 1rem; right: 1rem;">
+        <div class="d-flex">
+            <div class="toast-body" id="toastMessage">
+                
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.querySelector("form");
+        const errorToast = new bootstrap.Toast(document.getElementById("errorToast"));
+        const toastMessage = document.getElementById("toastMessage");
+
+        form.addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(form); 
+            const actionUrl = form.getAttribute("action");
+            const method = form.getAttribute("method");
+
+            try {
+                const response = await fetch(actionUrl, {
+                    method: method,
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    toastMessage.textContent = errorData.message || "Ha ocurrido un error inesperado."; 
+                    errorToast.show();
+                } else {
+                    window.location.href = "/eventos";
+                }
+            } catch (error) {
+                toastMessage.textContent = "Error de red: " + error.message;
+                errorToast.show();
+            }
+        });
+    });
+</script>

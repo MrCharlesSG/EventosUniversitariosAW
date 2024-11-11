@@ -39,12 +39,56 @@
                 </form>
             </div>
         </div>
-
     </div>
 
-    <%- include("partials/footer") %>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Incluir el parcial del toast -->
+    <%- include("partials/errorToast") %>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.querySelector("form");
+            const errorToastEl = document.getElementById("errorToast");
+            const toastMessage = document.getElementById("toastMessage");
+
+            // Configurar el toast con una duración de 8 segundos (8000 ms)
+            const errorToast = new bootstrap.Toast(errorToastEl, { delay: 8000 });
+
+            form.addEventListener("submit", async function(event) {
+                event.preventDefault();
+
+                const formData = new FormData(form);
+                const actionUrl = form.getAttribute("action");
+                const method = form.getAttribute("method");
+
+                try {
+                    console.log(formData)
+                    console.log("Form data values:");
+                    for (let pair of formData.entries()) {
+                        console.log(`${pair[0]}: ${pair[1]}`);
+                    }
+                    const response = await fetch(actionUrl, {
+                        method: method,
+                        body: formData,
+                        headers: {
+                            //'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        toastMessage.textContent = errorData.message || "Credenciales incorrectas.";
+                        errorToast.show();
+                    } else {
+                        window.location.href = "/"; 
+                    }
+                } catch (error) {
+                    toastMessage.textContent = "Error de red: " + error.message;
+                    errorToast.show();
+                }
+            });
+        });
+    </script>
 </body>
 </html>

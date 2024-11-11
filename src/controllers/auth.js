@@ -27,7 +27,7 @@ export class AuthController {
             const { RoleID } = result;
 
             req.session.user = { email, role: RoleID };
-            return res.redirect('/');
+            return res.status(200);
         });
     }
 

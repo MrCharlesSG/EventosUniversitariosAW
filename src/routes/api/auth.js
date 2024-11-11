@@ -4,7 +4,12 @@ import { isAuthenticated } from "../../middleware/auth.js";
 import { ResetPasswordController } from "../../controllers/resetPassword.js";
 export const authRouter = Router();
 
-authRouter.post("/login", AuthController.login)
+
+export const isnec = (req, res, next) => {
+    console.log(req)
+    next();
+};
+authRouter.post("/login",isnec, AuthController.login)
 authRouter.post("/register", AuthController.register)
 authRouter.post("/logout", isAuthenticated, AuthController.logout)
 authRouter.post("/modifyUserInfo", isAuthenticated, AuthController.modifyUserInfo)

@@ -7,12 +7,13 @@ import { fileURLToPath } from 'url';
 import { apiRouter } from './routes/api/index.js';
 import { viewsRouter } from './routes/views.js';
 
-dotenv.config();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 const app = express();
+app.use(json());
+app.use(express.urlencoded({
+    extended: true
+    }));
+    
+app.use(cookieParser());
 
 app.use(session({
     secret: process.env.JWT_SECRET_KEY || '1234',
@@ -20,9 +21,12 @@ app.use(session({
     saveUninitialized: true,
     cookie: { secure: false }
 }));
-app.use(json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+
+dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 
 
 app.set('view engine', 'ejs'); 
