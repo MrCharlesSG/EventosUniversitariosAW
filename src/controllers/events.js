@@ -12,7 +12,9 @@ export class EventsController {
                 e.Description, 
                 e.DateTime, 
                 e.ID, 
-                e.Location, 
+                f.ID AS FacultyID, 
+                f.Name AS FacultyName, 
+                f.University AS FacultyUniversity, 
                 e.Capacity, 
                 e.OrganizerID,
                 enr.Status,
@@ -26,11 +28,13 @@ export class EventsController {
             FROM 
                 Event e
             LEFT JOIN 
+                Faculty f ON e.Location = f.ID
+            LEFT JOIN 
                 Enrollment enr ON e.ID = enr.EventID AND enr.UserEmail = ?
             LEFT JOIN 
                 eventtype et ON et.ID = e.EventTypeID
             WHERE 
-                e.Active = 1  AND e.DateTime >= NOW()
+                e.Active = 1 AND e.DateTime >= NOW()
             ORDER BY 
                 e.DateTime ASC;
             `;
@@ -62,7 +66,9 @@ export class EventsController {
                     e.Description, 
                     e.DateTime, 
                     e.ID, 
-                    e.Location, 
+                    f.ID AS FacultyID, 
+                    f.Name AS FacultyName, 
+                    f.University AS FacultyUniversity, 
                     e.Capacity, 
                     e.OrganizerID,
                     et.Name AS EventType, 
@@ -75,9 +81,11 @@ export class EventsController {
                 FROM 
                     Event e
                 LEFT JOIN 
+                    Faculty f ON e.Location = f.ID
+                LEFT JOIN 
                     eventtype et ON et.ID = e.EventTypeID
                 WHERE 
-                    e.Active = 1  AND e.OrganizerID = ?
+                    e.Active = 1 AND e.OrganizerID = ?
                 ORDER BY 
                     e.DateTime ASC;
                 `;

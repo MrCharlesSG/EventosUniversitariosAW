@@ -27,7 +27,7 @@ export class AuthController {
             const { RoleID } = result;
 
             req.session.user = { email, role: RoleID };
-            return res.status(200);
+            return res.redirect('/');
         });
     }
 
@@ -48,50 +48,35 @@ export class AuthController {
 
     static async register(req, res) {
         const { email, fullName, phone, facultyID, password, roleID } = req.body;
-
+    
         if (!email || !fullName || !password || !roleID) {
             return res.status(400).json({ error: "Faltan datos obligatorios" });
         }
-
+    
         try {
             const selectUserQuery = "SELECT * FROM User WHERE Email = ?";
             const insertUserQuery = "INSERT INTO User (Email, FullName, Phone, FacultyID) VALUES (?, ?, ?, ?)";
             const insertAuthQuery = "INSERT INTO UserAuthentication (Email, Password, RoleID) VALUES (?, ?, ?)";
-
-
-            pool.query(selectUserQuery, email, (err, existingUser) => {
-                if(err) return res.status(500).json({error: err.message});
-                if (existingUser.length > 0) {
-                    return res.status(400).json({ error: "El usuario ya está registrado" });
-                }
-
-                pool.query(
-                    insertUserQuery, 
-                    [email, fullName, phone, facultyID],
-                    (err, _) => {
-                        if(err) return res.status(500).json({error: err.message});
-                        
-                        bcrypt.hash(password, 10, (err, hashedPassword) => { 
-                            if(err) return res.status(500).json({error: err.message});
-                            
-                            pool.query(
-                                insertAuthQuery,
-                                [email, hashedPassword, roleID],
-                                (err, _) => {
-                                    if(err) return res.status(500).json({error: err.message});
-                                    req.session.user = { email, role: roleID };
-                                    return res.redirect('/');
-                                }
-                            )
-                        })
-                    }
-                )
-            })
+    
+            const existingUser = await pool.query(selectUserQuery, [email]);
+            if (existingUser.length > 0) {
+                return res.status(400).json({ error: "El usuario ya está registrado" });
+            }
+    
+            await pool.query(insertUserQuery, [email, fullName, phone, facultyID]);
+    
+            const hashedPassword = await bcrypt.hash(password, 10);
+    
+            await pool.query(insertAuthQuery, [email, hashedPassword, roleID]);
+    
+            req.session.user = { email, role: roleID };
+            return res.redirect('/');
         } catch (error) {
             console.error("Error en el registro:", error);
             res.status(500).json({ error: "Error en el servidor" });
         }
     }
+    
 
     static async modifyUserInfo(req, res) {
         const { email } = req.session.user;  
@@ -128,17 +113,13 @@ export class AuthController {
 
             console.log("Modifying user, this are the values to update ", updateValues)
 
-            pool.query(updateQuery, updateValues, (err, result) => {
-                if (err) {
-                    return res.status(500).json({ error: err.message });
-                }
+            const result = await pool.query(updateQuery, updateValues);
 
-                if (result.affectedRows > 0) {
-                    return res.status(200).json({ message: "Información actualizada con éxito." });
-                } else {
-                    return res.status(404).json({ error: "No se encontró el usuario o no se hicieron cambios." });
-                }
-            });
+            if (result.affectedRows > 0) {
+                return res.status(200).json({ message: "Información actualizada con éxito." });
+            } else {
+                return res.status(404).json({ error: "No se encontró el usuario o no se hicieron cambios." });
+            }
         } catch (error) {
             console.error("Error al actualizar la información del usuario:", error);
             res.status(500).json({ error: "Error en el servidor" });
@@ -147,44 +128,25 @@ export class AuthController {
 }
 
 
-const verifyPassword = (email, plainPassword, callback) => {
-    pool.getConnection((err, connection) => {
-        if (err) {
-            console.error('Error connecting to the database:', err);
-            callback(err, null);
-            return;
+const verifyPassword = async (email, plainPassword) => {
+    try {
+        const [results] = await pool.query(
+            'SELECT Password, RoleID FROM UserAuthentication WHERE Email = ?', 
+            [email]
+        );
+
+        if (results.length === 0) {
+            return { isMatch: false };
         }
 
-        const query = 'SELECT Password, RoleID FROM UserAuthentication WHERE Email = ?';
+        const { Password: hashedPassword, RoleID } = results[0];
 
-        connection.query(query, [email], (error, results) => {
-            connection.release();
+        const isMatch = await bcrypt.compare(plainPassword, hashedPassword);
 
-            if (error) {
-                console.error('Error executing the query:', error);
-                callback(error, null);
-                return;
-            }
-
-            if (results.length === 0) {
-                callback(null, false); // no hay usuariuo
-                return;
-            }
-
-            const { Password: hashedPassword, RoleID } = results[0];
-
-            // contraseña correcta
-            bcrypt.compare(plainPassword, hashedPassword, (err, isMatch) => {
-                if (err) {
-                    console.error('Error comparing passwords:', err);
-                    callback(err, null);
-                    return;
-                }
-
-               
-                callback(null, isMatch ? { isMatch, RoleID } : { isMatch: false });
-            });
-        });
-    });
+        return { isMatch, RoleID };
+    } catch (err) {
+        console.error('Error en la verificación de la contraseña:', err);
+        throw new Error('Error al verificar la contraseña');
+    }
 };
 

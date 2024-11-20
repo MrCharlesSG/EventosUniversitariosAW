@@ -42,13 +42,14 @@ CREATE TABLE IF NOT EXISTS Event (
     Title VARCHAR(255) NOT NULL,
     Description TEXT,
     DateTime DATETIME NOT NULL,
-    Location VARCHAR(255),
+    Location INT,
     Capacity INT,
     EventTypeID INT,
     OrganizerID VARCHAR(255),
     Active TINYINT(1) NOT NULL,
     FOREIGN KEY (OrganizerID) REFERENCES User(Email),
-    FOREIGN KEY (EventTypeID) REFERENCES EventType(ID)
+    FOREIGN KEY (EventTypeID) REFERENCES EventType(ID),
+    FOREIGN KEY (Location) REFERENCES Faculty(ID)
 );
 
 
@@ -119,13 +120,13 @@ INSERT INTO UserAuthentication (Email, RoleID, Password) VALUES -- password "use
 
 -- Inserción de varios eventos
 INSERT INTO Event (Title, Description, DateTime, Location, Capacity, EventTypeID, OrganizerID, Active) VALUES 
-('Taller de Inteligencia Artificial', 'Introducción a la IA y sus aplicaciones.', '2024-11-20 10:00:00', 'Aula 101, Facultad de Ingeniería', 3, 1, 'luis.sanchez@ucm.es', TRUE),
-('Conferencia sobre Robótica', 'Exploración de la robótica moderna.', '2024-11-25 09:00:00', 'Auditorio, Facultad de Ingeniería', 3, 2, 'luis.sanchez@ucm.es', TRUE),
-('Seminario de Programación en Python', 'Seminario avanzado sobre Python para ingenieros.', '2024-12-01 14:00:00', 'Sala de Conferencias, Facultad de Ingeniería', 2, 3, 'ana.martinez@ucm.es', TRUE),
-('Taller de Machine Learning', 'Introducción al Machine Learning.', '2024-12-05 10:00:00', 'Aula 102, Facultad de Ingeniería', 30, 1, 'ana.martinez@ucm.es', TRUE),
-('Conferencia de Big Data', 'Conferencia sobre técnicas avanzadas de Big Data.', '2024-11-08 04:00:00', 'Auditorio, Facultad de Ingeniería', 80, 2, 'luis.sanchez@ucm.es', TRUE),
-('La ética en las TIC', 'Conferencia sobre cómo hacer discusiones éticas con tu jefe, amigos, profesores...', '2024-11-14 01:30:00', 'Laboratorio 4, Facultad de Ingeniería', 33, 2, 'ana.martinez@ucm.es', TRUE),
-('Como no jugar', 'Seminario de cómo se hacen ciertos materiales de semiconductores correctamente sin destruir la facultad', '2024-11-14 01:30:00', 'Laboratorio 4, Facultad de Ingeniería', 33, 3, 'ana.martinez@ucm.es', TRUE);
+('Taller de Inteligencia Artificial', 'Introducción a la IA y sus aplicaciones.','2024-11-27 09:00:00', 1, 3, 1, 'luis.sanchez@ucm.es', TRUE),
+('Conferencia sobre Robótica', 'Exploración de la robótica moderna.', '2024-11-25 09:00:00',1, 3, 2, 'luis.sanchez@ucm.es', TRUE),
+('Seminario de Programación en Python', 'Seminario avanzado sobre Python para ingenieros.', '2024-12-01 14:00:00', 2, 2, 3, 'ana.martinez@ucm.es', TRUE),
+('Taller de Machine Learning', 'Introducción al Machine Learning.', '2024-12-05 10:00:00', 1, 30, 1, 'ana.martinez@ucm.es', TRUE),
+('Conferencia de Big Data', 'Conferencia sobre técnicas avanzadas de Big Data.', '2024-11-08 04:00:00', 1, 80, 2, 'luis.sanchez@ucm.es', TRUE),
+('La ética en las TIC', 'Conferencia sobre cómo hacer discusiones éticas con tu jefe, amigos, profesores...', '2024-11-14 01:30:00', 3, 33, 2, 'ana.martinez@ucm.es', TRUE),
+('Como no jugar', 'Seminario de cómo se hacen ciertos materiales de semiconductores correctamente sin destruir la facultad', '2024-11-14 01:30:00', 3, 33, 3, 'ana.martinez@ucm.es', TRUE);
 
 -- Insertar usuarios inscritos en eventos con Status 'confirmed'
 INSERT INTO Enrollment (EventID, UserEmail, Status) VALUES 

@@ -40,7 +40,7 @@
                         <select class="form-control" id="facultyID" name="facultyID" required>
                             <option value="">Selecciona tu facultad</option>
                             <% faculties.forEach(faculty => { %>
-                                <option value="<%= faculty.ID %>"><%= faculty.Name %></option>
+                                <option value="<%= faculty.ID %>"><%= faculty.Name %>, <%= faculty.University %></option>
                             <% }) %>
                         </select>
                     </div>

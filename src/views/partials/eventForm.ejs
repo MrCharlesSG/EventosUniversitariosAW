@@ -53,14 +53,24 @@
 
                 <div class="form-group">
                     <label for="location">Ubicación</label>
-                    <input 
-                        type="text" 
+                    <select 
                         class="form-control" 
                         id="location" 
                         name="location" 
-                        placeholder="Ubicación del evento" 
-                        value="<%= event ? event.Location : '' %>"
+                        required
                     >
+                        <% if (facultyList && facultyList.length) { %>
+                            <% facultyList.forEach(faculty => { %>
+                                <option 
+                                    value="<%= faculty.ID %>" 
+                                    <%= event && event.Location === faculty.ID ? 'selected' : '' %>>
+                                    <%= faculty.Name %>, <%= faculty.University %>
+                                </option>
+                            <% }) %>
+                        <% } else { %>
+                            <option disabled>No hay facultades disponibles</option>
+                        <% } %>
+                    </select>
                 </div>
 
                 <div class="form-group">
