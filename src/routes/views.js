@@ -11,9 +11,10 @@ const __dirname = path.dirname(__filename);
 export const viewsRouter = Router();
 
 viewsRouter.get('/', isAuthenticated, (req, res) => {
-    res.render('index', { 
+    res.redirect('/events')
+   /* res.render('index', { 
         role: req.user.role
-    });
+    });*/
 });
 
 viewsRouter.get('/events', isAuthenticated, (req, res) => {
@@ -54,93 +55,82 @@ viewsRouter.get("/auth/forgot-password", redirectIfAuthenticated, (req, res) => 
     const { token } = req.params;
     res.render('reset-password', { token });
 });
-viewsRouter.get("/auth/register", redirectIfAuthenticated, (req, res) => {
-    
-    pool.query("SELECT ID, Name FROM Faculty", (err, faculties) => {
-        if (err) {
-            console.error("Error al obtener facultades:", err);
-            return res.status(500).send("Error al obtener facultades");
-        }
 
+viewsRouter.get("/auth/register", redirectIfAuthenticated, async (req, res) => {
+    try {
+        const faculties = await pool.query("SELECT * FROM Faculty");
+        console.log("The faculties attributes R ", faculties);
 
-        console.log("The faculties atributes R ", faculties)
-
-        // Consultar Roles
-        pool.query("SELECT ID, Name FROM Role", (err, roles) => {
-            if (err) {
-                console.error("Error al obtener roles:", err);
-                return res.status(500).send("Error al obtener roles");
-            }
-
-            res.render('register', { faculties, roles });
-        });
-    });
+        const roles = await pool.query("SELECT ID, Name FROM Role");
+        res.render('register', { faculties, roles });
+    } catch (err) {
+        console.error("Error al obtener datos para el registro:", err);
+        res.status(500).send("Error al obtener datos para el registro");
+    }
 });
 
-viewsRouter.get("/profile", isAuthenticated, (req, res) => {
-    const email = req.session.user.email;
 
-    pool.query("SELECT ID, Name FROM Faculty", (err, faculties) => {
-        if (err) {
-            console.error("Error al obtener facultades:", err);
-            return res.status(500).send("Error al obtener facultades");
-        }
+viewsRouter.get("/profile", isAuthenticated, async (req, res) => {
+    try {
+        const email = req.session.user.email;
 
-        console.log("The faculties atributes ", faculties)
-        pool.query("SELECT u.Email, u.FullName, u.Phone, f.ID AS FacultyID, f.Name AS FacultyName FROM User u JOIN Faculty f ON u.FacultyID = f.ID WHERE u.Email = ?", [email], (err, result) => {
-            if (err) return res.status(500).json({ error: err.message });
-            console.log("The profile atributes ", result)
-            const user = result[0];
-            res.render("profile", { user, faculties });
-        });
-    });
+        const faculties = await pool.query("SELECT * FROM Faculty");
+        console.log("The faculties attributes ", faculties);
+
+        const result = await pool.query(
+            "SELECT u.Email, u.FullName, u.Phone, f.ID AS FacultyID, f.Name AS FacultyName FROM User u JOIN Faculty f ON u.FacultyID = f.ID WHERE u.Email = ?",
+            [email]
+        );
+        console.log("The profile attributes ", result);
+
+        const user = result[0];
+        res.render("profile", { user, faculties });
+    } catch (err) {
+        console.error("Error al obtener datos del perfil:", err);
+        res.status(500).send("Error al obtener datos del perfil");
+    }
 });
+
 
 viewsRouter.get("/events/info", isAuthenticatedOrganizer, async (req, res) => {
-    pool.query(
-        "SELECT * FROM EventType",
-        (err, eventTypeList) => {
-            if(err) {
-                console.error("Error al cargar el formulario: ", err);
-                res.status(500).json({ error: "Error al cargar el formulario" });
-            }
-            const eventID = req.query.eventID;
+    try {
+        const [eventTypeList] = await pool.query("SELECT * FROM EventType");
+        const [facultyList] = await pool.query("SELECT * FROM Faculty");
+        const eventID = req.query.eventID;
 
-            if (eventID) {
-                pool.query(
-                    "SELECT * FROM Event WHERE ID = ?",
-                    eventID,
-                    (err, row) => {
-                        if(err || row.length==0) return res.status(404).json({ error: "Evento no encontrado" });
-                        res.render('event-info', { 
-                            role: req.user.role,
-                            eventTypeList,  
-                            event:row[0],           
-                        });
-                    }
-                )
-            }else{
-                res.status(404).json({ error: "Vista no encontrada" });
+        if (eventID) {
+            const [rows] = await pool.query("SELECT * FROM Event WHERE ID = ?", [eventID]);
+            if (rows.length === 0) {
+                return res.status(404).json({ error: "Evento no encontrado" });
             }
+
+            res.render('event-info', {
+                role: req.user.role,
+                eventTypeList,
+                facultyList,
+                event: rows[0],
+            });
+        } else {
+            res.status(404).json({ error: "Vista no encontrada" });
         }
-    );
+    } catch (err) {
+        console.error("Error al cargar el formulario: ", err);
+        res.status(500).json({ error: "Error al cargar el formulario" });
+    }
 });
 
 
 
 viewsRouter.get("/events/add", isAuthenticatedOrganizer, async (req, res) => {
-    pool.query(
-        "SELECT * FROM EventType",
-        (err, eventTypeList) => {
-            if(err) {
-                console.error("Error al cargar el formulario: ", err);
-                res.status(500).json({ error: "Error al cargar el formulario" });
-            }
-            res.render('event-add', { 
-                role: req.user.role,
-                eventTypeList,           
-            });                
-            
-        }
-    );
+    try {
+        const eventTypeList = await pool.query("SELECT * FROM EventType");
+        res.render('event-add', {
+            role: req.user.role,
+            eventTypeList,
+        });
+    } catch (err) {
+        console.error("Error al cargar el formulario: ", err);
+        res.status(500).json({ error: "Error al cargar el formulario" });
+    }
 });
+

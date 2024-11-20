@@ -6,29 +6,31 @@ import { validateUserCredentials } from "../schemas/user.js";
 export class AuthController {
 
     static async login(req, res) {
-        console.log("Validating: ", req.body)
+        console.log("Validating: ", req.body);
+    
         const isValidUser = validateUserCredentials(req.body);
-
+    
         if (!isValidUser.valid) {
             return res.status(400).json({ error: isValidUser.message });
         }
-
+    
         const { email, password } = req.body;
-
-        verifyPassword(email, password, (err, result) => {
-            if (err) {
-                return res.status(500).json({ error: err.message });
-            }
-
+    
+        try {
+            const result = await verifyPassword(email, password);
+    
             if (!result.isMatch) {
-                return res.status(401).json({ error: "Correo o contraseña invalida" });
+                return res.status(401).json({ error: "Correo o contraseña inválida" });
             }
-
+    
             const { RoleID } = result;
-
+    
             req.session.user = { email, role: RoleID };
-            return res.redirect('/');
-        });
+    
+            return res.redirect('/'); 
+        } catch (err) {
+            return res.status(500).json({ error: err.message });
+        }
     }
 
     static async logout(req, res) {
