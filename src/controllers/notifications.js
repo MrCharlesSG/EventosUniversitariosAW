@@ -59,55 +59,55 @@ export class NotificationsController {
         }
     }
     
-    static async sendNotificationOfModificatedEvent(event, sender, message, callback, errorCallback) {
+    static async sendNotificationOfModificatedEvent(event, sender, message) {
         console.log("Sending Notification ", message);
     
         try {
             const getUsersQuery = "SELECT UserEmail FROM Enrollment WHERE EventID = ?";
             const [users] = await pool.query(getUsersQuery, [event]);
     
-            if (users.length === 0) return callback();
+            if (users.length === 0) return true; // Si no hay usuarios, simplemente se resuelve la promesa.
     
             const notificationQuery = "INSERT INTO Notifications (Sender, Date, Message) VALUES (?, NOW(), ?)";
             const [result] = await pool.query(notificationQuery, [sender, message]);
     
             const notificationId = result.insertId;
     
-            for (const user of users) {
+            users.forEach(async user => {
                 const insertUserNotificationQuery = "INSERT INTO UserNotifications (UserEmail, NotificationID, Checked) VALUES (?, ?, 0)";
                 await pool.query(insertUserNotificationQuery, [user.UserEmail, notificationId]);
                 console.log(`Notificación enviada a ${user.UserEmail}`);
-            }
+            })
     
-            return callback();
         } catch (err) {
             console.error("Error al enviar la notificación:", err);
-            errorCallback(err.message);
+            throw new Error(err.message); 
         }
     }
     
+    
 
-    static async sendNotificationToUser(sender, receiver, message, callback, errorCallback) {
+    static async sendNotificationToUser(sender, receiver, message) {
         const notificationQuery = "INSERT INTO Notifications (Sender, Date, Message) VALUES (?, NOW(), ?)";
-        
+    
         try {
             const [result] = await pool.query(notificationQuery, [sender, message]);
     
             const notificationId = result.insertId;
             const insertOrganizerNotificationQuery = "INSERT INTO UserNotifications (UserEmail, NotificationID, Checked) VALUES (?, ?, 0)";
-            
+    
             await pool.query(insertOrganizerNotificationQuery, [receiver, notificationId]);
     
             console.log(`Notificación enviada al usuario: ${receiver} from ${sender}`);
-            callback(); 
         } catch (err) {
             console.error("Error al crear o asociar la notificación:", err);
-            errorCallback("Error al crear o asociar la notificación: " + err.message);
+            throw new Error("Error al crear o asociar la notificación: " + err.message); 
         }
     }
     
+    
 
-    static async sendOrganizerNotification(eventId, sender, message, callback, errorCallback) {
+    static async sendOrganizerNotification(eventId, sender, message) {
         console.log("Sending Notification to Organizer: ", message);
     
         try {
@@ -115,7 +115,7 @@ export class NotificationsController {
             const [result] = await pool.query(getOrganizerQuery, [eventId]);
     
             if (result.length === 0) {
-                return errorCallback("No se encontró organizador para el evento especificado.");
+                throw new Error("No se encontró organizador para el evento especificado.");
             }
     
             const organizerEmail = result[0].OrganizerEmail;
@@ -129,12 +129,12 @@ export class NotificationsController {
             await pool.query(insertOrganizerNotificationQuery, [organizerEmail, notificationId]);
     
             console.log(`Notificación enviada al organizador: ${organizerEmail}`);
-            return callback();
         } catch (err) {
             console.error("Error al enviar la notificación al organizador:", err);
-            return errorCallback("Error al enviar la notificación al organizador: " + err.message);
+            throw new Error("Error al enviar la notificación al organizador: " + err.message); // Lanzamos el error
         }
     }
+    
     
     
     

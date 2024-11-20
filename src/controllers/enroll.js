@@ -44,7 +44,7 @@ export class EnrollController {
                     return res.status(400).json({ error: "Ya estás inscrito a este evento" });
                 }
     
-                const thereIsSpace = await checkCapacity(event);
+                const thereIsSpace = await checkCapacityQuery(event);
     
                 const status = thereIsSpace ? 'confirmed' : 'waiting';
     
@@ -99,7 +99,7 @@ export class EnrollController {
                 return res.status(400).json({ error: "El usuario no está inscrito al evento" });
             }
     
-            const eventResult = await pool.query(eventQuery, [idEvent]);
+            const [eventResult] = await pool.query(eventQuery, [idEvent]);
             if (eventResult.length === 0) {
                 return res.status(400).json({ error: "Evento no encontrado" });
             }
@@ -113,7 +113,7 @@ export class EnrollController {
             const organizerMessage = `El usuario ${email} se ha desapuntado del evento ${event.Title}.`;
             await NotificationsController.sendOrganizerNotification(idEvent, email, organizerMessage);
     
-            const queueResult = await pool.query(promoteQuery, [idEvent]);
+            const [queueResult] = await pool.query(promoteQuery, [idEvent]);
     
             if (queueResult.length > 0) {
                 // Promote user from the queue

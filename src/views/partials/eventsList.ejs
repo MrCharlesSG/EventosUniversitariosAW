@@ -37,61 +37,168 @@
         bottom: 5px;
         left: 5px;
     }
+
+    
+    h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #343a40;
+        text-align: center;
+    }
+    
+    .filters-section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+
+
+    /* Estilo para la sección de filtros aplicados */
+    .applied-filters {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        font-size: 14px;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .applied-filters span {
+        margin-left: 10px;
+        padding: 5px;
+        background-color: #e9ecef;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    .applied-filters span:hover {
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+    }
+
+    .list-header {
+        position: sticky;
+        top: 0;
+        z-index: 100; 
+    }
+
 </style>
 
 
+<div>
+    <div class="list-header">
+        <h1><%= title %></h1> 
 
-<div class="list-container">
-    <ul id="event-list" class="list-unstyled">
+    <!-- Sección de filtros -->
+    <div id="filters-section" class="filters-section mb-3 mt-3">
+        <button id="filter-button" class="btn btn-outline-primary">
+            <img src="/public/img/filter.svg" alt="Filtros" width="20" height="20">
+        </button>
 
-    </ul>
+        <!-- Mostrar filtros aplicados o "Sin filtros" -->
+        <div id="applied-filters" class="applied-filters">
+            <span id="filters-text">Sin filtros</span>
+        </div>
+    </div>
+    </div>
+
+    <div class="list-container">
+        <ul id="event-list" class="list-unstyled"></ul>
+    </div>
 </div>
 
+<%- include("filterModal", { role: role, user: user, eventTypeList, facultyList }) %>
 
-<%- include("eventModal", { role: role, user:user }) %>
+<%- include("eventModal", { role: role, user: user }) %>
+
+
 
 
 <script>
-    document.addEventListener('DOMContentLoaded', fetchEvents);
 
-    const currentUserId = '<%= user %>';
-
-    function fetchEvents() {
-        const eventList = document.getElementById('event-list');
-        eventList.innerHTML = '';
-        const currentPath = window.location.pathname;
-        const apiUrl = currentPath.includes('myevents') ? '/api/events/user' : '/api/events';
-        
-        console.log("Llamando a la API:", apiUrl, " por user ", currentUserId);
-        
-        fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                data.forEach(event => {
-                    console.log("The event ", event);
-                    let badgeClass = '';
-                    let badgeText = '';
     
-                    if (event.OrganizerID !== currentUserId) {
-                        switch (event.Status) {
-                            case 'confirmed':
-                                badgeClass = 'badge-success';
-                                badgeText = 'Inscrito';
-                                break;
-                            case 'waiting':
-                                badgeClass = 'badge-warning';
-                                badgeText = 'En Cola';
-                                break;
-                            default:
-                                badgeClass = 'badge-danger';
-                                badgeText = 'No Inscrito';
-                        }
-                    }
-                    const enrollmentInfo = `${event.EnrollmentCount} / ${event.Capacity} inscritos`;
+        const eventsData = [];
 
-                    const eventItem = `
-                        <li class="event-item" 
-                            data-id="${event.ID}" 
+        const eventsDoneData = [];
+
+        const initialFilters = {
+            date: null,           
+            location: '',        
+            locationText: '',      
+            eventType: '',         
+            capacity: null,        
+            minCapacity: null,    
+            maxCapacity: null    
+        }
+
+        let appliedFilters = initialFilters;
+        
+    
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentPath = window.location.pathname;
+            const apiUrl = currentPath.includes('myevents') ? '/api/events/user' : '/api/events';
+            
+            console.log("Llamando a la API:", apiUrl, " por user ", currentUserId);
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    eventsData.push(...data); 
+                    renderEvents();
+                })
+                .catch(error => {
+                    console.error("Error al cargar los eventos:", error);
+                });
+        });
+    
+        const currentUserId = '<%= user %>';
+    
+        function renderEvents() {
+            const eventList = document.getElementById('event-list');
+            eventList.innerHTML = ''; 
+            console.log(appliedFilters)
+            const filteredEvents = eventsData.filter(event => {
+                console.log(event)
+                return (
+                    (!appliedFilters.date || new Date(event.DateTime).toLocaleDateString() === new Date(appliedFilters.date).toLocaleDateString()) &&
+                    (appliedFilters.location ? event.FacultyID==appliedFilters.location : true) &&
+                    (appliedFilters.eventType ? event.EventType == appliedFilters.eventType : true) &&
+                    (!appliedFilters.minCapacity || event.Capacity >= appliedFilters.minCapacity) && 
+                    (!appliedFilters.maxCapacity || event.Capacity <= appliedFilters.maxCapacity)   // Filtro de capacidad máxima
+                );
+            });
+    
+            filteredEvents.forEach(event => {
+                let badgeClass = '';
+                let badgeText = '';
+    
+                if (event.OrganizerID !== currentUserId) {
+                    switch (event.Status) {
+                        case 'confirmed':
+                            badgeClass = 'badge-success';
+                            badgeText = 'Inscrito';
+                            break;
+                        case 'waiting':
+                            badgeClass = 'badge-warning';
+                            badgeText = 'En Cola';
+                            break;
+                        default:
+                            badgeClass = 'badge-danger';
+                            badgeText = 'No Inscrito';
+                    }
+                }
+    
+                const enrollmentInfo = `${event.EnrollmentCount} / ${event.Capacity} inscritos`;
+    
+                const eventItem = `
+                    <li class="event-item" 
+                        data-id="${event.ID}" 
                             data-organizer="${event.OrganizerID}"
                             data-title="${event.Title}" 
                             data-description="${event.Description}" 
@@ -102,30 +209,104 @@
                             data-event-type="${event.EventType}"
                             data-enrollment-count="${event.EnrollmentCount}"
                             data-enrollment-status="${event.Status}">
-                            <div class="event-title">${event.Title} ${badgeText ? `<span class="badge ${badgeClass}">${badgeText}</span>` : ''}</div>
-                            <div class="event-description">${event.Description}</div>
-                            <div class="event-details  d-flex flex-wrap justify-content-between">
-                                <span><img src="/public/img/calendar-icon.svg" width="13" height="13" alt="Calendar"> ${new Date(event.DateTime).toLocaleString()}</span>
-                                <span><img src="/public/img/ubication-icon.svg" width="13" height="13" alt="Ubicacion"> ${event.FacultyName}, ${event.FacultyUniversity}</span>
-                                <span><img src="/public/img/event-type-icon.svg" width="13" height="13" alt="Event Type"> ${event.EventType}</span>
-                                <span><img src="/public/img/hashtag.svg" width="13" height="13" alt="Enrollment Count"> ${enrollmentInfo}</span>
-                            </div>
-                        </li>
-                    `;
+                    
+                        <div class="event-title">${event.Title} ${badgeText ? `<span class="badge ${badgeClass}">${badgeText}</span>` : ''}</div>
+                        <div class="event-description">${event.Description}</div>
+                        <div class="event-details d-flex flex-wrap justify-content-between">
+                            <span><img src="/public/img/calendar-icon.svg" width="13" height="13" alt="Calendar"> ${new Date(event.DateTime).toLocaleString()}</span>
+                            <span><img src="/public/img/ubication-icon.svg" width="13" height="13" alt="Ubicación"> ${event.FacultyName}, ${event.FacultyUniversity}</span>
+                            <span><img src="/public/img/event-type-icon.svg" width="13" height="13" alt="Tipo de Evento"> ${event.EventType}</span>
+                            <span><img src="/public/img/hashtag.svg" width="13" height="13" alt="Cuenta de Inscripción"> ${enrollmentInfo}</span>
+                        </div>
+                    </li>
+                `;
+                
+                eventList.innerHTML += eventItem;
+            });
+            const items = eventList.querySelectorAll('.event-item');
+            items.forEach(item => {
+                item.addEventListener('click', showEventModal);
+            });
+            updateFiltersText(); 
+        }
+    
+        document.getElementById('filters-text').addEventListener('click', () => {
+            appliedFilters = initialFilters;
+            renderEvents(); 
+            document.getElementById('filters-text').innerText = 'Sin filtros'; 
+        });
+        
 
-                    eventList.innerHTML += eventItem;
-                });
+        function updateFiltersText() {
+            const filtersText = document.getElementById('filters-text');
+            const appliedFiltersText = [];
+        
+            if (appliedFilters.date) {
+                appliedFiltersText.push(`Fecha: ${new Date(appliedFilters.date).toLocaleDateString()}`);
+            }
+        
+            if (appliedFilters.locationText) {
+                appliedFiltersText.push(`Ubicación: ${appliedFilters.locationText}`);
+            }
+        
+            if (appliedFilters.eventType) {
+                appliedFiltersText.push(`Tipo: ${appliedFilters.eventType}`);
+            }
+        
+            if (appliedFilters.capacity) {
+                appliedFiltersText.push(`Capacidad total: ${appliedFilters.capacity}`);
+            }
+        
+            if (appliedFilters.minCapacity) {
+                appliedFiltersText.push(`Capacidad mínima: ${appliedFilters.minCapacity}`);
+            }
+        
+            if (appliedFilters.maxCapacity) {
+                appliedFiltersText.push(`Capacidad máxima: ${appliedFilters.maxCapacity}`);
+            }
+        
+            filtersText.innerText = appliedFiltersText.length > 0 ? appliedFiltersText.join(', ') : 'Sin filtros';
+        }
+        
+        
     
-                // Add a click event to each list item to open the modal
-                const items = eventList.querySelectorAll('.event-item');
-                items.forEach(item => {
-                    item.addEventListener('click', showModal);
-                });
-            })
-            .catch(error => console.error('Error al cargar eventos:', error));
-    }
+        document.getElementById('filter-button').addEventListener('click', () => {
+            const filterModal = new bootstrap.Modal(document.getElementById('filterModal'));
+            filterModal.show();
+        });
     
-    function showModal(event) {
+        document.getElementById('apply-filters').addEventListener('click', () => {
+            appliedFilters.date = document.getElementById('filter-date').value;
+            appliedFilters.location = document.getElementById('filter-location').value;
+            appliedFilters.eventType = document.getElementById('filter-type').value;
+            appliedFilters.minCapacity = document.getElementById('filter-min-capacity').value;
+            appliedFilters.maxCapacity = document.getElementById('filter-max-capacity').value;
+        
+            const selectedLocation = document.getElementById('filter-location');
+            const selectedOption = selectedLocation.options[selectedLocation.selectedIndex];
+            appliedFilters.locationText = selectedOption ? selectedOption.text : '';
+        
+            renderEvents();  
+            $('#filterModal').modal('hide');
+        });
+        
+
+        document.getElementById('reset-filters').addEventListener('click', () => {
+            appliedFilters = initialFilters;
+        
+            document.getElementById('filter-date').value = '';
+            document.getElementById('filter-location').value = '';
+            document.getElementById('filter-type').value = '';
+            document.getElementById('filter-min-capacity').value = '';
+            document.getElementById('filter-max-capacity').value = '';
+        
+            updateFiltersText();
+        
+            $('#filterModal').modal('hide');
+        });
+        
+
+    function showEventModal(event) {
         const item = event.currentTarget;
         const title = item.getAttribute('data-title');
         const description = item.getAttribute('data-description');

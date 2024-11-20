@@ -10,13 +10,6 @@
         body {
             background-color: #f8f9fa;
         }
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #343a40;
-            text-align: center;
-            margin-bottom: 30px;
-        }
 
     </style>
 </head>
@@ -25,16 +18,13 @@
     <%- include("partials/navbar", { role: role }) %>
 
     <div class="container mt-5 pt-2">
-        <h1>
-            <% if(isMyEvents){ %>
-                Tus Eventos
-            <% } else { %>  
-                Eventos Universitarios
-            <% } %>  
-        </h1>
-        
-        <%- include("partials/eventsList", { role: role, user:user }) %>
+        <%- include("partials/eventsList", { 
+            title: isMyEvents ? "Tus Eventos" : "Eventos Universitarios", 
+            role: role, user: user,
+            eventTypeList, facultyList
+         }) %>
     </div>
+    
     <%- include("partials/footer") %>
 
     <% if(role == 1){ %>

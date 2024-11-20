@@ -17,21 +17,45 @@ viewsRouter.get('/', isAuthenticated, (req, res) => {
     });*/
 });
 
-viewsRouter.get('/events', isAuthenticated, (req, res) => {
-    res.render('events', { 
-        role: req.user.role,
-        user: req.user.email,
-        isMyEvents: false
-    });
+viewsRouter.get('/events', isAuthenticated, async (req, res) => {
+    try {
+        
+
+        const [eventTypeList] = await pool.query("SELECT * FROM EventType");
+        const [facultyList] = await pool.query("SELECT * FROM Faculty");
+
+        res.render('events', {
+            role: req.user.role,
+            user: req.user.email,
+            isMyEvents: false,
+            eventTypeList,
+            facultyList
+        });
+    } catch (err) {
+        console.error("Error al obtener eventos: ", err);
+        res.status(500).json({ error: "Error al obtener los eventos" });
+    }
 });
 
-viewsRouter.get("/myevents", isAuthenticated, (req, res) => {
-    res.render('events', { 
-        role: req.user.role,
-        user: req.user.email,
-        isMyEvents: true
-    });
-})
+viewsRouter.get("/myevents", isAuthenticated, async (req, res) => {
+    try {
+
+        const [eventTypeList] = await pool.query("SELECT * FROM EventType");
+        const [facultyList] = await pool.query("SELECT * FROM Faculty");
+
+        res.render('events', {
+            role: req.user.role,
+            user: req.user.email,
+            isMyEvents: true, 
+            eventTypeList,
+            facultyList
+        });
+    } catch (err) {
+        console.error("Error al obtener mis eventos: ", err);
+        res.status(500).json({ error: "Error al obtener los eventos" });
+    }
+});
+
 
 viewsRouter.get("/notifications", isAuthenticated, (req, res) => {
     res.render('notifications',{
