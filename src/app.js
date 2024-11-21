@@ -31,6 +31,16 @@ const __dirname = path.dirname(__filename);
 
 
 app.set('view engine', 'ejs'); 
+
+
+app.post('/set-theme', (req, res) => {
+    console.log("saving theme ", req.body)
+    const { theme } = req.body;
+    req.session.theme = theme
+    res.status(200).send({ message: 'Tema guardado' });
+});
+
+
 app.set('views', path.join(__dirname, 'views'));
 app.set('layout', 'layout');
 

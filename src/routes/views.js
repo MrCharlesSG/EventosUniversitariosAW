@@ -1,14 +1,18 @@
 import { Router } from "express";
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { isAuthenticated, isAuthenticatedOrganizer, isAuthenticatedUser, redirectIfAuthenticated } from "../middleware/auth.js";
-import { isOrganizer } from "../utils/auth-utils.js";
-import { pool } from "../config/db.js";  // Asegúrate de tener acceso a tu pool de base de datos
+import { pool } from "../config/db.js"; // Asegúrate de tener acceso a tu pool de base de datos
+import { isAuthenticated, isAuthenticatedOrganizer, redirectIfAuthenticated } from "../middleware/auth.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export const viewsRouter = Router();
+
+const getTheme = (req) => {
+    console.log("Getting saved themec ", req.session)
+    return req.session.theme || ''
+}
 
 viewsRouter.get('/', isAuthenticated, (req, res) => {
     res.redirect('/events')
@@ -29,7 +33,8 @@ viewsRouter.get('/events', isAuthenticated, async (req, res) => {
             user: req.user.email,
             isMyEvents: false,
             eventTypeList,
-            facultyList
+            facultyList,
+            theme: getTheme(req)
         });
     } catch (err) {
         console.error("Error al obtener eventos: ", err);
@@ -49,7 +54,8 @@ viewsRouter.get("/myevents", isAuthenticated, async (req, res) => {
             user: req.user.email,
             isMyEvents: true, 
             eventTypeList,
-            facultyList
+            facultyList,
+            theme:"theme-dark"
         });
     } catch (err) {
         console.error("Error al obtener mis eventos: ", err);
@@ -62,6 +68,7 @@ viewsRouter.get("/notifications", isAuthenticated, (req, res) => {
     res.render('notifications',{
         role: req.user.role,
         user: req.user.email,
+        theme: getTheme(req)
         
     })
 })
@@ -71,6 +78,7 @@ viewsRouter.get("/accesibility", isAuthenticated, (req, res) => {
         'accesibility',
         { 
             role: req.user.role,
+            theme: getTheme(req)
          },
         
     )
@@ -118,7 +126,8 @@ viewsRouter.get("/profile", isAuthenticated, async (req, res) => {
         console.log("The profile attributes ", result);
 
         const user = result[0];
-        res.render("profile", { user, faculties, role: req.user.role });
+        res.render("profile", { user, faculties, role: req.user.role,
+            theme: getTheme(req) });
     } catch (err) {
         console.error("Error al obtener datos del perfil:", err);
         res.status(500).send("Error al obtener datos del perfil");
@@ -143,6 +152,7 @@ viewsRouter.get("/events/info", isAuthenticatedOrganizer, async (req, res) => {
                 eventTypeList,
                 facultyList,
                 event: rows[0],
+                theme: getTheme(req)
             });
         } else {
             res.status(404).json({ error: "Vista no encontrada" });
@@ -163,6 +173,7 @@ viewsRouter.get("/events/add", isAuthenticatedOrganizer, async (req, res) => {
             role: req.user.role,
             eventTypeList,
             facultyList,
+            theme: getTheme(req)
         });
     } catch (err) {
         console.error("Error al cargar el formulario: ", err);

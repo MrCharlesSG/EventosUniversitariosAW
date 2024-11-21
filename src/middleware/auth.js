@@ -52,17 +52,9 @@ export const isTheAuthenticatedUserAOrganizer = (req, res, next) => {
 };
 
 export const redirectIfAuthenticated = (req, res, next) => {
-    const token = req.cookies.token; 
-
-    if(!token) next();
-
-    if (token) {
-        jwt.verify(token, JWT_SECRET, (err, decoded) => {
-            if (!err) {
-                console.log("Esta autenticado redireccionando")
-                return res.redirect('/');
-            }
-            next();
-        });
+    if (req.session.user) {
+        console.log("No active session");
+        return res.redirect('/');
     }
+    next()
 };
