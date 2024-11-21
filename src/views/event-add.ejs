@@ -1,12 +1,4 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Evento</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <style>
+<style>
         body {
             background-color: #f8f9fa;
         }
@@ -22,34 +14,27 @@
             position: relative;
             top: -70px;
         }
+
+        .form {
+            margin-top: -40px;
+        }
+
+
         
-    </style>
-</head>
-<body>
-
-    <%- include("partials/navbar", {role:role}) %>
-
-    <div class="container mt-5 pt-2">
+</style>
         <div class="row justify-content-center">
-            <div class=" col-12 col-lg-9 ">
+            <div class=" col-12 col-lg-8 ">
                 <h2 class=" text-center">Crear Evento</h2>
                 <button class="btn back-button btn-outline-primary" onclick="window.history.back()">
                     <i class="fas fa-arrow-left"></i> 
+                    <span class="d-none d-lg-inline">Regresar</span>
                 </button>
                     
             </div>
         </div>
-        <div class="row justify-content-center">
-            <div class=" col-12 col-lg-9 ">
+        <div class="row justify-content-center form">
+            <div class=" col-12 col-lg-8 ">
                 <%- include("partials/eventForm", {event:null}) %>
             </div>
         </div>
-        <%- include("partials/footer") %>
     </div>
-
-    
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>

@@ -1,0 +1,19 @@
+
+    <h1>Elige tu estilo</h1>
+    <button onclick="changeThemeStyle('style1.css')">Estilo 1</button>
+    <button onclick="changeThemeStyle('style2.css')">Estilo 2</button>
+    <h1>Elige tu letra</h1>
+    <button onclick="changeLetterStyle('normal.css')">Normal</button>
+    <button onclick="changeLetterStyle('big.css')">Big</button>
+
+
+    <script>
+        function changeThemeStyle(style) {
+            const themeStyle = document.getElementById('theme-style');
+            themeStyle.setAttribute('href', `/public/css/color/${style}`);
+        }
+        function changeLetterStyle(style) {
+            const themeStyle = document.getElementById('letter-style');
+            themeStyle.setAttribute('href', `/public/css/letter/${style}`);
+        }
+    </script>

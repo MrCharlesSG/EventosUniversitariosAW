@@ -1,12 +1,4 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= event ? "Editar Evento" : "Crear Evento" %></title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <style>
+<style>
         body {
             background-color: #f8f9fa;
         }
@@ -48,27 +40,22 @@
         }
     </style>
 </head>
-<body>
 
-    <%- include("partials/navbar", {role:role}) %>
-
-    <div class="container mt-5 pt-2">
         <div class="row justify-content-center">
             <div class="col-12">
                 <h2 class="text-center"><%= event ? "Editar Evento" : "Crear Evento" %></h2>
                 <button class="btn back-button btn-outline-primary" onclick="window.history.back()">
                     <i class="fas fa-arrow-left"></i> 
+                    <span class="d-none d-lg-inline">Regresar</span>
                 </button>
             </div>
         </div>
 
         <div class="row  big-container justify-content-center ">
-            <!-- Formulario a la izquierda -->
             <div class="col-11 col-lg-8">
                 <%- include("partials/eventForm", {event}) %>
             </div>
 
-            <!-- Participantes a la derecha -->
             <div class="col-11 col-lg-4 h-100 mt-lg-0 mt-3">
                     <div class="accordion" id="accordionParticipantesConfirmados">
                         <div class="card  card-background">
@@ -116,11 +103,7 @@
             </div>
         <% } %>
 
-        <%- include("partials/footer") %>
-    </div>
-</body>
-
-</html>
+       
 
 
 
@@ -140,7 +123,6 @@
             });
         }
 
-        // Fetch de correos confirmados
         fetch(`${baseURL}/confirm/emails`)
             .then(response => {
                 if (!response.ok) {
@@ -157,7 +139,6 @@
                 document.getElementById('confirmedEmailsList').innerHTML = '<li class="list-group-item text-danger">Error al cargar correos confirmados</li>';
             });
 
-        // Fetch de correos en espera
         fetch(`${baseURL}/waiting/emails`)
             .then(response => {
                 if (!response.ok) {
@@ -175,7 +156,3 @@
             });
     }
 </script>
-
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

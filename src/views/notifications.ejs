@@ -1,16 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notificaciones</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
+<style>
 
         h1 {
             font-size: 2.5rem;
@@ -25,19 +14,29 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             padding: 20px;
-            margin-top: -20px;
         }
-
-        .notification-meta {
-            font-size: 0.875rem;
-            color: #6c757d;
+        .list-item {
+            border-bottom: 1px solid #ddd;
+            padding: 15px;
+            cursor: pointer;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            border-radius: 8px;
+            flex-direction: column;
+            margin-bottom: 5px;
+        }
+        .list-item:hover {
+            background-color: #f1f1f1;
+        }
+        .list-title {
+            font-weight: bold;
+            color: #007bff;
+            font-size: 1.25rem;
         }
 
-        .notification-meta span {
-            margin-right: 10px;
+        
+        .list-details {
+            font-size: 0.9rem;
+            color: #6c757d;
         }
 
         .read {
@@ -49,13 +48,9 @@
             top: -40px;
         }
     </style>
-</head>
 
-<body>
-    <!-- Navbar placeholder -->
-    <%- include("partials/navbar", { role: role }) %>
 
-    <div class="container mt-5 pt-2">
+
         <div class="row justify-content-center">
             <div class=" col-12 col-lg-8 ">
                 <h2 class=" text-center">Notifications</h2>
@@ -70,20 +65,11 @@
             <div class="col-12 col-lg-8">
                 <div class="list-container">
                     <ul id="notification-list" class="list-unstyled">
-                        <!-- Las notificaciones se agregarán aquí mediante JavaScript -->
+
                     </ul>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Footer placeholder -->
-    <%- include("partials/footer") %>
-
-    <!-- Bootstrap and jQuery scripts -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
         function fetchNotifications() {
@@ -107,11 +93,11 @@
                             });
     
                             const notificationItem = `
-                                <li class="notification-item read">
+                                <li class="list-item">
                                     <div class="d-flex align-items-center">
                                         <div>
-                                            <h5 class="notification-message text-primary">${notification.Message}</h5>
-                                            <div class="notification-meta d-flex flex-wrap justify-content-between">
+                                            <h5 class="list-title text-primary">${notification.Message}</h5>
+                                            <div class="list-details d-flex flex-wrap justify-content-between">
                                                 <span><strong>De:</strong> ${notification.Sender}</span>
                                                 <span><strong>Fecha:</strong> ${notificationDate}</span>
                                             </div>
@@ -132,6 +118,3 @@
 
         window.onload = fetchNotifications;
     </script>
-</body>
-
-</html>

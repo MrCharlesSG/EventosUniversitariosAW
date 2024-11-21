@@ -5,7 +5,7 @@
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         padding: 20px;
     }
-    .event-item {
+    .list-item {
         border-bottom: 1px solid #ddd;
         padding: 15px;
         cursor: pointer;
@@ -14,19 +14,19 @@
         flex-direction: column;
         margin-bottom: 5px;
     }
-    .event-item:hover {
+    .list-item:hover {
         background-color: #f1f1f1;
     }
-    .event-title {
+    .list-title {
         font-weight: bold;
         color: #007bff;
         font-size: 1.25rem;
     }
-    .event-description {
+    .list-description {
         font-size: 1rem;
         color: #6c757d;
     }
-    .event-details {
+    .list-details {
         font-size: 0.9rem;
         color: #6c757d;
     }
@@ -89,33 +89,55 @@
         z-index: 100; 
     }
 
+    
+
 </style>
 
 
-<div>
+<div class="">
     <div class="list-header">
         <h1><%= title %></h1> 
 
-    <!-- Sección de filtros -->
-    <div id="filters-section" class="filters-section mb-3 mt-3">
-        <button id="filter-button" class="btn btn-outline-primary">
-            <img src="/public/img/filter.svg" alt="Filtros" width="20" height="20">
-        </button>
+        <div id="filters-section" class="filters-section mb-3 mt-3">
+            <button id="filter-button" class="btn btn-outline-primary">
+                <img src="/public/img/filter.svg" alt="Filtros" width="20" height="20">
+            </button>
 
-        <!-- Mostrar filtros aplicados o "Sin filtros" -->
-        <div id="applied-filters" class="applied-filters">
-            <span id="filters-text">Sin filtros</span>
+            <div id="applied-filters" class="applied-filters">
+                <span id="filters-text">Sin filtros</span>
+            </div>
         </div>
     </div>
-    </div>
 
+    <div class="accordion mb-3" style="display: none;" id="accordionPastEvents">
+        <div class="list-container">
+            <div class=" " id="headingPastEvents">
+                <h5 class="mb-0">
+                    <button class="btn text-primary" type="button" data-toggle="collapse" data-target="#collapsePastEvents" aria-expanded="false" aria-controls="collapsePastEvents">
+                        <i class="fas fa-chevron-down"></i> Eventos Transcurridos
+                    </button>
+                </h5>
+            </div>
+            <div id="collapsePastEvents" class="collapse" aria-labelledby="headingPastEvents" data-parent="#accordionPastEvents">
+                <div class="card-body">
+                    <ul id="past-event-list" class="list-unstyled"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="list-container">
         <ul id="event-list" class="list-unstyled"></ul>
+
+        
     </div>
 </div>
 
-<%- include("filterModal", { role: role, user: user, eventTypeList, facultyList }) %>
+<button id="scroll-to-top" class="btn btn-outline-primary" style="display: none; position: fixed; bottom: 5px; right: 5px; z-index: 1000;">
+    <i class="fas fa-arrow-right" style="transform: rotate(-90deg);"></i>
+</button>
 
+
+<%- include("filterModal", { role: role, user: user, eventTypeList, facultyList }) %>
 <%- include("eventModal", { role: role, user: user }) %>
 
 
@@ -161,23 +183,29 @@
     
         function renderEvents() {
             const eventList = document.getElementById('event-list');
-            eventList.innerHTML = ''; 
-            console.log(appliedFilters)
+            const pastEventList = document.getElementById('past-event-list');
+            const accordionContainer = document.getElementById('accordionPastEvents');
+
+            eventList.innerHTML = '';
+            pastEventList.innerHTML = '';
+
+            const now = new Date();
             const filteredEvents = eventsData.filter(event => {
-                console.log(event)
                 return (
                     (!appliedFilters.date || new Date(event.DateTime).toLocaleDateString() === new Date(appliedFilters.date).toLocaleDateString()) &&
-                    (appliedFilters.location ? event.FacultyID==appliedFilters.location : true) &&
+                    (appliedFilters.location ? event.FacultyID == appliedFilters.location : true) &&
                     (appliedFilters.eventType ? event.EventType == appliedFilters.eventType : true) &&
-                    (!appliedFilters.minCapacity || event.Capacity >= appliedFilters.minCapacity) && 
-                    (!appliedFilters.maxCapacity || event.Capacity <= appliedFilters.maxCapacity)   // Filtro de capacidad máxima
+                    (!appliedFilters.minCapacity || event.Capacity >= appliedFilters.minCapacity) &&
+                    (!appliedFilters.maxCapacity || event.Capacity <= appliedFilters.maxCapacity)
                 );
             });
-    
+
             filteredEvents.forEach(event => {
+                const isPastEvent = new Date(event.DateTime) < now;
+
                 let badgeClass = '';
                 let badgeText = '';
-    
+
                 if (event.OrganizerID !== currentUserId) {
                     switch (event.Status) {
                         case 'confirmed':
@@ -193,26 +221,26 @@
                             badgeText = 'No Inscrito';
                     }
                 }
-    
+
                 const enrollmentInfo = `${event.EnrollmentCount} / ${event.Capacity} inscritos`;
-    
+
                 const eventItem = `
-                    <li class="event-item" 
+                    <li class="list-item" 
                         data-id="${event.ID}" 
-                            data-organizer="${event.OrganizerID}"
-                            data-title="${event.Title}" 
-                            data-description="${event.Description}" 
-                            data-date="${new Date(event.DateTime).toLocaleString()}" 
-                            data-location-name="${event.FacultyName}" 
-                            data-location-university="${event.FacultyUniversity}" 
-                            data-capacity="${event.Capacity}" 
-                            data-event-type="${event.EventType}"
-                            data-enrollment-count="${event.EnrollmentCount}"
-                            data-enrollment-status="${event.Status}">
+                        data-organizer="${event.OrganizerID}"
+                        data-title="${event.Title}" 
+                        data-description="${event.Description}" 
+                        data-date="${new Date(event.DateTime).toLocaleString()}" 
+                        data-location-name="${event.FacultyName}" 
+                        data-location-university="${event.FacultyUniversity}" 
+                        data-capacity="${event.Capacity}" 
+                        data-event-type="${event.EventType}"
+                        data-enrollment-count="${event.EnrollmentCount}"
+                        data-enrollment-status="${event.Status}">
                     
-                        <div class="event-title">${event.Title} ${badgeText ? `<span class="badge ${badgeClass}">${badgeText}</span>` : ''}</div>
-                        <div class="event-description">${event.Description}</div>
-                        <div class="event-details d-flex flex-wrap justify-content-between">
+                        <div class="list-title">${event.Title} ${badgeText ? `<span class="badge ${badgeClass}">${badgeText}</span>` : ''}</div>
+                        <div class="list-description">${event.Description}</div>
+                        <div class="list-details d-flex flex-wrap justify-content-between">
                             <span><img src="/public/img/calendar-icon.svg" width="13" height="13" alt="Calendar"> ${new Date(event.DateTime).toLocaleString()}</span>
                             <span><img src="/public/img/ubication-icon.svg" width="13" height="13" alt="Ubicación"> ${event.FacultyName}, ${event.FacultyUniversity}</span>
                             <span><img src="/public/img/event-type-icon.svg" width="13" height="13" alt="Tipo de Evento"> ${event.EventType}</span>
@@ -220,16 +248,33 @@
                         </div>
                     </li>
                 `;
-                
-                eventList.innerHTML += eventItem;
+
+                if (isPastEvent) {
+                    pastEventList.innerHTML += eventItem;
+                } else {
+                    eventList.innerHTML += eventItem;
+                }
             });
-            const items = eventList.querySelectorAll('.event-item');
+
+            const items = eventList.querySelectorAll('.list-item');
             items.forEach(item => {
                 item.addEventListener('click', showEventModal);
             });
-            updateFiltersText(); 
+            /*pastEvents.forEach(event => {
+                pastEventList.innerHTML += event;
+            });*/
+            if (pastEventList.children.length > 0) {
+                
+                accordionContainer.style.display = 'block'; 
+            } else {
+                accordionContainer.style.display = 'none'; 
+            }
+        
+            
+            updateFiltersText();
         }
-    
+
+        
         document.getElementById('filters-text').addEventListener('click', () => {
             appliedFilters = initialFilters;
             renderEvents(); 
@@ -415,4 +460,26 @@
         })
         .catch(error => console.error('Error al cancelar la inscripción del evento:', error));
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const scrollToTopButton = document.getElementById('scroll-to-top');
+    
+        // Mostrar/ocultar el botón según la posición del scroll
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) { // Mostrar el botón si el scroll está a más de 300px
+                scrollToTopButton.style.display = 'flex';
+            } else {
+                scrollToTopButton.style.display = 'none';
+            }
+        });
+    
+        // Manejar el clic en el botón
+        scrollToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    });
+    
 </script>
