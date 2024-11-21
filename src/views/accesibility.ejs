@@ -1,19 +1,38 @@
 
-    <h1>Elige tu estilo</h1>
-    <button onclick="changeThemeStyle('style1.css')">Estilo 1</button>
-    <button onclick="changeThemeStyle('style2.css')">Estilo 2</button>
-    <h1>Elige tu letra</h1>
-    <button onclick="changeLetterStyle('normal.css')">Normal</button>
-    <button onclick="changeLetterStyle('big.css')">Big</button>
+<div class="container mt-5">
+    <h1>Accesibilidad</h1>
+    <p>Elige un tema para mejorar tu experiencia en el sitio web.</p>
 
+    <div class="mb-4">
+        <button class="btn btn-primary" onclick="changeTheme('default')">Tema Predeterminado</button>
+        <button class="btn btn-secondary" onclick="changeTheme('dark')">Tema Oscuro</button>
+        <button class="btn btn-success" onclick="changeTheme('daltonic')">Tema Daltonico</button>
+    </div>
 
-    <script>
-        function changeThemeStyle(style) {
-            const themeStyle = document.getElementById('theme-style');
-            themeStyle.setAttribute('href', `/public/css/color/${style}`);
+    <div class="preview">
+        <h2>Vista previa del tema</h2>
+        <div class="alert alert-success">Mensaje de éxito</div>
+        <div class="alert alert-danger">Mensaje de error</div>
+        <div class="alert alert-warning">Mensaje de advertencia</div>
+        <button class="btn btn-primary">Botón Principal</button>
+    </div>
+</div>
+
+<script>
+    function changeTheme(theme) {
+        document.body.classList.remove('theme-dark', 'theme-daltonic');
+        if (theme === 'dark') {
+            document.body.classList.add('theme-dark');
+        } else if (theme === 'daltonic') {
+            document.body.classList.add('theme-daltonic');
         }
-        function changeLetterStyle(style) {
-            const themeStyle = document.getElementById('letter-style');
-            themeStyle.setAttribute('href', `/public/css/letter/${style}`);
+        localStorage.setItem('theme', theme);
+    }
+
+    (function() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            changeTheme(savedTheme);
         }
-    </script>
+    })();
+</script>

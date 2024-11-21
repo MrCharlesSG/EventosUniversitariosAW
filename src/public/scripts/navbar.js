@@ -23,13 +23,13 @@ function fetchNotificationsAndCheck() {
                         });
 
                         const notificationItem = `
-                            <div class="notification-item ${notification.Checked ? 'read' : 'unread'}">
+                            <div class="list-item ${notification.Checked ? 'read' : 'unread'}">
                                 <div class="d-flex align-items-center">
-                                    <div class="notification-message">
+                                    <div class="list-item-title">
                                         <strong>${notification.Message}</strong> 
                                     </div>
                                 </div>
-                                <div class="notification-meta d-flex flex-wrap justify-content-between">
+                                <div class="list-item-meta d-flex flex-wrap justify-content-between">
                                     <span><strong>Remitente:</strong> ${notification.Sender}</span>
                                     <span><strong>Fecha:</strong> ${notificationDate}</span>
                                 </div>

@@ -1,42 +1,14 @@
 <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #343a40;
-            text-align: center;
-            margin-bottom: 30px;
-        }
+
+
         
         .back-button {
             position: relative;
-            top: -70px;
-        }
-        .danger-zone {
-            border-radius: 5px;
-            background-color: rgb(255, 220, 220);
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .big-container {
-            margin-top: -50px;
+            top: -45px;
         }
 
-        .card-header-background {
-            background-color: white;
-        }
-
-        .card-background{
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border:#f8f9fa;
-        }
-
-        .list-item-background{
-            border-radius: 5px;
-            border:white;
-            background-color: #f8f9fa;
+        .form {
+            margin-top: -30px;
         }
     </style>
 </head>
@@ -51,41 +23,41 @@
             </div>
         </div>
 
-        <div class="row  big-container justify-content-center ">
+        <div class="row  form justify-content-center ">
             <div class="col-11 col-lg-8">
                 <%- include("partials/eventForm", {event}) %>
             </div>
 
             <div class="col-11 col-lg-4 h-100 mt-lg-0 mt-3">
                     <div class="accordion" id="accordionParticipantesConfirmados">
-                        <div class="card  card-background">
-                            <div class="card-header card-header-background" id="headingConfirmados">
+                        <div class="card">
+                            <div class="card-header " id="headingConfirmados">
                                 <h5 class="mb-0">
-                                    <button class="btn text-primary" type="button" data-toggle="collapse" data-target="#collapseConfirmados" aria-expanded="true" aria-controls="collapseConfirmados">
+                                    <button class="btn card-header-title" type="button" data-toggle="collapse" data-target="#collapseConfirmados" aria-expanded="true" aria-controls="collapseConfirmados">
                                         <i class="fas fa-chevron-down"></i> Participantes Confirmados
                                     </button>
                                 </h5>
                             </div>
                             <div id="collapseConfirmados" class="collapse " aria-labelledby="headingConfirmados" data-parent="#accordionParticipantesConfirmados">
                                 <div class="card-body">
-                                    <ul id="confirmedEmailsList" class="list-group mb-4"></ul>
+                                    <ul id="confirmedEmailsList" class="list-group list-group-flush mb-4"></ul>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="accordion" id="accordionParticipantesEsperas">
-                        <div class="card card-background mt-3">
-                            <div class="card-header card-header-background" id="headingEspera">
+                        <div class="card mt-3">
+                            <div class="card-header" id="headingEspera">
                                 <h5 class="mb-0">
-                                    <button class="btn text-primary" type="button" data-toggle="collapse" data-target="#collapseEspera" aria-expanded="true" aria-controls="collapseEspera">
+                                    <button class="btn card-header-title" type="button" data-toggle="collapse" data-target="#collapseEspera" aria-expanded="true" aria-controls="collapseEspera">
                                         <i class="fas fa-chevron-down"></i> Participantes en Espera
                                     </button>
                                 </h5>
                             </div>
                             <div id="collapseEspera" class="collapse show" aria-labelledby="headingEspera" data-parent="#accordionParticipantesEsperas">
                                 <div class="card-body">
-                                    <ul id="waitingEmailsList" class="list-group "></ul>
+                                    <ul id="waitingEmailsList" class="list-group list-group-flush "></ul>
                                 </div>
                             </div>
                         </div>
@@ -95,7 +67,7 @@
 
         <% if (event) { %>
             <div class=" row  mt-3 justify-content-center">
-                <form class="danger-zone border border-danger p-3 col-11 col-lg-8" id="cancelEventForm" action="/api/events/<%= event.ID %>/cancel" method="POST">
+                <form class="danger-zone p-3 col-11 col-lg-8" id="cancelEventForm" action="/api/events/<%= event.ID %>/cancel" method="POST">
                     <h5 class="w-100 text-danger text-center">Zona de Peligro</h5>
                     <button type="submit" class="btn w-100 btn-danger">Eliminar Evento</button>
                 </form>
@@ -117,7 +89,7 @@
             listElement.innerHTML = '';
             emails.forEach(email => {
                 const listItem = document.createElement('li');
-                listItem.className = 'list-group-item  list-item-background mt-1';
+                listItem.className = 'list-group-item mt-1';
                 listItem.textContent = email;
                 listElement.appendChild(listItem);
             });

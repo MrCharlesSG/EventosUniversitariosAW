@@ -1,17 +1,6 @@
 <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .profile-container {
-            border: 1px solid #f8fafc;
-            border-radius: 5px;
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
 
-        .profile-container h2 {
-            margin-bottom: 20px;
-        }
+        
 
         .toast {
             position: fixed;
@@ -20,17 +9,6 @@
             z-index: 1050;
         }
 
-        .danger-zone {
-            border-radius: 5px;
-            margin: auto;
-            background-color: rgb(255, 220, 220);
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h2 {
-            font-weight: 700;
-            color: #343a40;
-            text-align: center;
-        }
         .back-button {
             position: relative;
             top: -45px;
@@ -54,7 +32,7 @@
             
         <div class=" row justify-content-center big-container">
             <div class=" col-12 col-lg-7">
-                <div class=" w-100 profile-container px-3 py-4">
+                <div class=" w-100 form-container px-3 py-4">
                     <form id="profileForm" action="/api/auth/modifyUserInfo" method="POST">
                         <div class="form-group">
                             <label for="email">Correo Electrónico</label>

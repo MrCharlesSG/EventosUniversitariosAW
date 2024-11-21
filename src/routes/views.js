@@ -66,10 +66,12 @@ viewsRouter.get("/notifications", isAuthenticated, (req, res) => {
     })
 })
 
-viewsRouter.get("/accesibility",isAuthenticated, (req, res) => {
+viewsRouter.get("/accesibility", isAuthenticated, (req, res) => {
     res.render(
         'accesibility',
-        {role: req.user.role },
+        { 
+            role: req.user.role,
+         },
         
     )
 })

@@ -1,23 +1,7 @@
 <!-- Modal de filtros -->
 <style>
-    .form-container {
-        background-color: white;
-        border-radius: 5px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-    .form-group label {
-        font-weight: bold;
-    }
 
-    .form-select {
-        appearance: none; /* Elimina el estilo por defecto de algunos navegadores */
-        width: 100%; /* Asegura que el select ocupe todo el espacio disponible */
-        padding: 0.375rem 0.75rem;
-        border-radius: 0.375rem;
-        border: 1px solid #ccc;
-        background-color: #fff;
-        box-shadow: none;
-     }
+
 
 </style>
 
@@ -35,7 +19,7 @@
 
                 <div class="form-group">
                     <label for="filter-location">Ubicación</label>
-                    <select id="filter-location" class="form-select">
+                    <select id="filter-location" class="form-control" >
                         <option value="">Seleccionar Ubicación</option>
                         <% if (facultyList && facultyList.length) { %>
                             <% facultyList.forEach(faculty => { %>
@@ -51,7 +35,7 @@
 
                 <div class="form-group">
                     <label for="filter-type">Tipo de Evento</label>
-                    <select id="filter-type" class="form-select">
+                    <select id="filter-type" class="form-control">
                         <option value="">Seleccionar Tipo</option>
                         <% if (eventTypeList && eventTypeList.length) { %>
                             <% eventTypeList.forEach(eventType => { %>
