@@ -55,7 +55,7 @@ viewsRouter.get("/myevents", isAuthenticated, async (req, res) => {
             isMyEvents: true, 
             eventTypeList,
             facultyList,
-            theme:"theme-dark"
+            theme: getTheme(req)
         });
     } catch (err) {
         console.error("Error al obtener mis eventos: ", err);

@@ -66,7 +66,7 @@ body {
 
 nav {
     background-color: var(--background-color);
-    
+    font-size: var(--font-size-small-heading);
 }
 
 h1 {
@@ -83,6 +83,14 @@ h2 {
     text-align: center;
 }
 
+nav i {
+    color: var(--text-color);
+    font-size: 1.5rem;
+}
+
+nav i:hover {
+    color: var(--primary-color);
+}
 
 
  label {
@@ -114,6 +122,10 @@ input, select, textarea {
 .btn-primary {
     background-color: var(--primary-color) !important;
     border-color: var(--primary-color-light) !important;
+}
+
+.logo-name {
+    color: var(--primary-color) !important;
 }
 
 /*
@@ -327,9 +339,31 @@ NAV BAR
 */
 
 .navbar-brand {
-    color: var(--text-secondary-color) !important;
+    color: var(--primary-color) !important;
+    font-weight: bold;
 }
 
 .nav-item a {
     color: var(--text-secondary-color) !important;
+}
+
+.nav-item a.active {
+    color: var(--text-primary-color) !important; /* Cambia a un color específico para el activo */
+    font-weight: bold; /* Opcional: para resaltar el activo */
+    border-bottom: 2px solid var(--text-primary-color); /* Por ejemplo, una línea debajo */
+}
+
+.dropdown-menu {
+    background-color: var(--background-secondary) !important;
+    border: none !important;
+}
+
+.dropdown-item {
+    color: var(--text-secondary-color)  !important;
+}
+
+
+
+.danger-text {
+    color: var(--danger-color) !important;
 }

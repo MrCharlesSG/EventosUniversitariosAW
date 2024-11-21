@@ -32,7 +32,7 @@
 
         <div id="filters-section" class="filters-section mb-3 mt-3">
             <button id="filter-button" class="btn btn-outline-primary">
-                <img src="/public/img/filter.svg" alt="Filtros" width="20" height="20">
+                <i class="bi bi-funnel"></i>
             </button>
 
             <div id="applied-filters" class="applied-filters">
@@ -46,17 +46,18 @@
 
 
     <div class="accordion mb-3" style="display: none;" id="accordionPastEvents">
-        <div class="list-container">
-            <div class=" " id="headingPastEvents">
+        
+        <div class="card" >
+            <div class="card-header " id="headingPastEvents">
                 <h5 class="mb-0">
-                    <button class="btn text-primary" type="button" data-toggle="collapse" data-target="#collapsePastEvents" aria-expanded="false" aria-controls="collapsePastEvents">
-                        <i class="fas fa-chevron-down"></i> Eventos Transcurridos
+                    <button class="btn card-header-title " type="button" data-toggle="collapse" data-target="#collapsePastEvents" aria-expanded="false" aria-controls="collapsePastEvents">
+                        <i class="bi bi-chevron-down"></i> Eventos Transcurridos
                     </button>
                 </h5>
             </div>
-            <div id="collapsePastEvents" class="collapse" aria-labelledby="headingPastEvents" data-parent="#accordionPastEvents">
+            <div id="collapsePastEvents" class="collapse " aria-labelledby="headingPastEvents" data-parent="#accordionPastEvents">
                 <div class="card-body">
-                    <ul id="past-event-list" class="list-unstyled"></ul>
+                    <ul id="past-event-list" class="list-group list-unstyled mb-4"></ul>
                 </div>
             </div>
         </div>
@@ -69,7 +70,7 @@
 </div>
 
 <button id="scroll-to-top" class="btn btn-outline-primary" style="display: none; position: fixed; bottom: 5px; right: 5px; z-index: 1000;">
-    <i class="fas fa-arrow-right" style="transform: rotate(-90deg);"></i>
+    <i class="bi bi-chevron-up"></i>
 </button>
 
 
@@ -177,10 +178,10 @@
                         <div class="list-item-important-title">${event.Title} ${badgeText ? `<span class="badge ${badgeClass}">${badgeText}</span>` : ''}</div>
                         <div class="list-item-important-meta">${event.Description}</div>
                         <div class="list-item-important-meta d-flex flex-wrap justify-content-between">
-                            <span><img src="/public/img/calendar-icon.svg" width="13" height="13" alt="Calendar"> ${new Date(event.DateTime).toLocaleString()}</span>
-                            <span><img src="/public/img/ubication-icon.svg" width="13" height="13" alt="Ubicación"> ${event.FacultyName}, ${event.FacultyUniversity}</span>
-                            <span><img src="/public/img/event-type-icon.svg" width="13" height="13" alt="Tipo de Evento"> ${event.EventType}</span>
-                            <span><img src="/public/img/hashtag.svg" width="13" height="13" alt="Cuenta de Inscripción"> ${enrollmentInfo}</span>
+                            <span><i class="bi bi-calendar-event"></i> ${new Date(event.DateTime).toLocaleString()}</span>
+                            <span><i class="bi bi-geo"></i> ${event.FacultyName}, ${event.FacultyUniversity}</span>
+                            <span><i class="bi bi-tags"></i> ${event.EventType}</span>
+                            <span><i class="bi bi-hash"></i> ${enrollmentInfo}</span>
                         </div>
                     </li>
                 `;
