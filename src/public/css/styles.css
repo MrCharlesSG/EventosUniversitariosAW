@@ -10,7 +10,7 @@
     --warning-color-light:#fbbf24;
 
     --background-color: #f1f5f9; 
-    --background-secondary: #fff;
+    --background-secondary: #f8fafc;
     --background-dark: #d9dee2;
     
     --text-color: #1e293b;
@@ -58,7 +58,34 @@
     --font-size-large-heading: 1.75rem;
     --font-size-xl-heading: 2.25rem;
     --font-size-small: 0.875rem;
+    --font-size-medium: 1rem;
+    --font-size-large: 1.125rem;
 }
+
+:root.theme-small {
+    --font-size-base: 0.4rem;
+    --font-size-small-heading: 0.8rem;
+    --font-size-medium-heading: 1rem;
+    --font-size-large-heading: 1.4rem;
+    --font-size-xl-heading: 1.8rem;
+    --font-size-small: 0.75rem;
+    --font-size-medium: 0.9rem;
+    --font-size-large: 1rem;
+}
+
+:root.theme-large {
+    --font-size-base: 0.6rem;
+    --font-size-small-heading: 1.2rem;
+    --font-size-medium-heading: 1.5rem;
+    --font-size-large-heading: 2rem;
+    --font-size-xl-heading: 2.5rem;
+    --font-size-small: 1rem;
+    --font-size-medium: 1.2rem;
+    --font-size-large: 1.4rem;
+}
+
+
+
 
 body {
     background-color: var(--background-color) !important;
@@ -70,22 +97,26 @@ nav {
 }
 
 h1 {
-    font-size: var(--font-size-xl-heading);
+    font-size: var(--font-size-xl-heading)  !important;
     font-weight: 600;
-    color: var(--text-color);
+    color: var(--primary-color) !important;
     text-align: center;
 }
 
 h2 {
-    font-size: var(--font-size-large-heading);
+    font-size: var(--font-size-large-heading)  !important;
     font-weight: 700;
-    color: var(--text-color);
+    color: var(--primary-color-light) !important;
     text-align: center;
+}
+
+p {
+    font-size: var(--font-size-small) !important;
 }
 
 nav i {
     color: var(--text-color);
-    font-size: 1.5rem;
+    font-size: 1.75rem;
 }
 
 nav i:hover {

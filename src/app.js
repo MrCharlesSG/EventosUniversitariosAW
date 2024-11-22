@@ -36,7 +36,20 @@ app.set('view engine', 'ejs');
 app.post('/set-theme', (req, res) => {
     console.log("saving theme ", req.body)
     const { theme } = req.body;
-    req.session.theme = theme
+    req.session.theme = {
+        color: theme,
+        letter: req.session.theme?.letter || ''
+    }
+    res.status(200).send({ message: 'Tema guardado' });
+});
+ 
+app.post('/set-letter-theme', (req, res) => {
+    console.log("saving theme ", req.body)
+    const { theme } = req.body;
+    req.session.theme = {
+        color: req.session.theme.color || '',
+        letter: theme
+    }
     res.status(200).send({ message: 'Tema guardado' });
 });
 

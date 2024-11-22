@@ -1,27 +1,74 @@
+<div>
+    <!-- Header -->
+    <header class="mb-4 text-center">
+        <h1 >Opciones de Accesibilidad</h1>
+        <p class="lead text-muted">
+            Personaliza tu experiencia de navegación para que sea más cómoda y accesible.
+        </p>
+    </header>
 
-<div class="container mt-5">
-    <h1>Accesibilidad</h1>
-    <p>Elige un tema para mejorar tu experiencia en el sitio web.</p>
+    <!-- Section: Tema -->
+    <section class="card mb-5 shadow-sm">
+        <div class="card-body">
+            <h2>Seleccionar Tema de Colores</h2>
+            <p class="card-text text-muted">
+                Elige el tema que mejor se adapte a tus necesidades de visualización. 
+                El tema oscuro es ideal para condiciones de poca luz, mientras que el tema daltónico 
+                ofrece colores adaptados para personas con daltonismo.
+            </p>
+            <div class="btn-group" role="group" aria-label="Seleccionar tema">
+                <button class="btn btn-primary {{ theme === '' ? 'active' : '' }}" onclick="changeTheme('')">
+                    Predeterminado
+                </button>
+                <button class="btn btn-dark {{ theme === 'theme-dark' ? 'active' : '' }}" onclick="changeTheme('theme-dark')">
+                    Oscuro
+                </button>
+                <button class="btn btn-success {{ theme === 'theme-daltonic' ? 'active' : '' }}" onclick="changeTheme('theme-daltonic')">
+                    Daltónico
+                </button>
+            </div>
+        </div>
+    </section>
 
-    <div class="mb-4">
-        <button class="btn btn-primary" onclick="changeTheme('')">Tema Predeterminado</button>
-        <button class="btn btn-secondary" onclick="changeTheme('theme-dark')">Tema Oscuro</button>
-        <button class="btn btn-success" onclick="changeTheme('theme-daltonic')">Tema Daltonico</button>
-    </div>
+    <!-- Section: Dimensiones -->
+    <section class="card shadow-sm">
+        <div class="card-body">
+            <h2 >Ajustar Tamaño del Texto</h2>
+            <p class="card-text text-muted">
+                Ajusta el tamaño del texto para mejorar la legibilidad. El tamaño mediano es el predeterminado 
+                y debería funcionar bien para la mayoría de los usuarios.
+            </p>
+            <div class="btn-group" role="group" aria-label="Seleccionar tamaño de texto">
+                <button class="btn btn-primary {{ letter === 'theme-small' ? 'active' : '' }}" onclick="changeLetterTheme('theme-small')">
+                    Pequeño
+                </button>
+                <button class="btn btn-secondary {{ letter === '' ? 'active' : '' }}" onclick="changeLetterTheme('')">
+                    Predeterminado
+                </button>
+                <button class="btn btn-success {{ letter === 'theme-large' ? 'active' : '' }}" onclick="changeLetterTheme('theme-large')">
+                    Grande
+                </button>
+            </div>
+        </div>
+    </section>
 </div>
 
 <script>
-
     async function changeTheme(theme) {
-
         await fetch('/set-theme', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ theme })
         });
-
         location.reload();
     }
-    
-</script>
 
+    async function changeLetterTheme(theme) {
+        await fetch('/set-letter-theme', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ theme })
+        });
+        location.reload();
+    }
+</script>
