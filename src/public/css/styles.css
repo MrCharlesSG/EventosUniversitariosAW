@@ -26,7 +26,7 @@
     --text-secondary-color: #f1f5f9;
 
     --primary-color: #bb86fc;
-    --primary-color-light: #6200ea;
+    --primary-color-light: #701ce5;
     --danger-color: #cf6679;
     --danger-color-light: #ff8a80;
     --success-color: #03dac6;
@@ -397,4 +397,13 @@ NAV BAR
 
 .danger-text {
     color: var(--danger-color) !important;
+}
+
+.back-button {
+    position: relative;
+    top: -40px;
+}
+
+.form {
+    margin-top: -25px;
 }
