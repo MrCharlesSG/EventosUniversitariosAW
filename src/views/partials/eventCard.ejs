@@ -1,11 +1,157 @@
-<div class="card">
-    <div class="card-body">
-        <h5 class="card-title"><%= event.Title %></h5>
-        <h6 class="card-subtitle mb-2 text-muted"><%= new Date(event.DateTime).toLocaleDateString() %> - <%= new Date(event.DateTime).toLocaleTimeString() %></h6>
-        <p class="card-text"><%= event.Description %></p>
-        <p class="card-text"><strong>Ubicación:</strong> <%= event.Location %></p>
-        <p class="card-text"><strong>Capacidad:</strong> <%= event.Capacity %></p>
-        <a href="#" class="card-link">Detalles</a>
-        <a href="#" class="card-link">Inscribirse</a>
-    </div>
-</div>
+<!-- Lista de Eventos -->
+<ul>
+    <li class="list-item" 
+        data-status="<%= event.Status %>" 
+        data-organizer="<%= event.OrganizerID %>" 
+        data-id="<%= event.ID %>" 
+        data-title="<%= event.Title %>" 
+        data-description="<%= event.Description %>" 
+        data-date="<%= event.DateTime %>" data-location-name="<%= event.FacultyName %>" data-location-university="<%= event.FacultyUniversity %>" data-event-type="<%= event.EventType %>" data-enrollment-count="<%= event.EnrollmentCount %>" data-capacity="<%= event.Capacity %>">
+        <div class="list-item-important-title">
+            <%= event.Title %> 
+            <span class="badge-container"></span>
+        </div>
+        <div class="list-item-important-meta"><%= event.Description %></div>
+        <div class="list-item-important-meta d-flex flex-wrap justify-content-between">
+            <span><i class="bi bi-calendar-event"></i> <%= new Date(event.DateTime).toLocaleString() %></span>
+            <span><i class="bi bi-geo"></i> <%= event.FacultyName %>, <%= event.FacultyUniversity %></span>
+            <span><i class="bi bi-tags"></i> <%= event.EventType %></span>
+            <span><i class="bi bi-hash"></i> <%= event.EnrollmentCount %> / <%= event.Capacity %> inscritos</span>
+        </div>
+    </li>
+</ul>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+
+    $(document).ready(function() {
+        $('.list-item').each(function() {
+            var eventStatus = $(this).data('status');
+            var organizerId = $(this).data('organizer');
+            var currentUserId = '<%= user %>';
+            var badgeClass = '';
+            var badgeText = '';
+
+            if (organizerId !== currentUserId) {
+                switch (eventStatus) {
+                    case 'confirmed':
+                        badgeClass = 'badge-success';
+                        badgeText = 'Inscrito';
+                        break;
+                    case 'waiting':
+                        badgeClass = 'badge-warning';
+                        badgeText = 'En Cola';
+                        break;
+                    default:
+                        badgeClass = 'badge-danger';
+                        badgeText = 'No Inscrito';
+                }
+
+                $(this).find('.badge-container').html('<span class="badge ' + badgeClass + '">' + badgeText + '</span>');
+            }
+        });
+
+        $('.list-item').on('click', function() {
+            var title = $(this).data('title');
+            var description = $(this).data('description');
+            var date = new Date($(this).data('date')).toLocaleString();
+            var location = $(this).data('location-name') + ', ' + $(this).data('location-university');
+            var eventType = $(this).data('event-type');
+            var enrollmentCount = $(this).data('enrollment-count');
+            var capacity = $(this).data('capacity');
+            var organizer = $(this).data('organizer');
+            var status = $(this).data('status');
+            var eventId = $(this).data('id');
+            
+            var userStatus = '';
+            if (organizer === '<%= user %>') {
+                userStatus = 'Organizador';
+            } else {
+                switch (status) {
+                    case 'confirmed':
+                        userStatus = 'Inscrito';
+                        break;
+                    case 'waiting':
+                        userStatus = 'En Cola';
+                        break;
+                    default:
+                        userStatus = 'No Inscrito';
+                }
+            }
+
+            $('#modalTitle').text(title);
+            $('#modalDescription').text(description);
+            $('#modalDate').text(date);
+            $('#modalLocation').text(location);
+            $('#modalEventType').text(eventType);
+            $('#modalEnrollmentCount').text(enrollmentCount + ' inscritos');
+            $('#modalCapacity').text(capacity);
+            $('#modalOrganizer').text(organizer);
+            $('#modalUserStatus').text(userStatus);
+
+            if (organizer === '<%= user %>') {
+                $('#editButton').show();
+                $('#signUpButton').hide();
+                $('#dropOutButton').hide();
+                $('#editButton').attr('href', '/events/info?eventID=' + eventId);
+            } else {
+                $('#editButton').hide();
+                if (status === 'confirmed' || status === 'waiting') {
+                    $('#signUpButton').hide();
+                    $('#dropOutButton').show();
+                } else {
+                    $('#signUpButton').show();
+                    $('#dropOutButton').hide();
+                }
+            }
+
+            // Mostrar el modal
+            $('#eventModal').modal('show');
+
+            $('#signUpButton').off('click').on('click', function() {
+                enrollEvent(eventId);
+            });
+
+            $('#dropOutButton').off('click').on('click', function() {
+                unenrollEvent(eventId);
+            });
+            function enrollEvent(eventId) {
+                $.ajax({
+                    url: '/api/enroll/' + eventId,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    success: function(data) {
+                        if (data.message) {
+                            $('#signUpButton').hide();
+                            $('#dropOutButton').show();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error al inscribirse en el evento:', error);
+                    }
+                });
+            }
+    
+            function unenrollEvent(eventId) {
+                $.ajax({
+                    url: '/api/enroll/' + eventId,
+                    type: 'DELETE',
+                    contentType: 'application/json',
+                    success: function(data) {
+                        if (data.message) {
+                            $('#signUpButton').show();
+                            $('#dropOutButton').hide();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error al cancelar la inscripción del evento:', error);
+                    }
+                });
+            }
+    
+            $('#eventModal').modal('show');
+        });
+
+        
+    });
+</script>

@@ -1,10 +1,3 @@
-<!-- Modal de filtros -->
-<style>
-
-
-
-</style>
-
 <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -12,14 +5,34 @@
                 <h5 class="modal-title" id="filterModalLabel">Aplicar Filtros</h5>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label for="filter-date">Fecha</label>
-                    <input type="date" id="filter-date" class="form-control">
+                <!-- Fila para fechas -->
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="filter-date-start">Fecha de Inicio</label>
+                        <input type="date" id="filter-date-start" class="form-control">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="filter-date-end">Fecha de Fin</label>
+                        <input type="date" id="filter-date-end" class="form-control">
+                    </div>
                 </div>
 
-                <div class="form-group">
+                <!-- Fila para capacidades -->
+                <div class="form-row mt-3">
+                    <div class="form-group col-md-6">
+                        <label for="filter-min-capacity">Capacidad Mínima</label>
+                        <input type="number" id="filter-min-capacity" class="form-control" placeholder="Capacidad mínima">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="filter-max-capacity">Capacidad Máxima</label>
+                        <input type="number" id="filter-max-capacity" class="form-control" placeholder="Capacidad máxima">
+                    </div>
+                </div>
+
+                <!-- Filtro de ubicación -->
+                <div class="form-group mt-3">
                     <label for="filter-location">Ubicación</label>
-                    <select id="filter-location" class="form-control" >
+                    <select id="filter-location" class="form-control">
                         <option value="">Seleccionar Ubicación</option>
                         <% if (facultyList && facultyList.length) { %>
                             <% facultyList.forEach(faculty => { %>
@@ -33,7 +46,8 @@
                     </select>
                 </div>
 
-                <div class="form-group">
+                <!-- Filtro de tipo de evento -->
+                <div class="form-group mt-3">
                     <label for="filter-type">Tipo de Evento</label>
                     <select id="filter-type" class="form-control">
                         <option value="">Seleccionar Tipo</option>
@@ -48,23 +62,13 @@
                         <% } %>
                     </select>
                 </div>
-
-                <div class="form-group">
-                    <label for="filter-min-capacity">Capacidad Mínima</label>
-                    <input type="number" id="filter-min-capacity" class="form-control" placeholder="Capacidad mínima">
-                </div>
-                
-                <div class="form-group">
-                    <label for="filter-max-capacity">Capacidad Máxima</label>
-                    <input type="number" id="filter-max-capacity" class="form-control" placeholder="Capacidad máxima">
-                </div>
-                
             </div>
+
+            <!-- Botones de acción -->
             <div class="modal-footer d-flex justify-content-between">
                 <button type="button" id="reset-filters" class="btn btn-outline-primary flex-grow-1">Reiniciar</button>
                 <button type="button" id="apply-filters" class="btn btn-success flex-grow-1">Aplicar Filtros</button>
             </div>
-            
         </div>
     </div>
 </div>

@@ -45,7 +45,7 @@
     </object>
 
 
-    <div class="accordion mb-3" style="display: none;" id="accordionPastEvents">
+    <div class="accordion mb-3" id="accordionPastEvents">
         
         <div class="card" >
             <div class="card-header " id="headingPastEvents">
@@ -78,6 +78,7 @@
 <%- include("eventModal", { role: role, user: user }) %>
 
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 
 <script>
@@ -98,325 +99,387 @@
         }
 
         let appliedFilters = initialFilters;
+        const currentUserId = '<%= user %>';
         
     
-        document.addEventListener('DOMContentLoaded', () => {
+        $(document).ready(function () {
             const currentPath = window.location.pathname;
             const apiUrl = currentPath.includes('myevents') ? '/api/events/user' : '/api/events';
-            
+        
+            const eventsData = [];
+            let appliedFilters = {
+                date: null,
+                location: '',
+                locationText: '',
+                eventType: '',
+                minCapacity: null,
+                maxCapacity: null
+            };
+        
             console.log("Llamando a la API:", apiUrl, " por user ", currentUserId);
-            fetch(apiUrl)
-                .then(response => response.json())
-                .then(data => {
-                    eventsData.push(...data); 
+        
+            $.ajax({
+                url: apiUrl,
+                method: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    eventsData.push(...data);
                     renderEvents();
-                })
-                .catch(error => {
+                },
+                error: function (xhr, status, error) {
                     console.error("Error al cargar los eventos:", error);
+                }
+            });
+        
+            function renderEvents() {
+                const $eventList = $('#event-list');
+                const $pastEventList = $('#past-event-list');
+        
+                $eventList.empty();
+                $pastEventList.empty();
+        
+                const now = new Date();
+                const filteredEvents = eventsData.filter(event => {
+                    const eventDate = new Date(event.DateTime);
+
+                    return (
+                        (!appliedFilters.dateStart || eventDate >= new Date(appliedFilters.dateStart)) &&
+                        (!appliedFilters.dateEnd || eventDate <= new Date(appliedFilters.dateEnd)) &&
+                        (appliedFilters.location ? event.FacultyID == appliedFilters.location : true) &&
+                        (appliedFilters.eventType ? event.EventType == appliedFilters.eventType : true) &&
+                        (!appliedFilters.minCapacity || event.Capacity >= appliedFilters.minCapacity) &&
+                        (!appliedFilters.maxCapacity || event.Capacity <= appliedFilters.maxCapacity)
+                    );
                 });
-        });
-    
-        const currentUserId = '<%= user %>';
-    
-        function renderEvents() {
-            const eventList = document.getElementById('event-list');
-            const pastEventList = document.getElementById('past-event-list');
-            const accordionContainer = document.getElementById('accordionPastEvents');
-
-            eventList.innerHTML = '';
-            pastEventList.innerHTML = '';
-
-            const now = new Date();
-            const filteredEvents = eventsData.filter(event => {
-                return (
-                    (!appliedFilters.date || new Date(event.DateTime).toLocaleDateString() === new Date(appliedFilters.date).toLocaleDateString()) &&
-                    (appliedFilters.location ? event.FacultyID == appliedFilters.location : true) &&
-                    (appliedFilters.eventType ? event.EventType == appliedFilters.eventType : true) &&
-                    (!appliedFilters.minCapacity || event.Capacity >= appliedFilters.minCapacity) &&
-                    (!appliedFilters.maxCapacity || event.Capacity <= appliedFilters.maxCapacity)
-                );
+        
+                filteredEvents.forEach(event => {
+                    const isPastEvent = new Date(event.DateTime) < now;
+        
+                    let badgeClass = '';
+                    let badgeText = '';
+        
+                    if (event.OrganizerID !== currentUserId) {
+                        switch (event.Status) {
+                            case 'confirmed':
+                                badgeClass = 'badge-success';
+                                badgeText = 'Inscrito';
+                                break;
+                            case 'waiting':
+                                badgeClass = 'badge-warning';
+                                badgeText = 'En Cola';
+                                break;
+                            default:
+                                badgeClass = 'badge-danger';
+                                badgeText = 'No Inscrito';
+                        }
+                    }
+        
+                    const enrollmentInfo = ``;
+        
+                    const eventItem = `
+                        <li class="list-item" 
+                            data-id="${event.ID}" 
+                            data-organizer="${event.OrganizerID}"
+                            data-title="${event.Title}" 
+                            data-description="${event.Description}" 
+                            data-date="${new Date(event.DateTime).toLocaleString()}" 
+                            data-location-name="${event.FacultyName}" 
+                            data-location-university="${event.FacultyUniversity}" 
+                            data-capacity="${event.Capacity}" 
+                            data-event-type="${event.EventType}"
+                            data-enrollment-count="${event.EnrollmentCount}"
+                            data-enrollment-status="${event.Status}">
+                        
+                            <div class="list-item-important-title">${event.Title} ${badgeText ? `<span class="badge ${badgeClass}">${badgeText}</span>` : ''}</div>
+                            <div class="list-item-important-meta">${event.Description}</div>
+                            <div class="list-item-important-meta d-flex flex-wrap justify-content-between">
+                                <span><i class="bi bi-calendar-event"></i> ${new Date(event.DateTime).toLocaleString()}</span>
+                                <span><i class="bi bi-geo"></i> ${event.FacultyName}, ${event.FacultyUniversity}</span>
+                                <span><i class="bi bi-tags"></i> ${event.EventType}</span>
+                                <span><i class="bi bi-hash"></i> ${event.EnrollmentCount} / ${event.Capacity} inscritos</span>
+                            </div>
+                        </li>
+                    `;
+        
+                    if (isPastEvent) {
+                        $pastEventList.append(eventItem);
+                    } else {
+                        $eventList.append(eventItem);
+                    }
+                });
+        
+                $('.list-item').on('click', showEventModal);
+                updateFiltersText();
+            }
+        
+            function updateFiltersText() {
+                const $filtersText = $('#filters-text');
+                const appliedFiltersText = [];
+            
+                if (appliedFilters.dateStart && appliedFilters.dateEnd) {
+                    appliedFiltersText.push(
+                        `Fecha: del ${new Date(appliedFilters.dateStart).toLocaleDateString()} al ${new Date(appliedFilters.dateEnd).toLocaleDateString()}`
+                    );
+                } else if (appliedFilters.dateStart) {
+                    appliedFiltersText.push(`Fecha desde: ${new Date(appliedFilters.dateStart).toLocaleDateString()}`);
+                } else if (appliedFilters.dateEnd) {
+                    appliedFiltersText.push(`Fecha hasta: ${new Date(appliedFilters.dateEnd).toLocaleDateString()}`);
+                }
+            
+                if (appliedFilters.locationText) {
+                    appliedFiltersText.push(`Ubicación: ${appliedFilters.locationText}`);
+                }
+            
+                if (appliedFilters.eventType) {
+                    appliedFiltersText.push(`Tipo: ${appliedFilters.eventType}`);
+                }
+            
+                if (appliedFilters.minCapacity) {
+                    appliedFiltersText.push(`Capacidad mínima: ${appliedFilters.minCapacity}`);
+                }
+            
+                if (appliedFilters.maxCapacity) {
+                    appliedFiltersText.push(`Capacidad máxima: ${appliedFilters.maxCapacity}`);
+                }
+            
+                $filtersText.text(appliedFiltersText.length > 0 ? appliedFiltersText.join(', ') : 'Sin filtros');
+            }
+            
+        
+            $('#filter-button').on('click', () => {
+                $('#filterModal').modal('show');
+            });
+        
+            $('#apply-filters').on('click', function () {
+                // Guardar el valor y el texto del filtro de fecha (inicio y fin)
+                appliedFilters.dateStart = $('#filter-date-start').val(); 
+                appliedFilters.dateEnd = $('#filter-date-end').val(); 
+                
+                // Obtener el valor y el texto seleccionado en el filtro de ubicación
+                const selectedLocation = $('#filter-location').val();
+                const selectedLocationText = $('#filter-location option:selected').text();
+                
+                appliedFilters.location = selectedLocation;          
+                appliedFilters.locationText = selectedLocationText;  
+                
+                appliedFilters.eventType = $('#filter-type').val();
+                appliedFilters.minCapacity = $('#filter-min-capacity').val();
+                appliedFilters.maxCapacity = $('#filter-max-capacity').val();
+            
+                updateFiltersText();
+                
+                renderEvents();
+                
+                $('#filterModal').modal('hide');
+            });
+            
+            
+            $('#reset-filters').on('click', function() {
+                appliedFilters = {}; 
+                $('#filter-date-start').val('');
+                $('#filter-date-end').val('');
+                $('#filter-location').val('');
+                $('#filter-type').val('');
+                $('#filter-min-capacity').val('');
+                $('#filter-max-capacity').val('');
+                
+                updateFiltersText();
+                
+            });
+            
+            
+            $('#filters-text').on('click', () => {
+                appliedFilters = {
+                    date: null,
+                    location: '',
+                    locationText: '',
+                    eventType: '',
+                    minCapacity: null,
+                    maxCapacity: null
+                };
+        
+                renderEvents();
+                $('#filters-text').text('Sin filtros');
             });
 
-            filteredEvents.forEach(event => {
-                const isPastEvent = new Date(event.DateTime) < now;
-
-                let badgeClass = '';
-                let badgeText = '';
-
-                if (event.OrganizerID !== currentUserId) {
-                    switch (event.Status) {
+            function showEventModal(event) {
+                const $item = $(event.currentTarget);
+        
+                const title = $item.data('title');
+                const description = $item.data('description');
+                const date = $item.data('date');
+                const locationName = $item.data('location-name');
+                const locationUniversity = $item.data('location-university');
+                const location = `${locationName}, ${locationUniversity}`;
+                const organizer = $item.data('organizer');
+                const eventType = $item.data('event-type');
+                const enrollmentCount = $item.data('enrollment-count');
+                const capacity = $item.data('capacity');
+                const eventId = $item.data('id');
+                const enrollmentStatus = $item.data('enrollment-status');
+                const isEnrolled = enrollmentStatus === 'confirmed' || enrollmentStatus === 'waiting';
+        
+                let userStatus = '';
+                if (organizer === currentUserId) {
+                    userStatus = 'Organizador';
+                } else {
+                    switch (enrollmentStatus) {
                         case 'confirmed':
-                            badgeClass = 'badge-success';
-                            badgeText = 'Inscrito';
+                            userStatus = 'Inscrito';
                             break;
                         case 'waiting':
-                            badgeClass = 'badge-warning';
-                            badgeText = 'En Cola';
+                            userStatus = 'En Cola';
                             break;
                         default:
-                            badgeClass = 'badge-danger';
-                            badgeText = 'No Inscrito';
+                            userStatus = 'No Inscrito';
                     }
                 }
-
-                const enrollmentInfo = `${event.EnrollmentCount} / ${event.Capacity} inscritos`;
-
-                const eventItem = `
-                    <li class="list-item" 
-                        data-id="${event.ID}" 
-                        data-organizer="${event.OrganizerID}"
-                        data-title="${event.Title}" 
-                        data-description="${event.Description}" 
-                        data-date="${new Date(event.DateTime).toLocaleString()}" 
-                        data-location-name="${event.FacultyName}" 
-                        data-location-university="${event.FacultyUniversity}" 
-                        data-capacity="${event.Capacity}" 
-                        data-event-type="${event.EventType}"
-                        data-enrollment-count="${event.EnrollmentCount}"
-                        data-enrollment-status="${event.Status}">
-                    
-                        <div class="list-item-important-title">${event.Title} ${badgeText ? `<span class="badge ${badgeClass}">${badgeText}</span>` : ''}</div>
-                        <div class="list-item-important-meta">${event.Description}</div>
-                        <div class="list-item-important-meta d-flex flex-wrap justify-content-between">
-                            <span><i class="bi bi-calendar-event"></i> ${new Date(event.DateTime).toLocaleString()}</span>
-                            <span><i class="bi bi-geo"></i> ${event.FacultyName}, ${event.FacultyUniversity}</span>
-                            <span><i class="bi bi-tags"></i> ${event.EventType}</span>
-                            <span><i class="bi bi-hash"></i> ${enrollmentInfo}</span>
-                        </div>
-                    </li>
-                `;
-
-                if (isPastEvent) {
-                    pastEventList.innerHTML += eventItem;
+        
+                console.log("Is enrolled:", isEnrolled);
+        
+                $('#modalTitle').text(title);
+                $('#modalDescription').text(description);
+                $('#modalDate').text(date);
+                $('#modalLocation').text(location);
+                $('#modalOrganizer').text(organizer);
+                $('#modalEventType').text(eventType);
+                $('#modalEnrollmentCount').text(`${enrollmentCount} inscritos`);
+                $('#modalUserStatus').text(userStatus);
+                $('#modalCapacity').text(capacity);
+        
+                const $editButton = $('#editButton');
+                const $signUpButton = $('#signUpButton');
+                const $dropOutButton = $('#dropOutButton');
+        
+                if (organizer === currentUserId) {
+                    $editButton.show().attr('href', `/events/info?eventID=${eventId}`);
+                    $signUpButton.hide();
+                    $dropOutButton.hide();
                 } else {
-                    eventList.innerHTML += eventItem;
+                    $editButton.hide();
+                    if (isEnrolled) {
+                        $signUpButton.hide();
+                        $dropOutButton.show();
+                    } else {
+                        $signUpButton.show();
+                        $dropOutButton.hide();
+                    }
+                }
+        
+                $signUpButton.off('click').on('click', () => enrollEvent(eventId));
+                $dropOutButton.off('click').on('click', () => unenrollEvent(eventId));
+                $('#eventModal').modal('show');
+            }
+        
+            function enrollEvent(eventId) {
+                console.log("Enrolling...");
+                $.ajax({
+                    url: `/api/enroll/${eventId}`,
+                    method: 'POST',
+                    contentType: 'application/json',
+                    success: function (data) {
+                        if (data.message) {
+                            const $eventItem = $(`[data-id="${eventId}"]`);
+            
+                            const currentEnrollmentCount = parseInt($eventItem.data('enrollment-count'), 10);
+                            const capacity = parseInt($eventItem.data('capacity'), 10);
+                            const newEnrollmentCount = currentEnrollmentCount + 1;
+
+                            $eventItem.data('enrollment-count', newEnrollmentCount);
+            
+                            let newStatus = '';
+                            if (newEnrollmentCount > capacity) {
+                                newStatus = 'waiting';
+                            } else {
+                                newStatus = 'confirmed';
+                            }
+                            $eventItem.data('enrollment-status', newStatus);
+            
+                            // lista
+                            $eventItem.find('.list-item-important-title .badge')
+                                .removeClass('badge-danger badge-warning badge-success')
+                                .addClass(newStatus === 'confirmed' ? 'badge-success' : 'badge-warning')
+                                .text(newStatus === 'confirmed' ? 'Inscrito' : 'En Cola');
+            
+                                const enrollmentInfo = `${newEnrollmentCount} / ${$eventItem.data('capacity')} inscritos`;
+                                console.log("The new ", enrollmentInfo)
+                                const $enrollmentInfo = $eventItem.find('.bi-hash').parent();
+                                const currentText = $enrollmentInfo.html(); 
+                                $enrollmentInfo.html(`<i class="bi bi-hash"></i> ${enrollmentInfo}`);
+    
+                            // modal
+                            $('#modalEnrollmentCount').text(`${newEnrollmentCount} inscritos`);
+                            $('#modalUserStatus').text(event.Status === 'waiting' ? 'En Cola' : 'Inscrito');
+            
+                            $('#signUpButton').hide();
+                            $('#dropOutButton').show();
+                        }
+                    },
+                    error: function (error) {
+                        console.error('Error al inscribirse en el evento:', error);
+                    }
+                });
+            }
+            
+            function unenrollEvent(eventId) {
+                console.log("Unenrolling...");
+                $.ajax({
+                    url: `/api/enroll/${eventId}`,
+                    method: 'DELETE',
+                    contentType: 'application/json',
+                    success: function (data) {
+                        if (data.message) {
+                            const $eventItem = $(`[data-id="${eventId}"]`);
+            
+                            const currentEnrollmentCount = parseInt($eventItem.data('enrollment-count'), 10);
+                            const newEnrollmentCount = currentEnrollmentCount - 1;
+                            console.log("T--a-s" ,newEnrollmentCount)
+
+                            $eventItem.data('enrollment-count', newEnrollmentCount);
+                            $eventItem.data('enrollment-status', 'cancelled');
+            
+                            // lista
+                            $eventItem.find('.list-item-important-title .badge')
+                                .removeClass('badge-danger badge-warning badge-success')
+                                .addClass('badge-danger')
+                                .text('No Inscrito');
+            
+                            const enrollmentInfo = `${newEnrollmentCount} / ${$eventItem.data('capacity')} inscritos`;
+                            console.log("The new ", enrollmentInfo)
+                            const $enrollmentInfo = $eventItem.find('.bi-hash').parent();
+                            const currentText = $enrollmentInfo.html(); 
+                            $enrollmentInfo.html(`<i class="bi bi-hash"></i> ${enrollmentInfo}`);
+
+                            // modal
+                            $('#modalEnrollmentCount').text(`${newEnrollmentCount} inscritos`);
+                            $('#modalUserStatus').text('No Inscrito');
+                            $('#signUpButton').show();
+                            $('#dropOutButton').hide();
+                        }
+                    },
+                    error: function (error) {
+                        console.error('Error al cancelar la inscripción del evento:', error);
+                    }
+                });
+            }
+            
+            // Mostrar/ocultar el botón para volver al inicio según el scroll
+            const $scrollToTopButton = $('#scroll-to-top');
+            $(window).on('scroll', function () {
+                if ($(window).scrollTop() > 300) {
+                    $scrollToTopButton.fadeIn();
+                } else {
+                    $scrollToTopButton.fadeOut();
                 }
             });
-
-            const items = eventList.querySelectorAll('.list-item');
-            items.forEach(item => {
-                item.addEventListener('click', showEventModal);
+        
+            // Manejar el clic en el botón para volver al inicio
+            $scrollToTopButton.on('click', function () {
+                $('html, body').animate({ scrollTop: 0 }, 'smooth');
             });
-            /*pastEvents.forEach(event => {
-                pastEventList.innerHTML += event;
-            });*/
-            if (pastEventList.children.length > 0) {
-                
-                accordionContainer.style.display = 'block'; 
-            } else {
-                accordionContainer.style.display = 'none'; 
-            }
         
-            
-            updateFiltersText();
-        }
-
-        
-        document.getElementById('filters-text').addEventListener('click', () => {
-            appliedFilters = initialFilters;
-            renderEvents(); 
-            document.getElementById('filters-text').innerText = 'Sin filtros'; 
+            // Delegación de eventos para abrir el modal
+            $(document).on('click', '.list-item', showEventModal);
         });
-        
-
-        function updateFiltersText() {
-            const filtersText = document.getElementById('filters-text');
-            const appliedFiltersText = [];
-        
-            if (appliedFilters.date) {
-                appliedFiltersText.push(`Fecha: ${new Date(appliedFilters.date).toLocaleDateString()}`);
-            }
-        
-            if (appliedFilters.locationText) {
-                appliedFiltersText.push(`Ubicación: ${appliedFilters.locationText}`);
-            }
-        
-            if (appliedFilters.eventType) {
-                appliedFiltersText.push(`Tipo: ${appliedFilters.eventType}`);
-            }
-        
-            if (appliedFilters.capacity) {
-                appliedFiltersText.push(`Capacidad total: ${appliedFilters.capacity}`);
-            }
-        
-            if (appliedFilters.minCapacity) {
-                appliedFiltersText.push(`Capacidad mínima: ${appliedFilters.minCapacity}`);
-            }
-        
-            if (appliedFilters.maxCapacity) {
-                appliedFiltersText.push(`Capacidad máxima: ${appliedFilters.maxCapacity}`);
-            }
-        
-            filtersText.innerText = appliedFiltersText.length > 0 ? appliedFiltersText.join(', ') : 'Sin filtros';
-        }
-        
-        
-    
-        document.getElementById('filter-button').addEventListener('click', () => {
-            const filterModal = new bootstrap.Modal(document.getElementById('filterModal'));
-            filterModal.show();
-        });
-    
-        document.getElementById('apply-filters').addEventListener('click', () => {
-            appliedFilters.date = document.getElementById('filter-date').value;
-            appliedFilters.location = document.getElementById('filter-location').value;
-            appliedFilters.eventType = document.getElementById('filter-type').value;
-            appliedFilters.minCapacity = document.getElementById('filter-min-capacity').value;
-            appliedFilters.maxCapacity = document.getElementById('filter-max-capacity').value;
-        
-            const selectedLocation = document.getElementById('filter-location');
-            const selectedOption = selectedLocation.options[selectedLocation.selectedIndex];
-            appliedFilters.locationText = selectedOption ? selectedOption.text : '';
-        
-            renderEvents();  
-            $('#filterModal').modal('hide');
-        });
-        
-
-        document.getElementById('reset-filters').addEventListener('click', () => {
-            appliedFilters = initialFilters;
-        
-            document.getElementById('filter-date').value = '';
-            document.getElementById('filter-location').value = '';
-            document.getElementById('filter-type').value = '';
-            document.getElementById('filter-min-capacity').value = '';
-            document.getElementById('filter-max-capacity').value = '';
-        
-            updateFiltersText();
-        
-            $('#filterModal').modal('hide');
-        });
-        
-
-    function showEventModal(event) {
-        const item = event.currentTarget;
-        const title = item.getAttribute('data-title');
-        const description = item.getAttribute('data-description');
-        const date = item.getAttribute('data-date');
-        const locationName = item.getAttribute('data-location-name');
-        const locationUniversity = item.getAttribute('data-location-university');
-        const location = `${locationName}, ${locationUniversity}`;
-        const organizer = item.getAttribute('data-organizer');
-        const eventType = item.getAttribute('data-event-type');
-        const enrollmentCount = item.getAttribute('data-enrollment-count');
-        const capacity = item.getAttribute('data-capacity');
-        const eventId = item.getAttribute('data-id');
-        const enrollmentStatus = item.getAttribute('data-enrollment-status');
-        const isEnrolled = enrollmentStatus === 'confirmed' || enrollmentStatus === 'waiting';
-        let userStatus = '';
-        
-        if (organizer === currentUserId) {
-            userStatus = 'Organizador';
-        } else {
-            switch (enrollmentStatus) {
-                case 'confirmed':
-                    userStatus = 'Inscrito';
-                    break;
-                case 'waiting':
-                    userStatus = 'En Cola';
-                    break;
-                default:
-                    userStatus = 'Not Inscrito';
-            }
-        }
-    
-        console.log("Is enrolled ", isEnrolled);
-    
-        document.getElementById('modalTitle').textContent = title;
-        document.getElementById('modalDescription').textContent = description;
-        document.getElementById('modalDate').textContent = date;
-        document.getElementById('modalLocation').textContent = location;
-        document.getElementById('modalOrganizer').textContent = organizer;
-        document.getElementById('modalEventType').textContent = eventType;
-        document.getElementById('modalEnrollmentCount').textContent = `${enrollmentCount} inscritos`;
-        document.getElementById('modalUserStatus').textContent = userStatus;
-        document.getElementById('modalCapacity').textContent = capacity;
-    
-        const editButton = document.getElementById('editButton');
-        const signUpButton = document.getElementById('signUpButton');
-        const dropOutButton = document.getElementById('dropOutButton');
-    
-        if (organizer === currentUserId) {
-            editButton.style.display = 'inline-block';
-            signUpButton.style.display = 'none';
-            dropOutButton.style.display = 'none';
-            if (editButton && editButton.href) {
-                editButton.href = `/events/info?eventID=${eventId}`;
-            }
-        } else {
-            editButton.style.display = 'none';
-            if (isEnrolled) {
-                signUpButton.style.display = 'none';
-                dropOutButton.style.display = 'inline-block';
-            } else {
-                signUpButton.style.display = 'inline-block';
-                dropOutButton.style.display = 'none';
-            }
-        }
-    
-        signUpButton.onclick = () => enrollEvent(eventId);
-        dropOutButton.onclick = () => unenrollEvent(eventId);
-        $('#eventModal').modal('show');
-    }
-    
-
-    function enrollEvent(eventId) {
-        console.log("Enrolling...");
-
-        fetch(`/api/enroll/${eventId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message) {
-                document.getElementById('signUpButton').style.display = 'none';
-                document.getElementById('dropOutButton').style.display = 'inline-block';
-            }
-        })
-        .catch(error => console.error('Error al inscribirse en el evento:', error));
-    }
-
-    function unenrollEvent(eventId) {
-        console.log("Unenrolling...");
-
-        fetch(`/api/enroll/${eventId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message) {
-                document.getElementById('signUpButton').style.display = 'inline-block';
-                document.getElementById('dropOutButton').style.display = 'none';
-            }
-        })
-        .catch(error => console.error('Error al cancelar la inscripción del evento:', error));
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const scrollToTopButton = document.getElementById('scroll-to-top');
-    
-        // Mostrar/ocultar el botón según la posición del scroll
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 300) { // Mostrar el botón si el scroll está a más de 300px
-                scrollToTopButton.style.display = 'flex';
-            } else {
-                scrollToTopButton.style.display = 'none';
-            }
-        });
-    
-        // Manejar el clic en el botón
-        scrollToTopButton.addEventListener('click', () => {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
-    });
     
 </script>

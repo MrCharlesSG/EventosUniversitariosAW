@@ -35,7 +35,7 @@ export class EventsController {
                 LEFT JOIN 
                     eventtype et ON et.ID = e.EventTypeID
                 WHERE 
-                    e.Active = 1 AND e.DateTime >= NOW()
+                    e.Active = 1 
                 ORDER BY 
                     e.DateTime ASC;
             `;

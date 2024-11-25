@@ -1,150 +1,140 @@
-<style>
-
-
-
-</style>
-
-
 <div class="row justify-content-center">
-        <div class="form-container p-4 w-100 ">
-            <form action="<%= event ? `/api/events/${event.ID}/update` : '/api/events/' %>" method="POST">
-                <div class="form-group">
-                    <label for="title">Título del Evento</label>
-                    <input 
-                        type="text" 
-                        class="form-control" 
-                        id="title" 
-                        name="title" 
-                        placeholder="Ingresa el título del evento" 
-                        value="<%= event ? event.Title : '' %>" 
-                        required
-                    >
-                </div>
+    <div class="form-container p-4 w-100">
+        <form id="eventForm" action="<%= event ? `/api/events/${event.ID}/update` : '/api/events/' %>" method="POST">
+            <div class="form-group">
+                <label for="title">Título del Evento</label>
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    id="title" 
+                    name="title" 
+                    placeholder="Ingresa el título del evento" 
+                    value="<%= event ? event.Title : '' %>" 
+                    required
+                >
+            </div>
 
-                <div class="form-group">
-                    <label for="description">Descripción</label>
-                    <textarea 
-                        class="form-control" 
-                        id="description" 
-                        name="description" 
-                        rows="4" 
-                        placeholder="Descripción del evento"
-                    ><%= event ? event.Description : '' %></textarea>
-                </div>
+            <div class="form-group">
+                <label for="description">Descripción</label>
+                <textarea 
+                    class="form-control" 
+                    id="description" 
+                    name="description" 
+                    rows="4" 
+                    placeholder="Descripción del evento"
+                ><%= event ? event.Description : '' %></textarea>
+            </div>
 
-                <div class="form-group">
-                    <label for="dateTime">Fecha y Hora</label>
-                    <input 
-                        type="datetime-local" 
-                        class="form-control" 
-                        id="dateTime" 
-                        name="dateTime" 
-                        value="<%= event ? new Date(event.DateTime).toISOString().slice(0, 16) : '' %>" 
-                        required
-                    >
-                </div>
+            <div class="form-group">
+                <label for="dateTime">Fecha y Hora</label>
+                <input 
+                    type="datetime-local" 
+                    class="form-control" 
+                    id="dateTime" 
+                    name="dateTime" 
+                    value="<%= event ? new Date(event.DateTime).toISOString().slice(0, 16) : '' %>" 
+                    required
+                >
+            </div>
 
-                <div class="form-group">
-                    <label for="location">Ubicación</label>
-                    <select 
-                        class="form-control" 
-                        id="location" 
-                        name="location" 
-                        required
-                    >
-                        <% if (facultyList && facultyList.length) { %>
-                            <% facultyList.forEach(faculty => { %>
-                                <option 
-                                    value="<%= faculty.ID %>" 
-                                    <%= event && event.Location === faculty.ID ? 'selected' : '' %>>
-                                    <%= faculty.Name %>, <%= faculty.University %>
-                                </option>
-                            <% }) %>
-                        <% } else { %>
-                            <option disabled>No hay facultades disponibles</option>
-                        <% } %>
-                    </select>
-                </div>
+            <div class="form-group">
+                <label for="location">Ubicación</label>
+                <select 
+                    class="form-control" 
+                    id="location" 
+                    name="location" 
+                    required
+                >
+                    <% if (facultyList && facultyList.length) { %>
+                        <% facultyList.forEach(faculty => { %>
+                            <option 
+                                value="<%= faculty.ID %>" 
+                                <%= event && event.Location === faculty.ID ? 'selected' : '' %>>
+                                <%= faculty.Name %>, <%= faculty.University %>
+                            </option>
+                        <% }) %>
+                    <% } else { %>
+                        <option disabled>No hay facultades disponibles</option>
+                    <% } %>
+                </select>
+            </div>
 
-                <div class="form-group">
-                    <label for="capacity">Capacidad</label>
-                    <input 
-                        type="number" 
-                        class="form-control" 
-                        id="capacity" 
-                        name="capacity" 
-                        placeholder="Capacidad del evento"
-                        value="<%= event ? event.Capacity : '' %>"
-                        min="1" 
-                    >
-                </div>
+            <div class="form-group">
+                <label for="capacity">Capacidad</label>
+                <input 
+                    type="number" 
+                    class="form-control" 
+                    id="capacity" 
+                    name="capacity" 
+                    placeholder="Capacidad del evento"
+                    value="<%= event ? event.Capacity : '' %>"
+                    min="1" 
+                >
+            </div>
 
-                <div class="form-group">
-                    <label for="eventTypeID">Tipo de Evento</label>
-                    <select class="form-control" id="eventTypeID" name="eventTypeID" required>
-                        <% if (eventTypeList && eventTypeList.length) { %>
-                            <% eventTypeList.forEach(eventType => { %>
-                                <option value="<%= eventType.ID %>" <%= event && event.EventTypeID === eventType.ID ? 'selected' : '' %>>
-                                    <%= eventType.Name %>
-                                </option>
-                            <% }) %>
-                        <% } else { %>
-                            <option disabled>No hay tipos de eventos disponibles</option>
-                        <% } %>
-                    </select>
-                </div>
+            <div class="form-group">
+                <label for="eventTypeID">Tipo de Evento</label>
+                <select class="form-control" id="eventTypeID" name="eventTypeID" required>
+                    <% if (eventTypeList && eventTypeList.length) { %>
+                        <% eventTypeList.forEach(eventType => { %>
+                            <option value="<%= eventType.ID %>" <%= event && event.EventTypeID === eventType.ID ? 'selected' : '' %>>
+                                <%= eventType.Name %>
+                            </option>
+                        <% }) %>
+                    <% } else { %>
+                        <option disabled>No hay tipos de eventos disponibles</option>
+                    <% } %>
+                </select>
+            </div>
 
-                <div class="d-flex justify-content-between">
-                    <button type="submit" class="btn btn-success w-100">
-                        <%= event ? "Editar Evento" : "Crear Evento" %>
-                    </button>
-                </div>
-                
-            </form>
-        </div>
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-success w-100">
+                    <%= event ? "Editar Evento" : "Crear Evento" %>
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <div aria-live="polite" aria-atomic="true" style="position: relative;">
     <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; top: 1rem; right: 1rem;">
         <div class="d-flex">
-            <div class="toast-body" id="toastMessage">
-                
-            </div>
+            <div class="toast-body" id="toastMessage"></div>
             <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
     </div>
 </div>
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const form = document.querySelector("form");
-        const errorToast = new bootstrap.Toast(document.getElementById("errorToast"));
-        const toastMessage = document.getElementById("toastMessage");
+    $(document).ready(function() {
+        const form = $('#eventForm');
+        const errorToast = new bootstrap.Toast($('#errorToast'));
+        const toastMessage = $('#toastMessage');
 
-        form.addEventListener("submit", async function(event) {
+        form.on('submit', function(event) {
             event.preventDefault();
 
-            const formData = new FormData(form); 
-            const actionUrl = form.getAttribute("action");
-            const method = form.getAttribute("method");
+            const actionUrl = form.attr('action');
+            const method = form.attr('method');
+            const formData = new FormData(this);
 
-            try {
-                const response = await fetch(actionUrl, {
-                    method: method,
-                    body: formData
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    toastMessage.textContent = errorData.message || "Ha ocurrido un error inesperado."; 
-                    errorToast.show();
-                } else {
+            $.ajax({
+                url: actionUrl,
+                type: method,
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
                     window.location.href = "/eventos";
+                },
+                error: function(xhr) {
+                    
+                    const errorData = xhr.responseJSON || { error: "Ha ocurrido un error inesperado." };
+                    toastMessage.text(errorData.error);
+                    console.log(errorData)
+                    errorToast.show();
                 }
-            } catch (error) {
-                toastMessage.textContent = "Error de red: " + error.message;
-                errorToast.show();
-            }
+            });
         });
     });
 </script>
