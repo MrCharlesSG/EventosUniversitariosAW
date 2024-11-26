@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { pool } from "../config/db.js";
-import { validateRegisterCredentials, validateUserCredentials } from "../schemas/user.js";
+import { validateModifyUserInfo, validateRegisterCredentials, validateUserCredentials } from "../schemas/user.js";
 
 
 export class AuthController {
@@ -85,8 +85,9 @@ export class AuthController {
         const { email } = req.session.user;  
         const { fullName, phone, facultyID } = req.body;
 
-        if (!fullName && !phone && !facultyID) {
-            return res.status(400).json({ error: "No se proporcionaron datos para actualizar." });
+        const isValid = validateModifyUserInfo(req.body);
+        if (!isValid.valid) {
+            return res.status(400).json({ error: isValid.message });
         }
 
         try {
@@ -116,7 +117,7 @@ export class AuthController {
 
             console.log("Modifying user, this are the values to update ", updateValues)
 
-            const result = await pool.query(updateQuery, updateValues);
+            const [result] = await pool.query(updateQuery, updateValues);
 
             if (result.affectedRows > 0) {
                 return res.status(200).json({ message: "Información actualizada con éxito." });

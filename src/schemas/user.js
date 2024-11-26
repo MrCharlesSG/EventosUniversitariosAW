@@ -55,3 +55,22 @@ export function validateRegisterCredentials(input) {
 
     return { valid: true, message: "Todos los datos son válidos", data: [email, fullName, phone, facultyID, password, roleID] };
 }
+
+export function validateModifyUserInfo(input) {
+    const { fullName, phone, facultyID } = input;
+
+    if (fullName && (typeof fullName !== 'string' || fullName.trim() === '')) {
+        return { valid: false, message: "El nombre completo es obligatorio" };
+    }
+
+    if (phone && !/^\d+$/.test(phone)) {
+        return { valid: false, message: "El teléfono debe contener solo números" };
+    }
+
+    if (facultyID && (typeof facultyID !== 'string' || facultyID.trim() === '')) {
+        return { valid: false, message: "La facultad es obligatoria" };
+    }
+
+    return { valid: true, message: "Todos los datos son válidos" };
+}
+
