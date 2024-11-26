@@ -1,4 +1,5 @@
 import { pool } from "../config/db.js";
+import { validateEventData } from "../schemas/event.js";
 import { isNormalUser, isOrganizer } from "../utils/auth-utils.js";
 import { NotificationsController } from "./notifications.js";
 
@@ -113,13 +114,17 @@ export class EventsController {
         if (!isOrganizer(role)) {
             return res.status(403).json({ error: "No tienes permisos para crear eventos" });
         }
-    
+        
+        const isValidEvent = validateEventData(req.body);
+        if (!isValidEvent.valid) {
+            return res.status(400).json({ error: isValidEvent.message });
+        }
         const { title, description, dateTime, location, capacity, eventTypeID } = req.body;
     
         try {
             const query = `
-                INSERT INTO Event (Title, Description, DateTime, Location, Capacity, EventTypeID, OrganizerID)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO Event (Title, Description, DateTime, Location, Capacity, EventTypeID, OrganizerID, Active)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 1)
             `;
     
             await pool.query(query, [title, description, dateTime, location, capacity, eventTypeID, email]);
@@ -134,12 +139,18 @@ export class EventsController {
 
     static async updateEvent(req, res) {
         const { role, email } = req.user;
-        const { id } = req.params;
-        const { title, description, dateTime, location, capacity, eventTypeID } = req.body;
-    
         if (!isOrganizer(role)) {
             return res.status(403).json({ error: "No tienes permisos para actualizar eventos" });
         }
+
+        
+        const { id } = req.params;
+        console.log("Validating ", req.body)
+        const isValidEvent = validateEventData(req.body);
+        if (!isValidEvent.valid) {
+            return res.status(400).json({ error: isValidEvent.message });
+        }
+        const { title, description, dateTime, location, capacity, eventTypeID } = req.body;
     
         console.log("Updating as an organizer ", email, " this is the new title ", title);
     
@@ -199,7 +210,7 @@ export class EventsController {
             await pool.query(updateQuery, [id, email]);
     
             const message = `El evento ${eventOfDb[0].Title} ha sido cancelado.`;
-            await NotificationsController.sendNotificaionFromOrganizer(id, email, message);
+            await NotificationsController.sendNotificationOfModificatedEvent(id, email, message);
     
             res.status(201).redirect('/events');
         } catch (error) {

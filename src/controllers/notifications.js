@@ -15,7 +15,7 @@ export class NotificationsController {
     
             console.log("Getting notifications and checking for ", email);
             const [rows] = await pool.query(query, [email]);
-            /*
+            
             const queryUpdate = `
                 UPDATE UserNotifications
                 SET Checked = 1
@@ -24,7 +24,7 @@ export class NotificationsController {
             await pool.query(queryUpdate, [email]);
     
             console.log("Notifications marked as checked.");
-            */
+            
             return res.json(rows);
         } catch (error) {
             console.error("Error al obtener notificaciones:", error);

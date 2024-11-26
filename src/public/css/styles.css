@@ -1,6 +1,6 @@
 :root {
-    --primary-color: #4f46e5;
-    --primary-color-light: #6366f1;
+    --primary-color: #461d93;
+    --primary-color-light: #7235c3;
     --danger-color:#e11d48;
     --danger-color-light:#f43f5e;
     --danger-color-light-xl:#ffe4e6;
@@ -13,8 +13,8 @@
     --background-secondary: #f8fafc;
     --background-dark: #d9dee2;
     
-    --text-color: #1e293b;
-    --text-secondary-color: #475569;
+    --text-color: #371774;
+    --text-secondary-color: #4b3e63;
 }
 
 :root.theme-dark {
@@ -135,7 +135,7 @@ input, select, textarea {
 }
 
 a {
-    color: var(--primary-color) !important;
+    color: var(--primary-color-light) !important;
 }
 
 

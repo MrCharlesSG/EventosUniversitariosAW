@@ -303,25 +303,24 @@
                     const endDate = new Date(appliedFilters.dateEnd);
             
                     if (startDate > endDate) {
-                        $('#error-date').show(); // Mostrar error para las fechas
+                        $('#error-date').show(); 
                         setTimeout(function() {
-                            $('#error-date').hide(); // Ocultar el mensaje después de 3 segundos
+                            $('#error-date').hide(); 
                         }, 3000);
-                        valid = false; // Invalidar si hay un error
+                        valid = false;
                     }
                 }
             
-                // Validación de las capacidades
                 if (appliedFilters.minCapacity && appliedFilters.maxCapacity) {
                     const minCapacity = parseInt(appliedFilters.minCapacity);
                     const maxCapacity = parseInt(appliedFilters.maxCapacity);
             
                     if (minCapacity > maxCapacity) {
-                        $('#error-capacity').show(); // Mostrar error para las capacidades
+                        $('#error-capacity').show();
                         setTimeout(function() {
-                            $('#error-capacity').hide(); // Ocultar el mensaje después de 3 segundos
+                            $('#error-capacity').hide(); 
                         }, 3000);
-                        valid = false; // Invalidar si hay un error
+                        valid = false; 
                     }
                 }
             
@@ -331,11 +330,14 @@
                     appliedFilters.location = selectedLocation;
                     appliedFilters.locationText = selectedLocationText;
             
-                    const selectedStatus = [];
+                    const selectedStatuses = [];
+                    const selectedStatusesText = [];
                     $('input[name="filter-status"]:checked').each(function () {
-                        selectedStatus.push($(this).val());
+                        selectedStatuses.push($(this).val());
+                        selectedStatusesText.push($(this).parent().text().trim());
                     });
-                    appliedFilters.status = selectedStatus;
+                    appliedFilters.status = selectedStatuses; 
+                    appliedFilters.statusText = selectedStatusesText.join(', '); 
             
                     appliedFilters.eventType = $('#filter-type').val();
             
