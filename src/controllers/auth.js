@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { pool } from "../config/db.js";
-import { validateUserCredentials } from "../schemas/user.js";
+import { validateRegisterCredentials, validateUserCredentials } from "../schemas/user.js";
 
 
 export class AuthController {
@@ -26,8 +26,8 @@ export class AuthController {
             const { RoleID } = result;
     
             req.session.user = { email, role: RoleID };
-    
-            return res.redirect('/'); 
+            console.log("Successs")
+            return res.status(200).json({ success: true });
         } catch (err) {
             return res.status(500).json({ error: err.message });
         }
@@ -51,8 +51,9 @@ export class AuthController {
     static async register(req, res) {
         const { email, fullName, phone, facultyID, password, roleID } = req.body;
     
-        if (!email || !fullName || !password || !roleID) {
-            return res.status(400).json({ error: "Faltan datos obligatorios" });
+        const isValidRegister = validateRegisterCredentials(req.body);
+        if (!isValidRegister.valid) {
+            return res.status(400).json({ error: isValidRegister.message });
         }
     
         try {
@@ -60,7 +61,7 @@ export class AuthController {
             const insertUserQuery = "INSERT INTO User (Email, FullName, Phone, FacultyID) VALUES (?, ?, ?, ?)";
             const insertAuthQuery = "INSERT INTO UserAuthentication (Email, Password, RoleID) VALUES (?, ?, ?)";
     
-            const existingUser = await pool.query(selectUserQuery, [email]);
+            const [existingUser] = await pool.query(selectUserQuery, [email]);
             if (existingUser.length > 0) {
                 return res.status(400).json({ error: "El usuario ya está registrado" });
             }
@@ -72,7 +73,7 @@ export class AuthController {
             await pool.query(insertAuthQuery, [email, hashedPassword, roleID]);
     
             req.session.user = { email, role: roleID };
-            return res.redirect('/');
+            return res.status(200).json({ success: true });
         } catch (error) {
             console.error("Error en el registro:", error);
             res.status(500).json({ error: "Error en el servidor" });

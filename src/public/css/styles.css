@@ -134,6 +134,10 @@ input, select, textarea {
     border: 1px solid var(--background-color) !important;
 }
 
+a {
+    color: var(--primary-color) !important;
+}
+
 
 .alert-success {
     background-color: var(--success-color) !important;
@@ -241,9 +245,17 @@ LIST
     font-weight: bold;
 }
 
+.toast-error {
+    background-color: var(--danger-color) !important;
+    color: var(--background-color) !important;
+}
+
 /*
 BUTTONS
 */
+
+
+
 .btn-primary {
     background-color: var(--primary-color) !important;
     border-color: var(--primary-color-light) !important;

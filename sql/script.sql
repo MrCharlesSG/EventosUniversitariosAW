@@ -72,6 +72,12 @@ CREATE TABLE IF NOT EXISTS UserNotifications (
 );
 
 
+CREATE TABLE SQL_INJECTIONS (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ip_address VARCHAR(45) NOT NULL,  
+    attempted_query TEXT NOT NULL,
+    timestamp DATETIME NOT NULL
+);
 
 
 CREATE TABLE IF NOT EXISTS Enrollment (

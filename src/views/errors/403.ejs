@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Denegado</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/public/css/styles.css">
+</head>
+<body>
+    <div class="container text-center">
+        <h1 class="mt-5 text-danger">¡Acceso Prohibido!</h1>
+        <p class="lead">Tu IP ha sido bloqueada debido a múltiples intentos fallidos de inyección SQL.</p>
+        <p>Si crees que esto es un error, por favor contacta con el soporte.</p>
+        <a href="/" class="btn btn-primary">Volver al inicio</a>
+        
+        <%- include("../partials/footer" ) %>
+    </div>
+</body>
+</html>

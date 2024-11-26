@@ -5,91 +5,115 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Page</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f1f5f9;
-        }
-        .login-container {
-            border: 1px solid #f8fafc;
-            border-radius: 5px;
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/public/css/styles.css">
 </head>
 <body>
-    <div class=" container ">
-        <div class=" row justify-content-center my-4">
-            <div class="login-container col-10 col-lg-6 p-3 px-4">
-                <h2 class="text-center mb-4">Inicio de Session</h2>
-                <form action="/api/auth/login" method="POST">
+    <div class="container-fluid vh-100 d-flex flex-column justify-content-center">
+        <div class="text-center py-2">
+            <h1 class="navbar-brand d-flex justify-content-center" href="/">
+                <img src="/public/img/logo.png" width="50" height="50" class="d-inline-block align-top" alt="Logo">
+                EventosUniv
+            </h1>
+        </div>
+
+        <div class="d-flex justify-content-center mb-2">
+            <div class="col-10 col-md-6 col-lg-4 p-4 list-container">
+                <h2 class="text-center mb-4">Inicio de Sesión</h2>
+                <!-- Formulario de login -->
+                <form id="loginForm">
                     <div class="form-group">
                         <label for="email">Correo Electrónico</label>
                         <input type="email" class="form-control" id="email" name="email" required>
+                        <span id="emailError" class="form-text text-danger"></span>
                     </div>
                     <div class="form-group">
                         <label for="password">Contraseña</label>
                         <input type="password" class="form-control" id="password" name="password" required>
+                        <span id="passwordError" class="form-text text-danger"></span>
                     </div>
                     <button type="submit" class="btn btn-primary btn-block">Acceder</button>
                     <div class="text-center mt-3">
                         <p><a href="/auth/forgot-password">¿Olvidaste tu contraseña?</a></p>
-                        <p>¿No tienes cuenta? <a href="/auth/register">Registrate aquí</a></p>
+                        <p>¿No tienes cuenta? <a href="/auth/register">Regístrate aquí</a></p>
                     </div>
                 </form>
             </div>
         </div>
+
     </div>
 
-    <!-- Incluir el parcial del toast -->
-    <%- include("partials/errorToast") %>
+    <!-- Toast container -->
+    <div aria-live="polite" aria-atomic="true"style="position: absolute; top: 10px; right: 10px;">
+        <div id="toast" class="toast toast-error" >
+            <div class="toast-body" id="toastMessage">
+            </div>
+        </div>
+    </div>
 
+    <!-- Incluir jQuery y Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-        /*document.addEventListener("DOMContentLoaded", function() {
-            const form = document.querySelector("form");
-            const errorToastEl = document.getElementById("errorToast");
-            const toastMessage = document.getElementById("toastMessage");
+        
+        $('#loginForm').submit(function(event) {
+            event.preventDefault();
+            
+            $('#emailError').text('');
+            $('#passwordError').text('');
 
-            // Configurar el toast con una duración de 8 segundos (8000 ms)
-            const errorToast = new bootstrap.Toast(errorToastEl, { delay: 8000 });
+            let isValid = true;
+            let email = $('#email').val().trim();
+            let password = $('#password').val().trim();
 
-            form.addEventListener("submit", async function(event) {
-                event.preventDefault();
+            if (!email || !validateEmail(email)) {
+                $('#emailError').text('Por favor ingresa un correo electrónico válido.');
+                isValid = false;
+            }
 
-                const formData = new FormData(form);
-                const actionUrl = form.getAttribute("action");
-                const method = form.getAttribute("method");
+            if (!password) {
+                $('#passwordError').text('Por favor ingresa tu contraseña.');
+                isValid = false;
+            }
 
-                try {
-                    console.log(formData)
-                    console.log("Form data values:");
-                    for (let pair of formData.entries()) {
-                        console.log(`${pair[0]}: ${pair[1]}`);
-                    }
-                    const response = await fetch(actionUrl, {
-                        method: method,
-                        body: formData,
-                        headers: {
-                            //'Content-Type': 'application/json',
-                            'Accept': 'application/json'
+            if (isValid) {
+                $.ajax({
+                    url: '/api/auth/login',
+                    method: 'POST',
+                    data: {
+                        email: email,
+                        password: password
+                    },
+                    success: function(response) {
+                        console.log("No ha habido error")
+                        if (response.success) {
+                            window.location.href = '/'; 
                         }
-                    });
+                    },
+                    error: function(xhr, status, error) {
+                        let errorMessage = '';
 
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        toastMessage.textContent = errorData.message || "Credenciales incorrectas.";
-                        errorToast.show();
-                    } else {
-                        window.location.href = "/"; 
+                        if (xhr.status === 400 || xhr.status === 401) {
+                            errorMessage = xhr.responseJSON.error; 
+                        } else if (xhr.status === 500) {
+                            errorMessage = 'Hubo un problema en el servidor. Intenta de nuevo más tarde.';
+                        } else {
+                            errorMessage = 'Hubo un error inesperado. Intenta de nuevo.'; 
+                        }
+
+                        $('#toastMessage').text(errorMessage);
+                        $('#toast').toast('show');
                     }
-                } catch (error) {
-                    toastMessage.textContent = "Error de red: " + error.message;
-                    errorToast.show();
-                }
-            });
+                });
+            }
         });
-        */
+
+        function validateEmail(email) {
+            const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+            return regex.test(email);
+        }
     </script>
+
 </body>
 </html>
