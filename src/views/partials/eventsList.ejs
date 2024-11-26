@@ -88,17 +88,8 @@
 
         const eventsDoneData = [];
 
-        const initialFilters = {
-            date: null,           
-            location: '',        
-            locationText: '',      
-            eventType: '',         
-            capacity: null,        
-            minCapacity: null,    
-            maxCapacity: null    
-        }
+        let appliedFilters = {};
 
-        let appliedFilters = initialFilters;
         const currentUserId = '<%= user %>';
         
     
@@ -141,16 +132,21 @@
                 const now = new Date();
                 const filteredEvents = eventsData.filter(event => {
                     const eventDate = new Date(event.DateTime);
-
-                    return (
+                    return (    
                         (!appliedFilters.dateStart || eventDate >= new Date(appliedFilters.dateStart)) &&
                         (!appliedFilters.dateEnd || eventDate <= new Date(appliedFilters.dateEnd)) &&
-                        (appliedFilters.location ? event.FacultyID == appliedFilters.location : true) &&
-                        (appliedFilters.eventType ? event.EventType == appliedFilters.eventType : true) &&
+                        (!appliedFilters.location || appliedFilters.location == 'none' || event.FacultyID == appliedFilters.location) &&
+                        (!appliedFilters.eventType || appliedFilters.eventType == 'none' || event.EventType == appliedFilters.eventType) &&
                         (!appliedFilters.minCapacity || event.Capacity >= appliedFilters.minCapacity) &&
-                        (!appliedFilters.maxCapacity || event.Capacity <= appliedFilters.maxCapacity)
+                        (!appliedFilters.maxCapacity || event.Capacity <= appliedFilters.maxCapacity) &&
+                        (!appliedFilters.status || appliedFilters.status.length === 0 || 
+                            (appliedFilters.status.includes('cancelled') && (event.Status === null || event.Status == 'cancelled')) ||
+                            appliedFilters.status.includes(event.Status))
                     );
+
                 });
+
+                console.log(filteredEvents)
         
                 filteredEvents.forEach(event => {
                     const isPastEvent = new Date(event.DateTime) < now;
@@ -214,35 +210,79 @@
         
             function updateFiltersText() {
                 const $filtersText = $('#filters-text');
-                const appliedFiltersText = [];
+                const appliedFiltersHTML = [];
             
+                // Agregar fecha
                 if (appliedFilters.dateStart && appliedFilters.dateEnd) {
-                    appliedFiltersText.push(
-                        `Fecha: del ${new Date(appliedFilters.dateStart).toLocaleDateString()} al ${new Date(appliedFilters.dateEnd).toLocaleDateString()}`
-                    );
+                    appliedFiltersHTML.push(`
+                        <span><i class="bi bi-calendar-event"></i> 
+                        Del ${new Date(appliedFilters.dateStart).toLocaleDateString()} al ${new Date(appliedFilters.dateEnd).toLocaleDateString()}
+                        </span>
+                    `);
                 } else if (appliedFilters.dateStart) {
-                    appliedFiltersText.push(`Fecha desde: ${new Date(appliedFilters.dateStart).toLocaleDateString()}`);
+                    appliedFiltersHTML.push(`
+                        <span><i class="bi bi-calendar-event"></i> 
+                        Desde ${new Date(appliedFilters.dateStart).toLocaleDateString()}
+                        </span>
+                    `);
                 } else if (appliedFilters.dateEnd) {
-                    appliedFiltersText.push(`Fecha hasta: ${new Date(appliedFilters.dateEnd).toLocaleDateString()}`);
+                    appliedFiltersHTML.push(`
+                        <span><i class="bi bi-calendar-event"></i> 
+                        Hasta ${new Date(appliedFilters.dateEnd).toLocaleDateString()}
+                        </span>
+                    `);
+                }
+
+                if (appliedFilters.minCapacity || appliedFilters.maxCapacity) {
+                    let capacityText = '';
+                    
+                    if (appliedFilters.minCapacity && appliedFilters.maxCapacity) {
+                        capacityText = `
+                            <span><i class="bi bi-hash"></i> Capacidad: Desde ${appliedFilters.minCapacity} hasta ${appliedFilters.maxCapacity}</span>
+                        `;
+                    } 
+                    else if (appliedFilters.minCapacity) {
+                        capacityText = `
+                            <span><i class="bi bi-hash"></i> Capacidad desde: ${appliedFilters.minCapacity}</span>
+                        `;
+                    } 
+                    else if (appliedFilters.maxCapacity) {
+                        capacityText = `
+                            <span><i class="bi bi-hash-fill"></i> Capacidad hasta: ${appliedFilters.maxCapacity}</span>
+                        `;
+                    }
+            
+                    appliedFiltersHTML.push(capacityText);
                 }
             
-                if (appliedFilters.locationText) {
-                    appliedFiltersText.push(`Ubicación: ${appliedFilters.locationText}`);
+                // Agregar ubicación
+                if (appliedFilters.location && appliedFilters.location != 'none') {
+                    appliedFiltersHTML.push(`
+                        <span><i class="bi bi-geo"></i> ${appliedFilters.locationText}</span>
+                    `);
                 }
             
-                if (appliedFilters.eventType) {
-                    appliedFiltersText.push(`Tipo: ${appliedFilters.eventType}`);
+                // Agregar estado
+                if (appliedFilters.status && appliedFilters.status.length > 0) {
+                    appliedFiltersHTML.push(`
+                        <span><i class="bi bi-check-circle"></i> Estado: ${appliedFilters.statusText}</span>
+                    `);
                 }
             
-                if (appliedFilters.minCapacity) {
-                    appliedFiltersText.push(`Capacidad mínima: ${appliedFilters.minCapacity}`);
+                // Agregar tipo de evento
+                if (appliedFilters.eventType && appliedFilters.eventType != 'none') {
+                    appliedFiltersHTML.push(`
+                        <span><i class="bi bi-tags"></i> Tipo: ${appliedFilters.eventType}</span>
+                    `);
                 }
             
-                if (appliedFilters.maxCapacity) {
-                    appliedFiltersText.push(`Capacidad máxima: ${appliedFilters.maxCapacity}`);
-                }
+                
             
-                $filtersText.text(appliedFiltersText.length > 0 ? appliedFiltersText.join(', ') : 'Sin filtros');
+                $filtersText.html(
+                    appliedFiltersHTML.length > 0
+                        ? appliedFiltersHTML.join(' ')
+                        : '<span>Sin filtros</span>'
+                );
             }
             
         
@@ -251,52 +291,83 @@
             });
         
             $('#apply-filters').on('click', function () {
-                // Guardar el valor y el texto del filtro de fecha (inicio y fin)
-                appliedFilters.dateStart = $('#filter-date-start').val(); 
-                appliedFilters.dateEnd = $('#filter-date-end').val(); 
-                
-                // Obtener el valor y el texto seleccionado en el filtro de ubicación
-                const selectedLocation = $('#filter-location').val();
-                const selectedLocationText = $('#filter-location option:selected').text();
-                
-                appliedFilters.location = selectedLocation;          
-                appliedFilters.locationText = selectedLocationText;  
-                
-                appliedFilters.eventType = $('#filter-type').val();
+                appliedFilters.dateStart = $('#filter-date-start').val();
+                appliedFilters.dateEnd = $('#filter-date-end').val();
                 appliedFilters.minCapacity = $('#filter-min-capacity').val();
                 appliedFilters.maxCapacity = $('#filter-max-capacity').val();
             
-                updateFiltersText();
-                
-                renderEvents();
-                
-                $('#filterModal').modal('hide');
+                let valid = true; 
+
+                if (appliedFilters.dateStart && appliedFilters.dateEnd) {
+                    const startDate = new Date(appliedFilters.dateStart);
+                    const endDate = new Date(appliedFilters.dateEnd);
+            
+                    if (startDate > endDate) {
+                        $('#error-date').show(); // Mostrar error para las fechas
+                        setTimeout(function() {
+                            $('#error-date').hide(); // Ocultar el mensaje después de 3 segundos
+                        }, 3000);
+                        valid = false; // Invalidar si hay un error
+                    }
+                }
+            
+                // Validación de las capacidades
+                if (appliedFilters.minCapacity && appliedFilters.maxCapacity) {
+                    const minCapacity = parseInt(appliedFilters.minCapacity);
+                    const maxCapacity = parseInt(appliedFilters.maxCapacity);
+            
+                    if (minCapacity > maxCapacity) {
+                        $('#error-capacity').show(); // Mostrar error para las capacidades
+                        setTimeout(function() {
+                            $('#error-capacity').hide(); // Ocultar el mensaje después de 3 segundos
+                        }, 3000);
+                        valid = false; // Invalidar si hay un error
+                    }
+                }
+            
+                if (valid) {
+                    const selectedLocation = $('#filter-location').val();
+                    const selectedLocationText = $('#filter-location option:selected').text();
+                    appliedFilters.location = selectedLocation;
+                    appliedFilters.locationText = selectedLocationText;
+            
+                    const selectedStatus = [];
+                    $('input[name="filter-status"]:checked').each(function () {
+                        selectedStatus.push($(this).val());
+                    });
+                    appliedFilters.status = selectedStatus;
+            
+                    appliedFilters.eventType = $('#filter-type').val();
+            
+                    updateFiltersText();
+                    renderEvents();
+            
+                    $('#filterModal').modal('hide');
+                }
             });
             
             
             $('#reset-filters').on('click', function() {
-                appliedFilters = {}; 
-                $('#filter-date-start').val('');
-                $('#filter-date-end').val('');
-                $('#filter-location').val('');
-                $('#filter-type').val('');
-                $('#filter-min-capacity').val('');
-                $('#filter-max-capacity').val('');
-                
-                updateFiltersText();
+                resetModlaFilters()
                 
             });
             
+            function resetModlaFilters() {
+                appliedFilters = {}; 
+                $('#filter-date-start').val('');
+                $('#filter-date-end').val('');
+                $('#filter-location').val('none');
+                $('#filter-type').val('none');
+                $('input[name="filter-status"]').prop('checked', false);
+                $('#filter-min-capacity').val('');
+                $('#filter-max-capacity').val('');
+                $('input[name="filter-status"]').each(function () {
+                    $(this).parent().removeClass('active'); 
+                });
+            }
             
             $('#filters-text').on('click', () => {
-                appliedFilters = {
-                    date: null,
-                    location: '',
-                    locationText: '',
-                    eventType: '',
-                    minCapacity: null,
-                    maxCapacity: null
-                };
+               resetModlaFilters()
         
                 renderEvents();
                 $('#filters-text').text('Sin filtros');

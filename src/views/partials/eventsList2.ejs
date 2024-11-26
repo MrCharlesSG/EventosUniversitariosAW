@@ -1,0 +1,152 @@
+<style>
+
+    .list-item {
+        padding: 15px;
+        cursor: pointer;
+        display: flex;
+        border-radius: 8px;
+        flex-direction: column;
+        margin-bottom: 5px;
+    }    
+
+    .add-event-btn {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+    }
+
+    .list-header {
+        position: sticky;
+        top: 0;
+        z-index: 100; 
+    }
+
+    
+
+</style>
+
+
+<div class="">
+    <div class="list-header">
+        <h1><%= title %></h1> 
+
+        <div id="filters-section" class="filters-section mb-3 mt-3">
+            <button id="filter-button" class="btn btn-outline-primary">
+                <i class="bi bi-funnel"></i>
+            </button>
+
+            <div id="applied-filters" class="applied-filters">
+                <span id="filters-text">Sin filtros</span>
+            </div>
+        </div>
+    </div>
+
+
+    </object>
+
+
+    <div class="accordion mb-3" id="accordionPastEvents">
+        
+        <div class="card" >
+            <div class="card-header " id="headingPastEvents">
+                <h5 class="mb-0">
+                    <button class="btn card-header-title " type="button" data-toggle="collapse" data-target="#collapsePastEvents" aria-expanded="false" aria-controls="collapsePastEvents">
+                        <i class="bi bi-chevron-down"></i> Eventos Transcurridos
+                    </button>
+                </h5>
+            </div>
+            <div id="collapsePastEvents" class="collapse " aria-labelledby="headingPastEvents" data-parent="#accordionPastEvents">
+                <div class="card-body">
+                    <ul id="past-event-list" class="list-group list-unstyled mb-4">
+                        <% pastEvents.forEach(event => { 
+                            if(!event.notShow && new Date(event.DateTime) < new Date()) {
+                            %>
+                                <%- include('eventCard', { event }) %>
+                            <% } %>
+                        <% }) %>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="list-container">
+        <ul id="event-list" class="list-unstyled">
+            <% futureEvents.forEach(event => { 
+                if(!event.notShow && new Date(event.DateTime) >= new Date()) {
+                %>
+                    <%- include('eventCard', { event }) %>
+                <% } %>
+            <% }) %>
+        </ul>
+        
+
+        
+    </div>
+</div>
+
+<button id="scroll-to-top" class="btn btn-outline-primary" style="display: none; position: fixed; bottom: 5px; right: 5px; z-index: 1000;">
+    <i class="bi bi-chevron-up"></i>
+</button>
+
+<%- include("eventModal", { role: role, user: user }) %>
+<%- include("filterModal", { role: role, user: user, eventTypeList, facultyList }) %>
+
+<script>
+    const pastEvents = []
+    const futureEvents = []
+
+    const initialFilters = {
+        date: null,           
+        location: '',        
+        locationText: '',      
+        eventType: '',         
+        capacity: null,        
+        minCapacity: null,    
+        maxCapacity: null    
+    }
+
+    let appliedFilters = initialFilters;
+
+    const currentUserId = '<%= user %>';
+
+
+    function renderEvents(eventsFromDB) {
+        pastEvents.forEach(event => {
+            event.notShow = !filterEvent(event)
+        })
+        futureEvents.forEach(event => {
+            event.notShow = !filterEvent(event)
+        })        
+    }
+
+    function filterEvent(event) {
+        return (
+                    (!appliedFilters.date || new Date(event.DateTime).toLocaleDateString() === new Date(appliedFilters.date).toLocaleDateString()) &&
+                    (appliedFilters.location ? event.FacultyID == appliedFilters.location : true) &&
+                    (appliedFilters.eventType ? event.EventType == appliedFilters.eventType : true) &&
+                    (!appliedFilters.minCapacity || event.Capacity >= appliedFilters.minCapacity) &&
+                    (!appliedFilters.maxCapacity || event.Capacity <= appliedFilters.maxCapacity)
+                );
+    }
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const scrollToTopButton = document.getElementById('scroll-to-top');
+    
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) { 
+                scrollToTopButton.style.display = 'flex';
+            } else {
+                scrollToTopButton.style.display = 'none';
+            }
+        });
+    
+        scrollToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    });
+</script>

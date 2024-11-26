@@ -269,6 +269,12 @@ BUTTONS
     border-color: var(--primary-color) !important;
 }
 
+.btn-outline-primary.active {
+    background-color: var(--primary-color) !important; 
+    color: var(--background-color) !important; 
+    border-color: var(--primary-color) !important;
+}
+
 .btn-danger {
     background-color: var(--danger-color) !important;
     border-color: var(--danger-color-light) !important;
@@ -279,12 +285,31 @@ BUTTONS
 .badge-danger {
     background-color: var(--danger-color) !important;
     color: var(--background-color) !important;
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-medium) !important;
 }
 
 .btn-danger:hover {
     background-color: var(--danger-color-light) !important;
     border-color: var(--danger-color-light) !important;
+}
+
+.btn-outline-danger {
+    color: var(--danger-color) !important;
+    border-color: var(--danger-color) !important;
+    background-color: transparent !important;
+    font-size: var(--font-size-small-heading);
+}
+
+.btn-outline-danger:hover {
+    background-color: var(--danger-color) !important;
+    border-color: var(--danger-color-light) !important;
+    color: var(--background-color) !important;
+}
+
+.btn-outline-danger.active {
+    background-color: var(--danger-color) !important;
+    border-color: var(--danger-color-light) !important;
+    color: var(--background-color) !important;
 }
 
 .btn-success {
@@ -301,16 +326,34 @@ BUTTONS
 
 .badge-success {
     background-color: var(--success-color) !important;
-    color: var(--background-color);
-    font-size: var(--font-size-base);
+    color: var(--background-color) !important;
+    font-size: var(--font-size-medium) !important;
 }
 
 .badge-warning {
     background-color: var(--warning-color) !important;
-    color: var(--background-color);
-    font-size: var(--font-size-base);
+    color: var(--background-color) !important;
+    font-size: var(--font-size-medium) !important;
 }
 
+.btn-outline-warning {
+    color: var(--warning-color) !important;
+    border-color: var(--warning-color) !important;
+    background-color: transparent !important;
+    font-size: var(--font-size-small-heading);
+}
+
+.btn-outline-warning:hover {
+    background-color: var(--warning-color) !important;
+    color: var(--background-color) !important;
+    border-color: var(--warning-color-light) !important;
+}
+
+.btn-outline-warning.active {
+    background-color: var(--warning-color) !important;
+    color: var(--background-color) !important;
+    border-color: var(--warning-color-light) !important;
+}
 
 /*
 
@@ -341,7 +384,6 @@ FILTERS
 .applied-filters span {
     margin-left: 10px;
     padding: 5px;
-    background-color: var(--background-secondary);
     border-radius: 5px;
     font-size: var(--font-size-small-heading);
 }

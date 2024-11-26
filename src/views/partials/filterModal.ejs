@@ -5,7 +5,6 @@
                 <h5 class="modal-title" id="filterModalLabel">Aplicar Filtros</h5>
             </div>
             <div class="modal-body">
-                <!-- Fila para fechas -->
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="filter-date-start">Fecha de Inicio</label>
@@ -16,8 +15,8 @@
                         <input type="date" id="filter-date-end" class="form-control">
                     </div>
                 </div>
-
-                <!-- Fila para capacidades -->
+                <span id="error-date" class="text-danger" style="display:none;">La fecha de inicio no puede ser posterior a la de fin.</span>
+                
                 <div class="form-row mt-3">
                     <div class="form-group col-md-6">
                         <label for="filter-min-capacity">Capacidad Mínima</label>
@@ -28,12 +27,14 @@
                         <input type="number" id="filter-max-capacity" class="form-control" placeholder="Capacidad máxima">
                     </div>
                 </div>
+                <span id="error-capacity" class="text-danger" style="display:none;">La capacidad mínima no puede ser mayor que la capacidad máxima.</span>
+                
+                
 
-                <!-- Filtro de ubicación -->
                 <div class="form-group mt-3">
                     <label for="filter-location">Ubicación</label>
                     <select id="filter-location" class="form-control">
-                        <option value="">Seleccionar Ubicación</option>
+                        <option value="none">Seleccionar Ubicación</option>
                         <% if (facultyList && facultyList.length) { %>
                             <% facultyList.forEach(faculty => { %>
                                 <option value="<%= faculty.ID %>">
@@ -46,11 +47,10 @@
                     </select>
                 </div>
 
-                <!-- Filtro de tipo de evento -->
                 <div class="form-group mt-3">
                     <label for="filter-type">Tipo de Evento</label>
                     <select id="filter-type" class="form-control">
-                        <option value="">Seleccionar Tipo</option>
+                        <option value="none">Seleccionar Tipo</option>
                         <% if (eventTypeList && eventTypeList.length) { %>
                             <% eventTypeList.forEach(eventType => { %>
                                 <option value="<%= eventType.Name %>">
@@ -62,9 +62,24 @@
                         <% } %>
                     </select>
                 </div>
+
+                <div class="form-group mt-3">
+                    <label for="filter-status" class="form-label">Estado</label>
+                    <div class="btn-group btn-group-toggle d-flex" data-toggle="buttons">
+                        <label class="btn btn-outline-primary flex-fill">
+                            <input type="checkbox" name="filter-status" id="status-confirmed" value="confirmed" autocomplete="off"> Inscrito
+                        </label>
+                        <label class="btn btn-outline-warning flex-fill">
+                            <input type="checkbox" name="filter-status" id="status-waiting" value="waiting" autocomplete="off"> En Cola
+                        </label>
+                        <label class="btn btn-outline-danger flex-fill">
+                            <input type="checkbox" name="filter-status" id="status-cancelled" value="cancelled" autocomplete="off"> No Inscrito
+                        </label>
+                    </div>
+                </div>
+                
             </div>
 
-            <!-- Botones de acción -->
             <div class="modal-footer d-flex justify-content-between">
                 <button type="button" id="reset-filters" class="btn btn-outline-primary flex-grow-1">Reiniciar</button>
                 <button type="button" id="apply-filters" class="btn btn-success flex-grow-1">Aplicar Filtros</button>
