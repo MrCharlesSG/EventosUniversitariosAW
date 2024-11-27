@@ -159,33 +159,33 @@ INSERT INTO Event (Title, Description, TimeInit, TimeEnd, Location, EventTypeID,
 -- Insertar usuarios inscritos en eventos con Status 'confirmed'
 -- Evento 1: Taller de Inteligencia Artificial (Sala 6 - Capacidad: 2)
 INSERT INTO Enrollment (EventID, UserEmail, Status, DateTime) VALUES
-(1, 'ana.martinez@ucm.es', 'waiting', '2024-11-20 14:00:00'),
-(1, 'carlos.lopez@ucm.es', 'confirmed', '2024-11-22 12:00:00'),
-(1, 'maria.garcia@ucm.es', 'confirmed', '2024-11-23 13:00:00');
+(1, 'ana.martinez@ucm.es', 'waiting', '2024-8-20 14:00:00'),
+(1, 'carlos.lopez@ucm.es', 'confirmed', '2024-8-22 12:00:00'),
+(1, 'maria.garcia@ucm.es', 'confirmed', '2024-8-23 13:00:00');
 
 -- Evento 2: Conferencia sobre Robótica (Sala 6 - Capacidad: 2)
 INSERT INTO Enrollment (EventID, UserEmail, Status, DateTime) VALUES
-(2, 'ana.martinez@ucm.es', 'confirmed', '2024-11-15 09:00:00'),
-(2, 'carlos.lopez@ucm.es', 'confirmed', '2024-11-17 11:00:00'),
-(2, 'maria.garcia@ucm.es', 'waiting', '2024-11-18 12:00:00');
+(2, 'ana.martinez@ucm.es', 'confirmed', '2024-8-15 09:00:00'),
+(2, 'carlos.lopez@ucm.es', 'confirmed', '2024-8-17 11:00:00'),
+(2, 'maria.garcia@ucm.es', 'waiting', '2024-8-18 12:00:00');
 
 -- Evento 3: Seminario de Programación en Python (Sala 5 - Capacidad: 3)
 INSERT INTO Enrollment (EventID, UserEmail, Status, DateTime) VALUES
-(3, 'luis.sanchez@ucm.es', 'confirmed', '2024-11-25 15:00:00'),
-(3, 'carlos.lopez@ucm.es', 'confirmed', '2024-11-25 15:30:00'),
-(3, 'maria.garcia@ucm.es', 'confirmed', '2024-11-25 16:00:00');
+(3, 'luis.sanchez@ucm.es', 'confirmed', '2024-9-25 15:00:00'),
+(3, 'carlos.lopez@ucm.es', 'confirmed', '2024-9-25 15:30:00'),
+(3, 'maria.garcia@ucm.es', 'confirmed', '2024-9-25 16:00:00');
 
 -- Evento 4: Taller de Machine Learning (Sala 6 - Capacidad: 2)
 INSERT INTO Enrollment (EventID, UserEmail, Status, DateTime) VALUES
-(4, 'luis.sanchez@ucm.es', 'confirmed', '2024-12-01 09:30:00'),
-(4, 'carlos.lopez@ucm.es', 'confirmed', '2024-12-01 10:00:00'),
-(4, 'maria.garcia@ucm.es', 'waiting', '2024-12-01 10:30:00');
+(4, 'luis.sanchez@ucm.es', 'confirmed', '2024-10-01 09:30:00'),
+(4, 'carlos.lopez@ucm.es', 'confirmed', '2024-10-01 10:00:00'),
+(4, 'maria.garcia@ucm.es', 'waiting', '2024-10-01 10:30:00');
 
 -- Evento 5: Conferencia de Big Data (Sala 5 - Capacidad: 3)
 INSERT INTO Enrollment (EventID, UserEmail, Status, DateTime) VALUES
-(5, 'ana.martinez@ucm.es', 'confirmed', '2024-11-28 14:00:00'),
-(5, 'carlos.lopez@ucm.es', 'confirmed', '2024-11-28 15:00:00'),
-(5, 'maria.garcia@ucm.es', 'confirmed', '2024-11-28 15:30:00');
+(5, 'ana.martinez@ucm.es', 'confirmed', '2024-10-28 16:00:00'),
+(5, 'carlos.lopez@ucm.es', 'confirmed', '2024-10-28 15:00:00'),
+(5, 'maria.garcia@ucm.es', 'confirmed', '2024-10-28 15:30:00');
 
 -- Evento 6: La ética en las TIC (Sala 3 - Capacidad: 60)
 INSERT INTO Enrollment (EventID, UserEmail, Status, DateTime) VALUES
@@ -197,11 +197,11 @@ INSERT INTO Enrollment (EventID, UserEmail, Status, DateTime) VALUES
 
 -- Evento 7: Como no jugar (Sala 3 - Capacidad: 60)
 INSERT INTO Enrollment (EventID, UserEmail, Status, DateTime) VALUES
-(7, 'luis.sanchez@ucm.es', 'confirmed', '2024-11-29 09:30:00'),
-(7, 'carlos.lopez@ucm.es', 'confirmed', '2024-11-29 10:00:00'),
-(7, 'maria.garcia@ucm.es', 'confirmed', '2024-11-29 10:30:00'),
-(7, 'juan.perez@ucm.es', 'confirmed', '2024-11-29 11:00:00'),
-(7, 'laura.ramos@ucm.es', 'confirmed', '2024-11-29 11:30:00');
+(7, 'luis.sanchez@ucm.es', 'confirmed', '2024-10-29 09:30:00'),
+(7, 'carlos.lopez@ucm.es', 'confirmed', '2024-10-29 10:00:00'),
+(7, 'maria.garcia@ucm.es', 'confirmed', '2024-10-29 10:30:00'),
+(7, 'juan.perez@ucm.es', 'confirmed', '2024-10-29 11:00:00'),
+(7, 'laura.ramos@ucm.es', 'confirmed', '2024-10-29 11:30:00');
 
 
 INSERT INTO notifications (Sender, Date, Message) VALUES

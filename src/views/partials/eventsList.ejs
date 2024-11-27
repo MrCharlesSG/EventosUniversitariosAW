@@ -501,7 +501,9 @@
                             const newEnrollmentCount = currentEnrollmentCount + 1;
 
                             $eventItem.data('enrollment-count', newEnrollmentCount);
-            
+                            console.log("errollement count ", newEnrollmentCount)
+                            console.log("capa count ", capacity)
+                            console.log(newEnrollmentCount > capacity)
                             let newStatus = '';
                             if (newEnrollmentCount > capacity) {
                                 newStatus = 'waiting';
@@ -509,12 +511,12 @@
                                 newStatus = 'confirmed';
                             }
                             $eventItem.data('enrollment-status', newStatus);
-            
+                            console.log(newStatus)
                             // lista
                             $eventItem.find('.list-item-important-title .badge')
                                 .removeClass('badge-danger badge-warning badge-success')
-                                .addClass(newStatus === 'confirmed' ? 'badge-success' : 'badge-warning')
-                                .text(newStatus === 'confirmed' ? 'Inscrito' : 'En Cola');
+                                .addClass(newStatus == 'confirmed' ? 'badge-success' : 'badge-warning')
+                                .text(newStatus == 'confirmed' ? 'Inscrito' : 'En Cola');
             
                                 const enrollmentInfo = `${newEnrollmentCount} / ${$eventItem.data('capacity')} inscritos`;
                                 console.log("The new ", enrollmentInfo)
@@ -524,7 +526,7 @@
     
                             // modal
                             $('#modalEnrollmentCount').text(`${newEnrollmentCount} inscritos`);
-                            $('#modalUserStatus').text(event.Status === 'waiting' ? 'En Cola' : 'Inscrito');
+                            $('#modalUserStatus').text(newStatus == 'waiting' ? 'En Cola' : 'Inscrito');
             
                             $('#signUpButton').hide();
                             $('#dropOutButton').show();
@@ -588,7 +590,6 @@
                 }
             });
         
-            // Manejar el clic en el botón para volver al inicio
             $scrollToTopButton.on('click', function () {
                 $('html, body').animate({ scrollTop: 0 }, 'smooth');
             });

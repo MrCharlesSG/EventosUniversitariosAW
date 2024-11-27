@@ -24,8 +24,23 @@ export class EnrollController {
         const { idEvent } = req.params;
     
         try {
-            const eventQuery = "SELECT * FROM Event WHERE ID = ?";
-            const updateEnrollementQuery = "UPDATE Enrollment SET Status = ?, DateTime = NULL WHERE EventID = ? AND UserEmail = ?";
+            const eventQuery = `
+                SELECT 
+                    E.ID, 
+                    E.OrganizerID, 
+                    R.Capacity, 
+                    E.Title, 
+                    E.TimeInit
+                FROM 
+                    Event E
+                JOIN 
+                    Rooms R
+                ON 
+                    E.Location = R.RoomID
+                WHERE 
+                    E.ID = ?;
+            `;
+            const updateEnrollementQuery = "UPDATE Enrollment SET Status = ?, DateTime = NOW() WHERE EventID = ? AND UserEmail = ?";
     
             const [eventResult] = await pool.query(eventQuery, [idEvent]);
     
@@ -191,11 +206,10 @@ const isEnrolledQuery = async (idEvent, email) => {
     return result;
 };
 
-const enrollQuery = async (event, email, callback, callbackError) => {
-    const enrollConfirmed = "INSERT INTO Enrollment (EventID, UserEmail, Status) VALUES (?, ?, 'confirmed')";
+const enrollQuery = async (event, email) => {
+    const enrollConfirmed = "INSERT INTO Enrollment (EventID, UserEmail, Status, DateTime) VALUES (?, ?, 'confirmed', NOW())";
     const enrollWaiting = "INSERT INTO Enrollment (EventID, UserEmail, Status, DateTime) VALUES (?, ?, 'waiting', NOW())";
 
-    try {
         const thereIsSpace = await checkCapacityQuery(event);
         const query = thereIsSpace ? enrollConfirmed : enrollWaiting;
 
@@ -203,10 +217,8 @@ const enrollQuery = async (event, email, callback, callbackError) => {
 
         console.log("Enrolled correctly");
         const message = `El usuario ${email} ${thereIsSpace ? 'se ha inscrito a tu evento: ' : 'está en la cola de tu evento: '} ${event.Title}`;
-        callback(message);
-    } catch (err) {
-        callbackError(err.message);
-    }
+
+    
 };
 
 const checkCapacityQuery = async (event) => {

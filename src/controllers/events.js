@@ -171,30 +171,30 @@ export class EventsController {
         if (!isOrganizer(role)) {
             return res.status(403).json({ error: "No tienes permisos para actualizar eventos" });
         }
-
-        
+    
         const { id } = req.params;
-        console.log("Validating ", req.body)
+        const { title, description, timeInit, location, eventTypeID, durationHours, durationMinutes } = req.body;
+    
+        console.log("Validating ", req.body);
         const isValidEvent = validateEventData(req.body);
         if (!isValidEvent.valid) {
             return res.status(400).json({ error: isValidEvent.message });
         }
-        const { title, description, timeInit, location, eventTypeID, durationHours, durationMinutes } = req.body;
     
-        console.log("Updating as an organizer ", email, " this is the new title ", title);
         let startDate = moment.utc(timeInit);
         let timeEnd = startDate.add(parseInt(durationHours), 'hours').add(parseInt(durationMinutes), 'minutes').toISOString();
-
+    
         try {
-            const [eventOfDb] = await pool.query(
+            const [[eventOfDb]] = await pool.query(
                 "SELECT * FROM Event WHERE ID = ? AND OrganizerID = ?",
                 [id, email]
             );
     
-            if (eventOfDb.length === 0) {
+            if (!eventOfDb) {
                 return res.status(404).json({ error: "Evento no encontrado o no tienes permiso para editarlo" });
             }
-
+    
+            // Verificar si la sala está ocupada en el nuevo horario
             const [existingEvents] = await pool.query(`
                 SELECT * FROM Event 
                 WHERE Location = ? 
@@ -212,19 +212,65 @@ export class EventsController {
                 return res.status(400).json({ error: 'La sala está ocupada en el rango de tiempo especificado.' });
             }
     
+            // Obtener capacidad de la nueva sala
+            const [[newRoom]] = await pool.query("SELECT Capacity FROM Rooms WHERE RoomID = ?", [location]);
+            if (!newRoom) {
+                return res.status(404).json({ error: "La sala seleccionada no existe" });
+            }
+            const newCapacity = newRoom.Capacity;
+    
+            const [[currentRoom]] = await pool.query("SELECT Capacity FROM Rooms WHERE RoomID = ?", [eventOfDb.Location]);
+            const currentCapacity = currentRoom ? currentRoom.Capacity : 0;
+    
+            if (newCapacity !== currentCapacity) {
+                console.log(`Capacity changed from ${currentCapacity} to ${newCapacity}`);
+                // Obtener usuarios inscritos actuales
+                const [currentEnrollments] = await pool.query(`
+                    SELECT * FROM Enrollment 
+                    WHERE EventID = ? 
+                    AND Status = 'confirmed' 
+                    ORDER BY DateTime ASC
+                `, [id]);
+    
+                if (newCapacity < currentEnrollments.length) {
+                    // Mover usuarios excedentes a la cola
+                    const excessUsers = currentEnrollments.slice(newCapacity);
+                    for (const user of excessUsers) {
+                        await pool.query("UPDATE Enrollment SET Status = 'waiting' WHERE EventID = ? AND UserEmail = ?", [id, user.UserEmail]);
+
+                        const userMessage = `El evento ${title} ha cambiado de sala y ahora estás en la cola.`;
+                        await NotificationsController.sendNotificationToUser(eventOfDb.OrganizerID, user.UserEmail, userMessage);
+                    }
+                } else if (newCapacity > currentEnrollments.length) {
+                    // Promover usuarios de la cola a inscritos
+                    const slotsToFill = newCapacity - currentEnrollments.length;
+                    const [queueUsers] = await pool.query(`
+                        SELECT * FROM Enrollment 
+                        WHERE EventID = ? 
+                        AND Status = 'waiting' 
+                        ORDER BY DateTime ASC 
+                        LIMIT ?
+                    `, [id, slotsToFill]);
+    
+                    for (const user of queueUsers) {
+                        await pool.query("UPDATE Enrollment SET Status = 'confirmed' WHERE EventID = ? AND UserEmail = ?", [id, user.UserEmail]);
+
+                        const userMessage = `Te has movido de la cola a inscrito en el evento ${title}.`;
+                        await NotificationsController.sendNotificationToUser(eventOfDb.OrganizerID, user.UserEmail, userMessage);
+                    }
+                }
+            }
+    
+            // Actualizar el evento con los nuevos datos
             const updateQuery = `
                 UPDATE Event
-                SET Title = ?, Description = ?, TimeInit = ?,TimeEnd = ?, Location = ?, EventTypeID = ?
+                SET Title = ?, Description = ?, TimeInit = ?, TimeEnd = ?, Location = ?, EventTypeID = ?
                 WHERE ID = ? AND OrganizerID = ?
             `;
             await pool.query(updateQuery, [title, description, timeInit, timeEnd, location, eventTypeID, id, email]);
     
-            const message = `Se ha modificado este evento: ${eventOfDb[0].Title}`;
-            await NotificationsController.sendNotificationOfModificatedEvent(
-                id,
-                email,
-                message
-            );
+            const message = `Se ha modificado este evento: ${eventOfDb.Title}`;
+            await NotificationsController.sendNotificationOfModificatedEvent(id, email, message);
     
             res.status(201).redirect('/events');
         } catch (error) {
@@ -232,6 +278,7 @@ export class EventsController {
             res.status(500).json({ error: "Error al actualizar el evento" });
         }
     }
+    
     
 
     static async cancelEvent(req, res) {

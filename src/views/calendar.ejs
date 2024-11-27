@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario</title>
+
+    <!-- FullCalendar Script -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+</head>
+<body>
+    <div id="loading" style="display: none; text-align: center; margin: 20px;">
+        <i class="bi bi-arrow-clockwise"></i> Cargando eventos...
+    </div>
+        <div id="calendar"></div>
+    <%- include("partials/eventModal", { role: role, user: user }) %>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        const currentUserId = '<%= user %>';
+        $(document).ready(function () {
+            const calendarEl = document.getElementById('calendar');
+
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek'
+                },
+                // Configuración para cargar eventos
+                events: function (fetchInfo, successCallback, failureCallback) {
+                    $.ajax({
+                        url: '/api/events', 
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (response) {
+                            const events = response.map(event => ({
+                                id: event.ID, 
+                                title: event.Title,
+                                start: event.TimeInit, 
+                                end: event.TimeEnd,
+                                className: event.Status ?  event.Status : (event.OrganizerID == currentUserId ? 'organized': 'cancelled'),
+                                extendedProps: { 
+                                    description: event.Description,
+                                    location: event.RoomName,
+                                    enrollmentCount: event.EnrollmentCount,
+                                    capacity: event.Capacity,
+                                    organizer: event.OrganizerID,
+                                    facultyName: event.FacultyName,
+                                    facultyUniversity: event.FacultyUniversity,
+                                    status: event.Status,
+                                    eventType: event.EventType
+                                }
+                            }));
+                            console.log(events)
+                            successCallback(events); 
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error al cargar los eventos:", error);
+                            failureCallback(error);
+                        }
+                    });
+                },
+                displayEventTime : false,
+                eventDidMount: function(info) {
+                    $(info.el).tooltip({
+                        title: info.event.extendedProps.description,
+                        container: 'body',
+                        delay: { "show": 50, "hide": 50 }
+                    });
+                  },
+                  
+                loading: function (isLoading) {
+                    if (isLoading) {
+                        $('#loading').show(); 
+                    } else {
+                        $('#loading').hide(); 
+                    }
+                },
+                // Manejador de clic en un evento
+                eventClick: function (info) {
+                    const event = info.event;
+                    showEventModal(event)
+                }
+            });
+
+            function showEventModal(event) {
+                // Aquí usamos las propiedades extendidas del evento de FullCalendar
+                const title = event.title;
+                const description = event.extendedProps.description;
+                const initTime = event.start.toLocaleString();  // Formateamos la fecha de inicio
+                const endTime = event.end.toLocaleString();    // Formateamos la fecha de finalización
+                const locationName = event.extendedProps.facultyName;
+                const locationUniversity = event.extendedProps.facultyUniversity;
+                const roomName = event.extendedProps.location;
+                const location = `${locationName}, ${locationUniversity}`;
+                const organizer = event.extendedProps.organizer;
+                const eventType = event.extendedProps.eventType;
+                const enrollmentCount = event.extendedProps.enrollmentCount;
+                const capacity = event.extendedProps.capacity;
+                const eventId = event.id;  // Usamos el ID del evento de FullCalendar
+                const enrollmentStatus = event.extendedProps.status; // El estado de la inscripción
+                const isEnrolled = enrollmentStatus === 'confirmed' || enrollmentStatus === 'waiting';
+            
+                // Determinamos el estado del usuario según el rol
+                let userStatus = '';
+                if (organizer === currentUserId) {
+                    userStatus = 'Organizador';
+                } else {
+                    switch (enrollmentStatus) {
+                        case 'confirmed':
+                            userStatus = 'Inscrito';
+                            break;
+                        case 'waiting':
+                            userStatus = 'En Cola';
+                            break;
+                        default:
+                            userStatus = 'No Inscrito';
+                    }
+                }
+            
+                // Rellenamos los datos en el modal
+                $('#modalTitle').text(title);
+                $('#modalDescription').text(description);
+                $('#modalInitDate').text(initTime);
+                $('#modalEndDate').text(endTime);
+                $('#modalLocation').text(location);
+                $('#modalRoom').text(roomName);
+                $('#modalOrganizer').text(organizer);
+                $('#modalEventType').text(eventType);
+                $('#modalEnrollmentCount').text(`${enrollmentCount} inscritos`);
+                $('#modalUserStatus').text(userStatus);
+                $('#modalCapacity').text(capacity);
+            
+                const $editButton = $('#editButton');
+                const $signUpButton = $('#signUpButton');
+                const $dropOutButton = $('#dropOutButton');
+            
+                // Mostrar los botones según el estado del usuario
+                if (organizer === currentUserId) {
+                    $editButton.show().attr('href', `/events/info?eventID=${eventId}`);
+                    $signUpButton.hide();
+                    $dropOutButton.hide();
+                } else {
+                    $editButton.hide();
+                    if (isEnrolled) {
+                        $signUpButton.hide();
+                        $dropOutButton.show();
+                    } else {
+                        $signUpButton.show();
+                        $dropOutButton.hide();
+                    }
+                }
+            
+                // Asociamos las funciones de inscribirse y cancelar inscripción
+                $signUpButton.off('click').on('click', () => enrollEvent(eventId));
+                $dropOutButton.off('click').on('click', () => unenrollEvent(eventId));
+            
+                // Finalmente, mostramos el modal
+                $('#eventModal').modal('show');
+            }
+
+            calendar.render();
+        });
+    </script>
+</body>
+</html>
