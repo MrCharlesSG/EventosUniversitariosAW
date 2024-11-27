@@ -190,7 +190,8 @@
                             data-capacity="${event.Capacity}" 
                             data-event-type="${event.EventType}"
                             data-enrollment-count="${event.EnrollmentCount}" 
-                            data-enrollment-status="${event.Status}">
+                            data-enrollment-status="${event.Status}"
+                            tabindex="0">
                             
                             <div class="list-item-important-title">
                                 ${event.Title} ${badgeText ? `<span class="badge ${badgeClass}">${badgeText}</span>` : ''}
@@ -413,8 +414,34 @@
                 $('#filters-text').text('Sin filtros');
             });
 
-            function showEventModal(event) {
-                const $item = $(event.currentTarget);
+            $(document).on('keydown', function(e) {
+                const selectedEvent = $('.list-item:focus');  
+                if (selectedEvent.length === 0) return;
+            
+                const eventId = selectedEvent.data('id');
+            
+                // Detectar Ctrl + I (inscribirse)
+                if (e.ctrlKey && e.key.toLowerCase() === 'i') {
+                    e.preventDefault();  
+                    enrollEvent(eventId);  
+                }
+                
+                // Detectar Ctrl + D (mostrar detalles del evento)
+                if (e.ctrlKey && e.key.toLowerCase() === 'd') {
+                    e.preventDefault();  
+                    const event = selectedEvent[0]; // Seleccionar el evento enfocado
+                    showEventModal(event, true);  // Mostrar los detalles del evento
+                }
+            
+                // Detectar Ctrl + U (desinscribirse)
+                if (e.ctrlKey && e.key.toLowerCase() === 'u') {
+                    e.preventDefault();  
+                    unenrollEvent(eventId);  // Desinscribirse del evento
+                }
+            });
+            
+            function showEventModal(event, outside) {
+                const $item = $(outside ? event:event.currentTarget);
         
                 const title = $item.data('title');
                 const description = $item.data('description');

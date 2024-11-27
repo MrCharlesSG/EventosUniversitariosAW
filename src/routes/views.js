@@ -270,7 +270,7 @@ viewsRouter.get("/events/add", isAuthenticatedOrganizer, async (req, res) => {
     }
 });
 
-viewsRouter.get("/calendar", isAuthenticatedOrganizer, async (req, res) => {
+viewsRouter.get("/calendar", isAuthenticated, async (req, res) => {
     res.render('calendar', {
         role: req.user.role,
         user: req.user.email,
