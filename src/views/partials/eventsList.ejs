@@ -79,6 +79,7 @@
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 
 
 <script>
@@ -125,16 +126,16 @@
             function renderEvents() {
                 const $eventList = $('#event-list');
                 const $pastEventList = $('#past-event-list');
-        
+            
                 $eventList.empty();
                 $pastEventList.empty();
-        
+            
                 const now = new Date();
                 const filteredEvents = eventsData.filter(event => {
                     const eventDate = new Date(event.DateTime);
                     return (    
-                        (!appliedFilters.dateStart || eventDate >= new Date(appliedFilters.dateStart)) &&
-                        (!appliedFilters.dateEnd || eventDate <= new Date(appliedFilters.dateEnd)) &&
+                        (!appliedFilters.dateStart || new Date(event.TimeInit) >= new Date(appliedFilters.dateStart)) &&
+                        (!appliedFilters.dateEnd || new Date(event.TimeEnd) <= new Date(appliedFilters.dateEnd)) &&
                         (!appliedFilters.location || appliedFilters.location == 'none' || event.FacultyID == appliedFilters.location) &&
                         (!appliedFilters.eventType || appliedFilters.eventType == 'none' || event.EventType == appliedFilters.eventType) &&
                         (!appliedFilters.minCapacity || event.Capacity >= appliedFilters.minCapacity) &&
@@ -143,17 +144,16 @@
                             (appliedFilters.status.includes('cancelled') && (event.Status === null || event.Status == 'cancelled')) ||
                             appliedFilters.status.includes(event.Status))
                     );
-
                 });
-
+            
                 console.log(filteredEvents)
-        
+            
                 filteredEvents.forEach(event => {
-                    const isPastEvent = new Date(event.DateTime) < now;
-        
+                    const isPastEvent = new Date(event.TimeInit) < now;
+            
                     let badgeClass = '';
                     let badgeText = '';
-        
+            
                     if (event.OrganizerID !== currentUserId) {
                         switch (event.Status) {
                             case 'confirmed':
@@ -169,50 +169,88 @@
                                 badgeText = 'No Inscrito';
                         }
                     }
-        
+            
                     const enrollmentInfo = ``;
-        
+            
+                    // Convertimos las fechas usando moment.js con la zona horaria local
+                    const timeInitFormatted = moment(event.TimeInit).local().format('YYYY-MM-DD HH:mm');
+                    const timeEndFormatted = moment(event.TimeEnd).local().format('YYYY-MM-DD HH:mm');
+            
                     const eventItem = `
                         <li class="list-item" 
                             data-id="${event.ID}" 
                             data-organizer="${event.OrganizerID}"
                             data-title="${event.Title}" 
                             data-description="${event.Description}" 
-                            data-date="${new Date(event.DateTime).toLocaleString()}" 
+                            data-date-init="${timeInitFormatted}" 
+                            data-date-end="${timeEndFormatted}" 
                             data-location-name="${event.FacultyName}" 
+                            data-room-name="${event.RoomName}" 
                             data-location-university="${event.FacultyUniversity}" 
                             data-capacity="${event.Capacity}" 
                             data-event-type="${event.EventType}"
-                            data-enrollment-count="${event.EnrollmentCount}"
+                            data-enrollment-count="${event.EnrollmentCount}" 
                             data-enrollment-status="${event.Status}">
-                        
-                            <div class="list-item-important-title">${event.Title} ${badgeText ? `<span class="badge ${badgeClass}">${badgeText}</span>` : ''}</div>
+                            
+                            <div class="list-item-important-title">
+                                ${event.Title} ${badgeText ? `<span class="badge ${badgeClass}">${badgeText}</span>` : ''}
+                            </div>
                             <div class="list-item-important-meta">${event.Description}</div>
                             <div class="list-item-important-meta d-flex flex-wrap justify-content-between">
-                                <span><i class="bi bi-calendar-event"></i> ${new Date(event.DateTime).toLocaleString()}</span>
-                                <span><i class="bi bi-geo"></i> ${event.FacultyName}, ${event.FacultyUniversity}</span>
-                                <span><i class="bi bi-tags"></i> ${event.EventType}</span>
-                                <span><i class="bi bi-hash"></i> ${event.EnrollmentCount} / ${event.Capacity} inscritos</span>
+                                <span>
+                                    <i class="bi bi-calendar-event"></i> 
+                                    ${new Intl.DateTimeFormat('es-ES', { dateStyle: 'long', timeStyle: 'short' }).format(new Date(event.TimeInit))}
+                                </span>
+                                <span>
+                                    <i class="bi bi-clock"></i> 
+                                    ${calculateDuration(event.TimeInit, event.TimeEnd)}
+                                </span>
+                                <span>
+                                    <i class="bi bi-geo"></i> ${event.FacultyName}, ${event.FacultyUniversity}
+                                </span>
+                                <span>
+                                    <i class="bi bi-tags"></i> ${event.EventType}
+                                </span>
+                                <span>
+                                    <i class="bi bi-hash"></i> ${event.EnrollmentCount} / ${event.Capacity} inscritos
+                                </span>
                             </div>
                         </li>
                     `;
-        
+            
                     if (isPastEvent) {
                         $pastEventList.append(eventItem);
                     } else {
                         $eventList.append(eventItem);
                     }
                 });
-        
+            
                 $('.list-item').on('click', showEventModal);
                 updateFiltersText();
             }
+            
+            function calculateDuration(start, end) {
+                const startDate = new Date(start);
+                const endDate = new Date(end);
+                const diffMs = endDate - startDate; 
+            
+                const hours = Math.floor(diffMs / (1000 * 60 * 60));
+                const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+            
+                if (hours > 0 && minutes > 0) {
+                    return `${hours} horas y ${minutes} minutos`;
+                } else if (hours > 0) {
+                    return `${hours} horas`;
+                } else {
+                    return `${minutes} minutos`;
+                }
+            }
+            
         
             function updateFiltersText() {
                 const $filtersText = $('#filters-text');
                 const appliedFiltersHTML = [];
             
-                // Agregar fecha
                 if (appliedFilters.dateStart && appliedFilters.dateEnd) {
                     appliedFiltersHTML.push(`
                         <span><i class="bi bi-calendar-event"></i> 
@@ -380,9 +418,11 @@
         
                 const title = $item.data('title');
                 const description = $item.data('description');
-                const date = $item.data('date');
+                const initTime = $item.data('date-init');
+                const endTime = $item.data('date-end');
                 const locationName = $item.data('location-name');
                 const locationUniversity = $item.data('location-university');
+                const roomName = $item.data('room-name');
                 const location = `${locationName}, ${locationUniversity}`;
                 const organizer = $item.data('organizer');
                 const eventType = $item.data('event-type');
@@ -391,7 +431,7 @@
                 const eventId = $item.data('id');
                 const enrollmentStatus = $item.data('enrollment-status');
                 const isEnrolled = enrollmentStatus === 'confirmed' || enrollmentStatus === 'waiting';
-        
+                console.log(roomName)
                 let userStatus = '';
                 if (organizer === currentUserId) {
                     userStatus = 'Organizador';
@@ -412,8 +452,10 @@
         
                 $('#modalTitle').text(title);
                 $('#modalDescription').text(description);
-                $('#modalDate').text(date);
+                $('#modalInitDate').text(initTime);
+                $('#modalEndDate').text(endTime);
                 $('#modalLocation').text(location);
+                $('#modalRoom').text(roomName);
                 $('#modalOrganizer').text(organizer);
                 $('#modalEventType').text(eventType);
                 $('#modalEnrollmentCount').text(`${enrollmentCount} inscritos`);

@@ -8,8 +8,11 @@ import { apiRouter } from './routes/api/index.js';
 import { viewsRouter } from './routes/views.js';
 import expressLayouts from 'express-ejs-layouts';
 import checkBlockedIpMiddleware, { sqlInjectionMiddleware } from './middleware/attackts.js';
+import moment from 'moment';
 
 const app = express();
+moment.locale('es');
+app.locals.moment = moment;
 app.use(json());
 app.use(express.urlencoded({
     extended: true
@@ -23,7 +26,6 @@ app.use(session({
     saveUninitialized: true,
     cookie: { secure: false }
 }));
-
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);

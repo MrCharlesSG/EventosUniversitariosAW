@@ -15,3 +15,4 @@ eventsRouter.post("/:id/cancel",isTheAuthenticatedUserAOrganizer, EventsControll
 
 eventsRouter.post("/",isTheAuthenticatedUserAOrganizer, EventsController.createEvent)
 
+eventsRouter.get("/rooms/:id", isTheAuthenticatedUserAOrganizer, EventsController.getRoomsByFacultyID)

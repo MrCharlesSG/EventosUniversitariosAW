@@ -28,54 +28,125 @@
             </div>
 
             <div class="form-group">
-                <label for="dateTime">Fecha y Hora</label>
-                <input 
-                    type="datetime-local" 
-                    class="form-control" 
-                    id="dateTime" 
-                    name="dateTime" 
-                    value="<%= event ? new Date(event.DateTime).toISOString().slice(0, 16) : '' %>" 
-                    required
-                >
                 <span id="dateTimeError" class="error-text" style="display: none;"></span> 
+                <div class="form-group">
+                    <span id="dateTimeError" class="error-text" style="display: none;"></span> 
+                    <div class="form-row">
+                        <!-- Fecha de inicio -->
+                        <div class="form-group col-md-6">
+                            <label for="timeInit">Fecha de Inicio</label>
+                            <input 
+                                type="datetime-local" 
+                                class="form-control" 
+                                id="timeInit" 
+                                name="timeInit" 
+                                value="<%= event ? new Date(event.TimeInit).toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' }).replace(' ', 'T') : '' %>" 
+                                required
+                            >
+                        </div>
+                        
+                        <!-- Duración -->
+                        <div class="form-group col-md-6">
+                            <label for="duration">Duración</label>
+                            <div class="d-flex">
+                                <div class="mr-2">
+                                    <label for="hours">Horas</label>
+                                    <select class="form-control" id="hours" name="hours">
+                                        <% 
+                                            if (event) {
+                                                const timeInit = new Date(event.TimeInit);
+                                                const timeEnd = new Date(event.TimeEnd);
+                                                const duration = (timeEnd - timeInit) / 1000 / 60; // Duración en minutos
+                                                const hours = Math.floor(duration / 60); // Calcular horas
+                                                const minutes = duration % 60; // Calcular minutos
+                    
+                                                for (let i = 0; i <= 12; i++) {
+                                                    const selected = (i === hours) ? 'selected' : '';
+                                        %>
+                                                    <option value="<%= i %>" <%= selected %>><%= i %></option>
+                                        <% 
+                                                }
+                                            } else {
+                                                // Si no hay evento, lo dejamos vacío
+                                                for (let i = 0; i <= 12; i++) {
+                                        %>
+                                                    <option value="<%= i %>"><%= i %></option>
+                                        <% 
+                                                }
+                                            }
+                                        %>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="minutes">Minutos</label>
+                                    <select class="form-control" id="minutes" name="minutes">
+                                        <% 
+                                            if (event) {
+                                                const timeInit = new Date(event.TimeInit);
+                                                const timeEnd = new Date(event.TimeEnd);
+                                                const duration = (timeEnd - timeInit) / 1000 / 60; // Duración en minutos
+                                                const minutes = duration % 60; // Calcular minutos
+                    
+                                                // Preseleccionar los minutos
+                                                const selectedMinutes = [0, 15, 30, 45].find(m => m === minutes) || 0;
+                                        %>
+                                                <option value="0" <%= selectedMinutes === 0 ? 'selected' : '' %>>00</option>
+                                                <option value="15" <%= selectedMinutes === 15 ? 'selected' : '' %>>15</option>
+                                                <option value="30" <%= selectedMinutes === 30 ? 'selected' : '' %>>30</option>
+                                                <option value="45" <%= selectedMinutes === 45 ? 'selected' : '' %>>45</option>
+                                        <% 
+                                            } else {
+                                                // Si no hay evento, dejar todo vacío
+                                        %>
+                                                <option value="0">00</option>
+                                                <option value="15">15</option>
+                                                <option value="30">30</option>
+                                                <option value="45">45</option>
+                                        <% 
+                                            }
+                                        %>
+                                    </select>
+                                </div>
+                            </div>
+                            <span id="durationError" class="error-text" style="display: none;"></span>
+                        </div>
+                    </div>
+                    
+                </div>
+                
             </div>
 
             <div class="form-group">
-                <label for="location">Ubicación</label>
-                <select 
-                    class="form-control" 
-                    id="location" 
-                    name="location" 
-                    required
-                >
-                    <% if (facultyList && facultyList.length) { %>
+                <span id="roomError" class="error-text" style="display: none;"></span>
+                <div class="form-group">
+                    <label for="faculty">Facultad</label>
+                    <select class="form-control" id="faculty" name="faculty" required>
+                        <option value="">Seleccione una facultad</option>
                         <% facultyList.forEach(faculty => { %>
-                            <option 
-                                value="<%= faculty.ID %>" 
-                                <%= event && event.Location === faculty.ID ? 'selected' : '' %>>
-                                <%= faculty.Name %>, <%= faculty.University %>
+                            <option value="<%= faculty.ID %>" <%= event && faculty.ID == event.FacultyID ? 'selected' : '' %>>
+                                <%= faculty.Name %> - <%= faculty.University %>
                             </option>
                         <% }) %>
-                    <% } else { %>
-                        <option disabled>No hay facultades disponibles</option>
-                    <% } %>
-                </select>
-                <span id="locationError" class="error-text" style="display: none;"></span>
+                    </select>
+                    <span id="facultyError" class="error-text" style="display: none;"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="room">Sala</label>
+                    <select class="form-control" id="room" name="room" required>
+                        <option value="">Seleccione una sala</option>
+                        <% if (rooms && rooms.length > 0) { %>
+                            <% rooms.forEach(room => { %>
+                                <option value="<%= room.RoomID %>" <%= event && room.RoomID == event.RoomID ? 'selected' : '' %>>
+                                    <%= room.RoomName %> (Capacidad: <%= room.Capacity %>)
+                                </option>
+                            <% }) %>
+                        <% } %>
+                    </select>
+                    <span id="roomError" class="error-text" style="display: none;"></span>
+                </div>                
             </div>
-
-            <div class="form-group">
-                <label for="capacity">Capacidad</label>
-                <input 
-                    type="number" 
-                    class="form-control" 
-                    id="capacity" 
-                    name="capacity" 
-                    placeholder="Capacidad del evento"
-                    value="<%= event ? event.Capacity : '' %>"
-                    min="1" 
-                >
-                <span id="capacityError" class="error-text" style="display: none;"></span> 
-            </div>
+            
 
             <div class="form-group">
                 <label for="eventTypeID">Tipo de Evento</label>
@@ -109,51 +180,57 @@
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 <script>
+
+    const eventID = '<%= event ? event.ID : -1 %>'
+    console.log("eve", eventID)
     $(document).ready(function() {
         $('#eventForm').submit(function(event) {
             event.preventDefault(); 
             
             $('.error-text').hide().text('');
-
+        
             const title = $('#title').val().trim();
             const description = $('#description').val().trim();
-            const dateTime = $('#dateTime').val().trim();
-            const location = $('#location').val().trim();
-            const capacity = $('#capacity').val().trim();
+            const timeInit = $('#timeInit').val().trim();
+            const location = $('#room').val().trim();
             const eventTypeID = $('#eventTypeID').val().trim();
-
+            const hours = parseInt($('#hours').val().trim());  
+            const minutes = parseInt($('#minutes').val().trim());  
+        
             let isValid = true;
-
+        
             if (!title) {
                 $('#titleError').text("El título es obligatorio").show();
                 isValid = false;
             }
-
+        
             const datePattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
-            if (!datePattern.test(dateTime)) {
-                $('#dateTimeError').text("La fecha y hora deben estar en un formato válido").show();
+            if (!datePattern.test(timeInit)) {
+                $('#dateTimeError').text("La fecha debe estar en un formato válido").show();
                 isValid = false;
             }
-
+        
             if (!location) {
                 $('#locationError').text("La ubicación es obligatoria").show();
                 isValid = false;
             }
-
-            if (isNaN(capacity) || capacity <= 0) {
-                $('#capacityError').text("La capacidad debe ser un número positivo").show();
-                isValid = false;
-            }
-
+        
             if (!eventTypeID) {
                 $('#eventTypeIDError').text("El tipo de evento es obligatorio").show();
                 isValid = false;
             }
-
+        
+            if (isNaN(hours) || isNaN(minutes) || hours < 0 || minutes < 0) {
+                $('#durationError').text("La duración debe ser válida").show();
+                isValid = false;
+            }
+        
             if (!isValid) {
                 return; 
             }
+
 
             $.ajax({
                 url: $('#eventForm').attr('action'), 
@@ -161,9 +238,10 @@
                 data: {
                     title: title,
                     description: description,
-                    dateTime: dateTime,
+                    timeInit: timeInit, 
+                    durationHours: hours,  
+                    durationMinutes: minutes,
                     location: location,
-                    capacity: capacity,
                     eventTypeID: eventTypeID
                 },
                 success: function(response) {
@@ -180,6 +258,56 @@
                 }
             });
         });
+        
+        $('#faculty, #timeInit, #hours, #minutes').change(function () {
+            const facultyID = $('#faculty').val().trim();
+            const timeInit = $('#timeInit').val().trim();
+            const hours = parseInt($('#hours').val().trim()); 
+            const minutes = parseInt($('#minutes').val().trim());  
+            
+            if (!facultyID) {
+                $('#room').html('<option value="">Selecciona una sala</option>');
+                return;
+            }
+        
+            const currentRoomID = $('#room').val();
+            console.log("The room " , currentRoomID)
+            $.ajax({
+                url: `/api/events/rooms/${facultyID}`,
+                method: 'GET',
+                data: { timeInit, hours, minutes, eventID },
+                success: function (rooms) {
+                    console.log(rooms);
+                    $('#room').html('<option value="">Selecciona una sala</option>');
+        
+                    let roomFound = false;  
+                    rooms.forEach(room => {
+                        $('#room').append(
+                            `<option value="${room.RoomID}" data-capacity="${room.Capacity}">
+                                ${room.Name} (Capacidad: ${room.Capacity})
+                            </option>`
+                        );
+        
+                        if (currentRoomID && room.RoomID == currentRoomID) {
+                            roomFound = true; 
+                        }
+                        console.log(room)
+                    });
+        
+                    if (roomFound) {
+                        $('#room').val(currentRoomID);
+                    }
+                },
+                error: function (xhr) {
+                    console.error("Error al cargar las salas:", xhr.responseText);
+                    $('#room').html('<option value="">Error al cargar las salas</option>');
+                }
+            });
+        });
+        
+        
+
+        
     });
 
    

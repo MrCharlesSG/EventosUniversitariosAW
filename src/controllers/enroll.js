@@ -25,7 +25,7 @@ export class EnrollController {
     
         try {
             const eventQuery = "SELECT * FROM Event WHERE ID = ?";
-            const updateEnrollementQuery = "UPDATE Enrollment SET Status = ?, QueueDateTime = NULL WHERE EventID = ? AND UserEmail = ?";
+            const updateEnrollementQuery = "UPDATE Enrollment SET Status = ?, DateTime = NULL WHERE EventID = ? AND UserEmail = ?";
     
             const [eventResult] = await pool.query(eventQuery, [idEvent]);
     
@@ -90,8 +90,8 @@ export class EnrollController {
         const { idEvent } = req.params;
     
         try {
-            const promoteQuery = "SELECT * FROM Enrollment WHERE EventID = ? AND Status = 'waiting' ORDER BY QueueDateTime ASC LIMIT 1";
-            const updateEnrollmentQuery = "UPDATE Enrollment SET Status = ?, QueueDateTime = NULL WHERE EventID = ? AND UserEmail = ?";
+            const promoteQuery = "SELECT * FROM Enrollment WHERE EventID = ? AND Status = 'waiting' ORDER BY DateTime ASC LIMIT 1";
+            const updateEnrollmentQuery = "UPDATE Enrollment SET Status = ?, DateTime = NULL WHERE EventID = ? AND UserEmail = ?";
             const eventQuery = "SELECT * FROM Event WHERE ID = ?";
     
             const enrollmentResult = await isEnrolledQuery(idEvent, email);
@@ -170,7 +170,7 @@ export class EnrollController {
                 SELECT UserEmail 
                 FROM Enrollment 
                 WHERE EventID = ? AND Status = 'waiting'
-                ORDER BY QueueDateTime ASC
+                ORDER BY DateTime ASC
             `;
             
             const [result] = await pool.query(waitingQuery, [idEvent]);
@@ -193,7 +193,7 @@ const isEnrolledQuery = async (idEvent, email) => {
 
 const enrollQuery = async (event, email, callback, callbackError) => {
     const enrollConfirmed = "INSERT INTO Enrollment (EventID, UserEmail, Status) VALUES (?, ?, 'confirmed')";
-    const enrollWaiting = "INSERT INTO Enrollment (EventID, UserEmail, Status, QueueDateTime) VALUES (?, ?, 'waiting', NOW())";
+    const enrollWaiting = "INSERT INTO Enrollment (EventID, UserEmail, Status, DateTime) VALUES (?, ?, 'waiting', NOW())";
 
     try {
         const thereIsSpace = await checkCapacityQuery(event);
