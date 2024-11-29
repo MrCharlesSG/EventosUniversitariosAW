@@ -226,7 +226,26 @@
                     }
                 });
             
-                $('.list-item').on('click', showEventModal);
+                $('.list-item').on('click', function () {
+                    const $item = $(this);
+                    console.log("Lllamand9oooo")
+                    const eventData = {
+                        eventId: $item.data('id'),
+                        title: $item.data('title'),
+                        description: $item.data('description'),
+                        initTime: $item.data('date-init'),
+                        endTime: $item.data('date-end'),
+                        location: `${$item.data('location-name')}, ${$item.data('location-university')}`,
+                        roomName: $item.data('room-name'),
+                        organizer: $item.data('organizer'),
+                        eventType: $item.data('event-type'),
+                        enrollmentCount: $item.data('enrollment-count'),
+                        capacity: $item.data('capacity'),
+                        enrollmentStatus: $item.data('enrollment-status'),
+                    };
+            
+                    $('#eventModal').trigger('openEventModal', eventData);
+                });
                 updateFiltersText();
             }
             
@@ -294,21 +313,18 @@
                     appliedFiltersHTML.push(capacityText);
                 }
             
-                // Agregar ubicación
                 if (appliedFilters.location && appliedFilters.location != 'none') {
                     appliedFiltersHTML.push(`
                         <span><i class="bi bi-geo"></i> ${appliedFilters.locationText}</span>
                     `);
                 }
             
-                // Agregar estado
                 if (appliedFilters.status && appliedFilters.status.length > 0) {
                     appliedFiltersHTML.push(`
                         <span><i class="bi bi-check-circle"></i> Estado: ${appliedFilters.statusText}</span>
                     `);
                 }
             
-                // Agregar tipo de evento
                 if (appliedFilters.eventType && appliedFilters.eventType != 'none') {
                     appliedFiltersHTML.push(`
                         <span><i class="bi bi-tags"></i> Tipo: ${appliedFilters.eventType}</span>
@@ -413,198 +429,30 @@
                 renderEvents();
                 $('#filters-text').text('Sin filtros');
             });
-
-            $(document).on('keydown', function(e) {
-                const selectedEvent = $('.list-item:focus');  
-                if (selectedEvent.length === 0) return;
             
-                const eventId = selectedEvent.data('id');
+            $(document).on('updateEvents', function (e, { eventId, enrollmentCount, capacity, enrollmentStatus }) {
+                console.log("recibido ", eventId, enrollmentCount, capacity, enrollmentStatus);
             
-                if (e.ctrlKey && e.key.toLowerCase() === 'i') {
-                    e.preventDefault();  
-                    enrollEvent(eventId);  
-                }
-                
-                if (e.ctrlKey && e.key.toLowerCase() === 'd') {
-                    e.preventDefault();  
-                    const event = selectedEvent[0]; 
-                    showEventModal(event, true); 
-                }
+                const $eventItem = $(`[data-id="${eventId}"]`);
+                $eventItem.data('enrollment-count', enrollmentCount);
+                $eventItem.data('enrollment-status', enrollmentStatus);
             
-                if (e.ctrlKey && e.key.toLowerCase() === 'u') {
-                    e.preventDefault();  
-                    unenrollEvent(eventId);  
-                }
+                const badgeClass = enrollmentStatus === 'confirmed' ? 'badge-success' :
+                                   enrollmentStatus === 'waiting' ? 'badge-warning' :
+                                   'badge-danger';
+                const badgeText = enrollmentStatus === 'confirmed' ? 'Inscrito' :
+                                  enrollmentStatus === 'waiting' ? 'En Cola' :
+                                  'No Inscrito';
+            
+                $eventItem.find('.list-item-important-title .badge')
+                    .removeClass('badge-danger badge-warning badge-success')
+                    .addClass(badgeClass)
+                    .text(badgeText);
+            
+                const enrollmentInfo = `${enrollmentCount} / ${capacity} inscritos`;
+                $eventItem.find('.bi-hash').parent().html(`<i class="bi bi-hash"></i> ${enrollmentInfo}`);
             });
             
-            function showEventModal(event, outside) {
-                const $item = $(outside ? event:event.currentTarget);
-        
-                const title = $item.data('title');
-                const description = $item.data('description');
-                const initTime = $item.data('date-init');
-                const endTime = $item.data('date-end');
-                const locationName = $item.data('location-name');
-                const locationUniversity = $item.data('location-university');
-                const roomName = $item.data('room-name');
-                const location = `${locationName}, ${locationUniversity}`;
-                const organizer = $item.data('organizer');
-                const eventType = $item.data('event-type');
-                const enrollmentCount = $item.data('enrollment-count');
-                const capacity = $item.data('capacity');
-                const eventId = $item.data('id');
-                const enrollmentStatus = $item.data('enrollment-status');
-                const isEnrolled = enrollmentStatus === 'confirmed' || enrollmentStatus === 'waiting';
-                console.log(roomName)
-                let userStatus = '';
-                if (organizer === currentUserId) {
-                    userStatus = 'Organizador';
-                } else {
-                    switch (enrollmentStatus) {
-                        case 'confirmed':
-                            userStatus = 'Inscrito';
-                            break;
-                        case 'waiting':
-                            userStatus = 'En Cola';
-                            break;
-                        default:
-                            userStatus = 'No Inscrito';
-                    }
-                }
-        
-                console.log("Is enrolled:", isEnrolled);
-        
-                $('#modalTitle').text(title);
-                $('#modalDescription').text(description);
-                $('#modalInitDate').text(initTime);
-                $('#modalEndDate').text(endTime);
-                $('#modalLocation').text(location);
-                $('#modalRoom').text(roomName);
-                $('#modalOrganizer').text(organizer);
-                $('#modalEventType').text(eventType);
-                $('#modalEnrollmentCount').text(`${enrollmentCount} inscritos`);
-                $('#modalUserStatus').text(userStatus);
-                $('#modalCapacity').text(capacity);
-        
-                const $editButton = $('#editButton');
-                const $signUpButton = $('#signUpButton');
-                const $dropOutButton = $('#dropOutButton');
-        
-                if (organizer === currentUserId) {
-                    $editButton.show().attr('href', `/events/info?eventID=${eventId}`);
-                    $signUpButton.hide();
-                    $dropOutButton.hide();
-                } else {
-                    $editButton.hide();
-                    if (isEnrolled) {
-                        $signUpButton.hide();
-                        $dropOutButton.show();
-                    } else {
-                        $signUpButton.show();
-                        $dropOutButton.hide();
-                    }
-                }
-        
-                $signUpButton.off('click').on('click', () => enrollEvent(eventId));
-                $dropOutButton.off('click').on('click', () => unenrollEvent(eventId));
-                $('#eventModal').modal('show');
-            }
-        
-            function enrollEvent(eventId) {
-                console.log("Enrolling...");
-                $.ajax({
-                    url: `/api/enroll/${eventId}`,
-                    method: 'POST',
-                    contentType: 'application/json',
-                    success: function (data) {
-                        if (data.message) {
-                            const $eventItem = $(`[data-id="${eventId}"]`);
-            
-                            const currentEnrollmentCount = parseInt($eventItem.data('enrollment-count'), 10);
-                            const capacity = parseInt($eventItem.data('capacity'), 10);
-                            const newEnrollmentCount = currentEnrollmentCount + 1;
-
-                            $eventItem.data('enrollment-count', newEnrollmentCount);
-                            console.log("errollement count ", newEnrollmentCount)
-                            console.log("capa count ", capacity)
-                            console.log(newEnrollmentCount > capacity)
-                            let newStatus = '';
-                            if (newEnrollmentCount > capacity) {
-                                newStatus = 'waiting';
-                            } else {
-                                newStatus = 'confirmed';
-                            }
-                            $eventItem.data('enrollment-status', newStatus);
-                            console.log(newStatus)
-                            // lista
-                            $eventItem.find('.list-item-important-title .badge')
-                                .removeClass('badge-danger badge-warning badge-success')
-                                .addClass(newStatus == 'confirmed' ? 'badge-success' : 'badge-warning')
-                                .text(newStatus == 'confirmed' ? 'Inscrito' : 'En Cola');
-            
-                                const enrollmentInfo = `${newEnrollmentCount} / ${$eventItem.data('capacity')} inscritos`;
-                                console.log("The new ", enrollmentInfo)
-                                const $enrollmentInfo = $eventItem.find('.bi-hash').parent();
-                                const currentText = $enrollmentInfo.html(); 
-                                $enrollmentInfo.html(`<i class="bi bi-hash"></i> ${enrollmentInfo}`);
-    
-                            // modal
-                            $('#modalEnrollmentCount').text(`${newEnrollmentCount} inscritos`);
-                            $('#modalUserStatus').text(newStatus == 'waiting' ? 'En Cola' : 'Inscrito');
-            
-                            $('#signUpButton').hide();
-                            $('#dropOutButton').show();
-                        }
-                    },
-                    error: function (error) {
-                        console.error('Error al inscribirse en el evento:', error);
-                    }
-                });
-            }
-            
-            function unenrollEvent(eventId) {
-                console.log("Unenrolling...");
-                $.ajax({
-                    url: `/api/enroll/${eventId}`,
-                    method: 'DELETE',
-                    contentType: 'application/json',
-                    success: function (data) {
-                        if (data.message) {
-                            const $eventItem = $(`[data-id="${eventId}"]`);
-            
-                            const currentEnrollmentCount = parseInt($eventItem.data('enrollment-count'), 10);
-                            const newEnrollmentCount = currentEnrollmentCount - 1;
-                            console.log("T--a-s" ,newEnrollmentCount)
-
-                            $eventItem.data('enrollment-count', newEnrollmentCount);
-                            $eventItem.data('enrollment-status', 'cancelled');
-            
-                            // lista
-                            $eventItem.find('.list-item-important-title .badge')
-                                .removeClass('badge-danger badge-warning badge-success')
-                                .addClass('badge-danger')
-                                .text('No Inscrito');
-            
-                            const enrollmentInfo = `${newEnrollmentCount} / ${$eventItem.data('capacity')} inscritos`;
-                            console.log("The new ", enrollmentInfo)
-                            const $enrollmentInfo = $eventItem.find('.bi-hash').parent();
-                            const currentText = $enrollmentInfo.html(); 
-                            $enrollmentInfo.html(`<i class="bi bi-hash"></i> ${enrollmentInfo}`);
-
-                            // modal
-                            $('#modalEnrollmentCount').text(`${newEnrollmentCount} inscritos`);
-                            $('#modalUserStatus').text('No Inscrito');
-                            $('#signUpButton').show();
-                            $('#dropOutButton').hide();
-                        }
-                    },
-                    error: function (error) {
-                        console.error('Error al cancelar la inscripción del evento:', error);
-                    }
-                });
-            }
-            
-            // Mostrar/ocultar el botón para volver al inicio según el scroll
             const $scrollToTopButton = $('#scroll-to-top');
             $(window).on('scroll', function () {
                 if ($(window).scrollTop() > 300) {
@@ -617,9 +465,62 @@
             $scrollToTopButton.on('click', function () {
                 $('html, body').animate({ scrollTop: 0 }, 'smooth');
             });
+
+            $(document).on('keydown', function (e) {
+                const selectedEvent = $('.list-item:focus');
+                if (selectedEvent.length === 0) return;
+            
+                const $item = $(selectedEvent);
+                const eventId = $item.data('id');
+            
+                if (e.ctrlKey && e.key.toLowerCase() === 'd') {
+                    e.preventDefault();
+                    
+                    const eventData = {
+                        eventId: $item.data('id'),
+                        title: $item.data('title'),
+                        description: $item.data('description'),
+                        initTime: $item.data('date-init'),
+                        endTime: $item.data('date-end'),
+                        location: `${$item.data('location-name')}, ${$item.data('location-university')}`,
+                        roomName: $item.data('room-name'),
+                        organizer: $item.data('organizer'),
+                        eventType: $item.data('event-type'),
+                        enrollmentCount: $item.data('enrollment-count'),
+                        capacity: $item.data('capacity'),
+                        enrollmentStatus: $item.data('enrollment-status'),
+                    };
+            
+                    $('#eventModal').trigger('openEventModal', eventData);
+                }
+            
+                if (e.ctrlKey && e.key.toLowerCase() === 'i') {
+                    e.preventDefault();
+            
+                    const eventData = {
+                        eventId: $item.data('id'),
+                        enrollmentCount: $item.data('enrollment-count'),
+                        capacity: $item.data('capacity'),
+                    };
+            
+                    $('#eventModal').trigger('enrollEvent', eventData);
+                }
+            
+                if (e.ctrlKey && e.key.toLowerCase() === 'u') {
+                    e.preventDefault();
+            
+                    const eventData = {
+                        eventId: $item.data('id'),
+                        enrollmentCount: $item.data('enrollment-count'),
+                        capacity: $item.data('capacity'),
+                    };
+            
+                    $('#eventModal').trigger('unenrollEvent', eventData);
+                }
+            });
+            
         
-            // Delegación de eventos para abrir el modal
-            $(document).on('click', '.list-item', showEventModal);
+            //$(document).on('click', '.list-item', showEventModal);
         });
     
 </script>

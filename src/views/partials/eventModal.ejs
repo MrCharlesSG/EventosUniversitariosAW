@@ -26,3 +26,136 @@
         </div>
     </div>
 </div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+
+        $('#eventModal').on('openEventModal', function (e, eventData) {
+            console.log("LLegandooooo", eventData)
+            showEventModal(eventData); 
+            e.stopPropagation()
+        });
+
+        $('#eventModal').on('enrollEvent', function (e, eventData) {
+            console.log(eventData)
+            enrollEvent(eventData);
+        });
+    
+        $('#eventModal').on('unenrollEvent', function (e, eventData) {
+            unenrollEvent(eventData);
+        });
+
+        function showEventModal(eventData) {
+            
+            const isEnrolled = eventData.enrollmentStatus === 'confirmed' || eventData.enrollmentStatus === 'waiting';
+            const isOrganizer = eventData.organizer === currentUserId;
+            console.log(isEnrolled)
+            console.log(eventData)
+            $('#modalTitle').text(eventData.title);
+            $('#modalDescription').text(eventData.description);
+            $('#modalInitDate').text(eventData.initTime);
+            $('#modalEndDate').text(eventData.endTime);
+            $('#modalLocation').text(eventData.location);
+            $('#modalRoom').text(eventData.roomName);
+            $('#modalOrganizer').text(eventData.organizer);
+            $('#modalEventType').text(eventData.eventType);
+            $('#modalEnrollmentCount').text(`${eventData.enrollmentCount} inscritos`);
+            $('#modalCapacity').text(eventData.capacity);
+            $('#modalUserStatus').text(
+                isOrganizer ? 'Organizador' : isEnrolled ? (eventData.enrollmentStatus === 'confirmed' ? 'Inscrito' : 'En Cola') : 'No Inscrito'
+            );
+
+            const $editButton = $('#editButton');
+            const $signUpButton = $('#signUpButton');
+            const $dropOutButton = $('#dropOutButton');
+    
+            if (isOrganizer) {
+                $editButton.show().attr('href', `/events/info?eventID=${eventData.eventId}`);
+                $signUpButton.hide();
+                $dropOutButton.hide();
+            } else {
+                $editButton.hide();
+                if (isEnrolled) {
+                    $signUpButton.hide();
+                    $dropOutButton.show();
+                } else {
+                    $signUpButton.show();
+                    $dropOutButton.hide();
+                }
+            }
+    
+            $signUpButton.off('click').on('click', () => enrollEvent(eventData));
+            $dropOutButton.off('click').on('click', () => unenrollEvent(eventData));
+            console.log("fina")
+            $('#eventModal').modal('show');
+            console.log("fin2a")
+        }
+    
+        function enrollEvent(eventData) {
+            console.log("Enrolling...", eventData);
+            $.ajax({
+                url: `/api/enroll/${eventData.eventId}`,
+                method: 'POST',
+                contentType: 'application/json',
+                success: function (data) {
+                    if (data.message) {
+                        const newEnrollmentCount = parseInt(eventData.enrollmentCount, 10) + 1;
+                        const capacity = parseInt(eventData.capacity, 10);
+                        const enrollmentStatus = newEnrollmentCount > capacity ? 'waiting' : 'confirmed';
+                        eventData.enrollmentCount=newEnrollmentCount;
+                        eventData.enrollmentStatus = enrollmentStatus;
+                        $('#modalEnrollmentCount').text(`${newEnrollmentCount} inscritos`);
+                        $('#modalUserStatus').text(enrollmentStatus === 'waiting' ? 'En Cola' : 'Inscrito');
+                        $('#signUpButton').hide();
+                        $('#dropOutButton').show();
+                        
+                        console.log("Update events enviadop")
+                        $('#eventModal').trigger('updateEvents', {
+                            eventId: eventData.eventId,
+                            enrollmentCount: newEnrollmentCount,
+                            capacity,
+                            enrollmentStatus,
+                        });
+                    }
+                },
+                error: function (error) {
+                    console.error('Error al inscribirse en el evento:', error);
+                }
+            });
+        }
+    
+        function unenrollEvent(eventData) {
+            console.log("Unenrolling...", eventData);
+            $.ajax({
+                url: `/api/enroll/${eventData.eventId}`,
+                method: 'DELETE',
+                contentType: 'application/json',
+                success: function (data) {
+                    if (data.message) {
+                        const newEnrollmentCount = parseInt(eventData.enrollmentCount, 10) - 1;
+                        eventData.enrollmentCount=newEnrollmentCount;
+                        eventData.enrollmentStatus='cancelled';
+                        $('#modalEnrollmentCount').text(`${newEnrollmentCount} inscritos`);
+                        $('#modalUserStatus').text('No Inscrito');
+                        $('#signUpButton').show();
+                        $('#dropOutButton').hide();
+    
+                        console.log("Update events enviadop")
+                        $('#eventModal').trigger('updateEvents', {
+                            eventId: eventData.eventId,
+                            enrollmentCount: newEnrollmentCount,
+                            capacity: eventData.capacity,
+                            enrollmentStatus: 'cancelled',
+                        });
+                    }
+                },
+                error: function (error) {
+                    console.error('Error al cancelar la inscripción del evento:', error);
+                }
+            });
+        }
+    });
+    
+</script>
