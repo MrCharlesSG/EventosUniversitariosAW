@@ -87,7 +87,7 @@ viewsRouter.get("/accesibility", isAuthenticated, (req, res) => {
 
 
 viewsRouter.get("/auth/login", redirectIfAuthenticated, (req, res) => {
-   res.render('login',{ layout: false })
+    res.sendFile(path.join(__dirname, '../views/login.html'));
 });
 
 viewsRouter.get("/auth/forgot-password", redirectIfAuthenticated, (req, res) => {
@@ -183,20 +183,17 @@ viewsRouter.get("/events/info", isAuthenticatedOrganizer, async (req, res) => {
             
             const event = rows[0];
 
-            // Obtener la facultad de la ubicación
             const facultyID = event.FacultyID;
             const timeInitCET = moment(event.TimeInit).tz('Europe/Madrid').format(); 
             const timeEndCET = moment(event.TimeEnd).tz('Europe/Madrid').format();   
 
 
             console.log("The event 1 ", event);
-            // Si la facultad está asignada, obtenemos las salas disponibles para la fecha del evento
             let rooms = [];
             if (facultyID) {
                 const timeInit = event.TimeInit;
                 const timeEnd = event.TimeEnd;
                 
-                // Obtener las salas disponibles para esa facultad y fechas
                 const [availableRooms] = await pool.query(`
                     SELECT 
                         r.RoomID, 

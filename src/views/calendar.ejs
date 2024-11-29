@@ -96,11 +96,10 @@
                 const eventType = event.extendedProps.eventType;
                 const enrollmentCount = event.extendedProps.enrollmentCount;
                 const capacity = event.extendedProps.capacity;
-                const eventId = event.id;  // Usamos el ID del evento de FullCalendar
-                const enrollmentStatus = event.extendedProps.status; // El estado de la inscripción
+                const eventId = event.id;  
+                const enrollmentStatus = event.extendedProps.status;
                 const isEnrolled = enrollmentStatus === 'confirmed' || enrollmentStatus === 'waiting';
             
-                // Determinamos el estado del usuario según el rol
                 let userStatus = '';
                 if (organizer === currentUserId) {
                     userStatus = 'Organizador';
@@ -117,7 +116,6 @@
                     }
                 }
             
-                // Rellenamos los datos en el modal
                 $('#modalTitle').text(title);
                 $('#modalDescription').text(description);
                 $('#modalInitDate').text(initTime);
@@ -134,7 +132,6 @@
                 const $signUpButton = $('#signUpButton');
                 const $dropOutButton = $('#dropOutButton');
             
-                // Mostrar los botones según el estado del usuario
                 if (organizer === currentUserId) {
                     $editButton.show().attr('href', `/events/info?eventID=${eventId}`);
                     $signUpButton.hide();
@@ -150,11 +147,9 @@
                     }
                 }
             
-                // Asociamos las funciones de inscribirse y cancelar inscripción
                 $signUpButton.off('click').on('click', () => enrollEvent(eventId));
                 $dropOutButton.off('click').on('click', () => unenrollEvent(eventId));
             
-                // Finalmente, mostramos el modal
                 $('#eventModal').modal('show');
             }
 
