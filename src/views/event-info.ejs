@@ -67,51 +67,46 @@
 
 
 <script>
-    const eventID = "<%= event ? event.ID : '' %>";
+    
     if (eventID) {
         const baseURL = `http://localhost:3000/api/enroll/${eventID}`;
 
         function renderEmails(emails, listElementId) {
-            const listElement = document.getElementById(listElementId);
-            listElement.innerHTML = '';
+            const listElement = $(`#${listElementId}`);
+            listElement.empty();
             emails.forEach(email => {
-                const listItem = document.createElement('li');
-                listItem.className = 'list-group-item mt-1';
-                listItem.textContent = email;
-                listElement.appendChild(listItem);
+                const listItem = $('<li>')
+                    .addClass('list-group-item mt-1')
+                    .text(email);
+                listElement.append(listItem);
             });
         }
 
-        fetch(`${baseURL}/confirm/emails`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Error al obtener correos confirmados: ${response.statusText}`);
-                }
-                return response.json();
-            })
-            .then(data => {
+        $.ajax({
+            url: `${baseURL}/confirm/emails`,
+            method: 'GET',
+            success: function (data) {
                 const confirmedEmails = data.confirmed || [];
                 renderEmails(confirmedEmails, 'confirmedEmailsList');
-            })
-            .catch(error => {
-                console.error("Error al obtener correos confirmados:", error);
-                document.getElementById('confirmedEmailsList').innerHTML = '<li class="list-group-item text-danger">Error al cargar correos confirmados</li>';
-            });
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error("Error al obtener correos confirmados:", textStatus, errorThrown);
+                $('#confirmedEmailsList').html('<li class="list-group-item text-danger">Error al cargar correos confirmados</li>');
+            }
+        });
 
-        fetch(`${baseURL}/waiting/emails`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Error al obtener correos en espera: ${response.statusText}`);
-                }
-                return response.json();
-            })
-            .then(data => {
+        $.ajax({
+            url: `${baseURL}/waiting/emails`,
+            method: 'GET',
+            success: function (data) {
                 const waitingEmails = data.waiting || [];
                 renderEmails(waitingEmails, 'waitingEmailsList');
-            })
-            .catch(error => {
-                console.error("Error al obtener correos en espera:", error);
-                document.getElementById('waitingEmailsList').innerHTML = '<li class="list-group-item text-danger">Error al cargar correos en espera</li>';
-            });
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error("Error al obtener correos en espera:", textStatus, errorThrown);
+                $('#waitingEmailsList').html('<li class="list-group-item text-danger">Error al cargar correos en espera</li>');
+            }
+        });
     }
+
 </script>

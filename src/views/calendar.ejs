@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calendario</title>
 
-    <!-- FullCalendar Script -->
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
 </head>
 <body>
@@ -28,7 +27,7 @@
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek'
                 },
-                // Configuración para cargar eventos
+
                 events: function (fetchInfo, successCallback, failureCallback) {
                     $.ajax({
                         url: '/api/events', 
@@ -78,7 +77,6 @@
                         $('#loading').hide(); 
                     }
                 },
-                // Manejador de clic en un evento
                 eventClick: function (info) {
                     const event = info.event;
                     showEventModal(event)
@@ -86,11 +84,10 @@
             });
 
             function showEventModal(event) {
-                // Aquí usamos las propiedades extendidas del evento de FullCalendar
                 const title = event.title;
                 const description = event.extendedProps.description;
-                const initTime = event.start.toLocaleString();  // Formateamos la fecha de inicio
-                const endTime = event.end.toLocaleString();    // Formateamos la fecha de finalización
+                const initTime = event.start.toLocaleString();  
+                const endTime = event.end.toLocaleString();    
                 const locationName = event.extendedProps.facultyName;
                 const locationUniversity = event.extendedProps.facultyUniversity;
                 const roomName = event.extendedProps.location;

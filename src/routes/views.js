@@ -94,9 +94,12 @@ viewsRouter.get("/auth/forgot-password", redirectIfAuthenticated, (req, res) => 
     res.render('forgot-password',{ layout: false })
  });
 
- viewsRouter.get("/auth/reset-password/:token", (req, res) => {
-    const { token } = req.params;
-    res.render('reset-password', { token });
+ viewsRouter.get("/auth/reset-password/:email", (req, res) => {
+    const email  = req.params.email; 
+    if (!email) {
+        return res.status(403).json({ error: "Correo electrónico no proporcionado" });
+    }
+    res.render('reset-password', { email , layout: false});
 });
 
 viewsRouter.get("/auth/register", redirectIfAuthenticated, async (req, res) => {
