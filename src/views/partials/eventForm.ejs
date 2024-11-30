@@ -179,6 +179,17 @@
     const eventID = '<%= event ? event.ID : -1 %>'
     console.log("eve", eventID)
     $(document).ready(function() {
+
+        const isPastEvent = new Date("<%= event ? event.TimeInit : '' %>") < new Date();
+
+        if (isPastEvent) {
+            $('#eventForm input, #eventForm select, #eventForm textarea, #eventForm button[type="submit"]').prop('disabled', true);
+
+            $('#eventForm button[type="submit"]').hide();
+
+            $('.danger-zone').hide();
+        }
+
         $('#eventForm').submit(function(event) {
             event.preventDefault(); 
             

@@ -19,7 +19,7 @@
                 <p><strong>Organizador:</strong> <span id="modalOrganizer"></span></p>
                 <p><strong>Tu Estado:</strong> <span id="modalUserStatus"></span></p>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer" id="modalFooter">
                 <a href="#" type="button" id="editButton" class="btn btn-primary w-100" style="display: none;">Editar Evento</a>
                 <a href="#" type="button" id="signUpButton" class="btn btn-success w-100" style="display: none;">Apuntarse al Evento</a>
                 <a href="#" type="button" id="dropOutButton" class="btn btn-danger w-100" style="display: none;">Desapuntarse del Evento</a>
@@ -34,7 +34,6 @@
 
 <script>
     $(document).ready(function () {
-        moment.locale('es');
         $('#eventModal').on('openEventModal', function (e, eventData) {
             console.log("LLegandooooo", eventData)
             showEventModal(eventData); 
@@ -75,23 +74,32 @@
                 isOrganizer ? 'Organizador' : isEnrolled ? (eventData.enrollmentStatus === 'confirmed' ? 'Inscrito' : 'En Cola') : 'No Inscrito'
             );
 
+            
+
             const $editButton = $('#editButton');
             const $signUpButton = $('#signUpButton');
             const $dropOutButton = $('#dropOutButton');
     
             if (isOrganizer) {
+                $("#modalFooter").show();
                 $editButton.show().attr('href', `/events/info?eventID=${eventData.eventId}`);
                 $signUpButton.hide();
                 $dropOutButton.hide();
             } else {
-                $editButton.hide();
-                if (isEnrolled) {
-                    $signUpButton.hide();
-                    $dropOutButton.show();
-                } else {
-                    $signUpButton.show();
-                    $dropOutButton.hide();
-                }
+                const isPastEvent = new Date(eventData.initTime) < new Date();
+                if(isPastEvent){
+                    $("#modalFooter").hide();
+                }else{
+                    $("#modalFooter").show();
+                    $editButton.hide();
+                    if (isEnrolled) {
+                        $signUpButton.hide();
+                        $dropOutButton.show();
+                    } else {
+                        $signUpButton.show();
+                        $dropOutButton.hide();
+                    }
+                }                
             }
     
             $signUpButton.off('click').on('click', () => enrollEvent(eventData));
