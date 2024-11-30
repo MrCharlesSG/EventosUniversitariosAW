@@ -112,28 +112,49 @@ h2 {
     text-align: center;
 }
 
+h4 {
+    font-size: var(--font-size-medium-heading)  !important;
+    font-weight: 300;
+    color: var(--primary-color) !important;
+}
+
+h5 {
+    font-size: var(--font-size-small-heading)  !important;
+    font-weight: bold;
+    color: var(--primary-color) !important;
+}
+
+.font-base {
+    font-size: var(--font-size-medium) !important;
+}
+
 p {
     font-size: var(--font-size-small) !important;
 }
 
 nav i {
-    color: var(--text-color);
-    font-size: 1.75rem;
+    color: var(--text-color) !important;
+    font-size: var(--font-size-large-heading);
 }
 
 nav i:hover {
-    color: var(--primary-color);
+    color: var(--primary-color) !important;
 }
 
+li {
+    font-size: var(--font-size-medium) !important;
+}
 
  label {
     color: var(--text-color) !important;
+    font-size: var(--font-size-large);
 }
 
 input, select, textarea {
     background-color: transparent !important;
     color: var(--text-secondary-color)  !important;
     border: 1px solid var(--background-color) !important;
+    font-size: var(--font-size-medium) !important;
 }
 
 input:disabled, select:disabled, textarea:disabled {
@@ -229,6 +250,7 @@ LIST
 
 .card-header-title {
     color: var(--primary-color) !important;
+    font-size: var(--font-size-small-heading) !important;
 }
 
 .card {
@@ -268,7 +290,7 @@ BUTTONS
 
 .text-primary-font {
     color: var(--text-color);
-    font-size: var(--font-size-small-heading);
+    font-size: var(--font-size-small-heading) !important;
     font-weight: bold;
 
 }
@@ -276,7 +298,7 @@ BUTTONS
 .btn-primary {
     background-color: var(--primary-color) !important;
     border-color: var(--primary-color-light) !important;
-    font-size: var(--font-size-small-heading);
+    font-size: var(--font-size-small-heading) !important;
     color: var(--background-color) !important;
 }
 
@@ -289,7 +311,7 @@ BUTTONS
     color: var(--primary-color) !important;
     border-color: var(--primary-color) !important;
     background-color: transparent !important;
-    font-size: var(--font-size-small-heading);
+    font-size: var(--font-size-small-heading) !important;
 }
 
 .btn-outline-primary:hover {
@@ -308,7 +330,7 @@ BUTTONS
     background-color: var(--danger-color) !important;
     border-color: var(--danger-color-light) !important;
     color: var(--background-color) !important;
-    font-size: var(--font-size-small-heading);
+    font-size: var(--font-size-small-heading) !important;
 }
 
 .badge-danger {
@@ -326,7 +348,7 @@ BUTTONS
     color: var(--danger-color) !important;
     border-color: var(--danger-color) !important;
     background-color: transparent !important;
-    font-size: var(--font-size-small-heading);
+    font-size: var(--font-size-small-heading) !important;
 }
 
 .btn-outline-danger:hover {
@@ -345,7 +367,7 @@ BUTTONS
     background-color: var(--success-color) !important;
     border-color: var(--success-color-light) !important;
     color: var(--background-color) !important;
-    font-size: var(--font-size-small-heading);
+    font-size: var(--font-size-small-heading) !important;
 }
 
 .btn-success:hover {
@@ -369,7 +391,7 @@ BUTTONS
     color: var(--warning-color) !important;
     border-color: var(--warning-color) !important;
     background-color: transparent !important;
-    font-size: var(--font-size-small-heading);
+    font-size: var(--font-size-small-heading) !important;
 }
 
 .btn-outline-warning:hover {
