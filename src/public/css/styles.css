@@ -266,7 +266,12 @@ LIST
 BUTTONS
 */
 
+.text-primary-font {
+    color: var(--text-color);
+    font-size: var(--font-size-small-heading);
+    font-weight: bold;
 
+}
 
 .btn-primary {
     background-color: var(--primary-color) !important;

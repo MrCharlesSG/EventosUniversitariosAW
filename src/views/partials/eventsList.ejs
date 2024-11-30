@@ -28,19 +28,9 @@
 
 <div class="">
     <div class="list-header">
-        <h1><%= title %></h1> 
-
-        <div id="filters-section" class="filters-section mb-3 mt-3">
-            <button id="filter-button" class="btn btn-outline-primary">
-                <i class="bi bi-funnel"></i>
-            </button>
-
-            <div id="applied-filters" class="applied-filters">
-                <span id="filters-text">Sin filtros</span>
-            </div>
-        </div>
+        <h1><%= title %></h1>  
+        <%- include("filterModal", { eventTypeList, facultyList }) %>       
     </div>
-
 
     </object>
 
@@ -74,7 +64,6 @@
 </button>
 
 
-<%- include("filterModal", { role: role, user: user, eventTypeList, facultyList }) %>
 <%- include("eventModal", { role: role, user: user }) %>
 
 
@@ -141,7 +130,7 @@
                         (!appliedFilters.minCapacity || event.Capacity >= appliedFilters.minCapacity) &&
                         (!appliedFilters.maxCapacity || event.Capacity <= appliedFilters.maxCapacity) &&
                         (!appliedFilters.status || appliedFilters.status.length === 0 || 
-                            (appliedFilters.status.includes('cancelled') && (event.Status === null || event.Status == 'cancelled')) ||
+                            (appliedFilters.status.includes('cancelled') && (event.Status === null && event.OrganizerID != currentUserId || event.Status == 'cancelled')) ||
                             appliedFilters.status.includes(event.Status))
                     );
                 });
@@ -149,6 +138,7 @@
                 console.log(filteredEvents)
             
                 filteredEvents.forEach(event => {
+                    console.log(event)
                     const isPastEvent = new Date(event.TimeInit) < now;
             
                     let badgeClass = '';
@@ -172,18 +162,14 @@
             
                     const enrollmentInfo = ``;
             
-                    // Convertimos las fechas usando moment.js con la zona horaria local
-                    const timeInitFormatted = moment(event.TimeInit).local().format('YYYY-MM-DD HH:mm');
-                    const timeEndFormatted = moment(event.TimeEnd).local().format('YYYY-MM-DD HH:mm');
-            
                     const eventItem = `
                         <li class="list-item" 
                             data-id="${event.ID}" 
                             data-organizer="${event.OrganizerID}"
                             data-title="${event.Title}" 
                             data-description="${event.Description}" 
-                            data-date-init="${timeInitFormatted}" 
-                            data-date-end="${timeEndFormatted}" 
+                            data-date-init="${event.TimeInit}" 
+                            data-date-end="${event.TimeEnd}" 
                             data-location-name="${event.FacultyName}" 
                             data-room-name="${event.RoomName}" 
                             data-location-university="${event.FacultyUniversity}" 
@@ -243,10 +229,10 @@
                         capacity: $item.data('capacity'),
                         enrollmentStatus: $item.data('enrollment-status'),
                     };
+                    console.log(eventData)
             
                     $('#eventModal').trigger('openEventModal', eventData);
                 });
-                updateFiltersText();
             }
             
             function calculateDuration(start, end) {
@@ -267,167 +253,18 @@
             }
             
         
-            function updateFiltersText() {
-                const $filtersText = $('#filters-text');
-                const appliedFiltersHTML = [];
-            
-                if (appliedFilters.dateStart && appliedFilters.dateEnd) {
-                    appliedFiltersHTML.push(`
-                        <span><i class="bi bi-calendar-event"></i> 
-                        Del ${new Date(appliedFilters.dateStart).toLocaleDateString()} al ${new Date(appliedFilters.dateEnd).toLocaleDateString()}
-                        </span>
-                    `);
-                } else if (appliedFilters.dateStart) {
-                    appliedFiltersHTML.push(`
-                        <span><i class="bi bi-calendar-event"></i> 
-                        Desde ${new Date(appliedFilters.dateStart).toLocaleDateString()}
-                        </span>
-                    `);
-                } else if (appliedFilters.dateEnd) {
-                    appliedFiltersHTML.push(`
-                        <span><i class="bi bi-calendar-event"></i> 
-                        Hasta ${new Date(appliedFilters.dateEnd).toLocaleDateString()}
-                        </span>
-                    `);
-                }
+            $(document).on('filters:applied', function (e, filters) {
+                console.log('filtrsa ', filters);
+                appliedFilters = filters
+                renderEvents();
+            });
 
-                if (appliedFilters.minCapacity || appliedFilters.maxCapacity) {
-                    let capacityText = '';
-                    
-                    if (appliedFilters.minCapacity && appliedFilters.maxCapacity) {
-                        capacityText = `
-                            <span><i class="bi bi-hash"></i> Capacidad: Desde ${appliedFilters.minCapacity} hasta ${appliedFilters.maxCapacity}</span>
-                        `;
-                    } 
-                    else if (appliedFilters.minCapacity) {
-                        capacityText = `
-                            <span><i class="bi bi-hash"></i> Capacidad desde: ${appliedFilters.minCapacity}</span>
-                        `;
-                    } 
-                    else if (appliedFilters.maxCapacity) {
-                        capacityText = `
-                            <span><i class="bi bi-hash-fill"></i> Capacidad hasta: ${appliedFilters.maxCapacity}</span>
-                        `;
-                    }
-            
-                    appliedFiltersHTML.push(capacityText);
-                }
-            
-                if (appliedFilters.location && appliedFilters.location != 'none') {
-                    appliedFiltersHTML.push(`
-                        <span><i class="bi bi-geo"></i> ${appliedFilters.locationText}</span>
-                    `);
-                }
-            
-                if (appliedFilters.status && appliedFilters.status.length > 0) {
-                    appliedFiltersHTML.push(`
-                        <span><i class="bi bi-check-circle"></i> Estado: ${appliedFilters.statusText}</span>
-                    `);
-                }
-            
-                if (appliedFilters.eventType && appliedFilters.eventType != 'none') {
-                    appliedFiltersHTML.push(`
-                        <span><i class="bi bi-tags"></i> Tipo: ${appliedFilters.eventType}</span>
-                    `);
-                }
-            
-                
-            
-                $filtersText.html(
-                    appliedFiltersHTML.length > 0
-                        ? appliedFiltersHTML.join(' ')
-                        : '<span>Sin filtros</span>'
-                );
-            }
-            
+            $(document).on('filters:reset', function () {
         
-            $('#filter-button').on('click', () => {
-                $('#filterModal').modal('show');
-            });
-        
-            $('#apply-filters').on('click', function () {
-                appliedFilters.dateStart = $('#filter-date-start').val();
-                appliedFilters.dateEnd = $('#filter-date-end').val();
-                appliedFilters.minCapacity = $('#filter-min-capacity').val();
-                appliedFilters.maxCapacity = $('#filter-max-capacity').val();
-            
-                let valid = true; 
-
-                if (appliedFilters.dateStart && appliedFilters.dateEnd) {
-                    const startDate = new Date(appliedFilters.dateStart);
-                    const endDate = new Date(appliedFilters.dateEnd);
-            
-                    if (startDate > endDate) {
-                        $('#error-date').show(); 
-                        setTimeout(function() {
-                            $('#error-date').hide(); 
-                        }, 3000);
-                        valid = false;
-                    }
-                }
-            
-                if (appliedFilters.minCapacity && appliedFilters.maxCapacity) {
-                    const minCapacity = parseInt(appliedFilters.minCapacity);
-                    const maxCapacity = parseInt(appliedFilters.maxCapacity);
-            
-                    if (minCapacity > maxCapacity) {
-                        $('#error-capacity').show();
-                        setTimeout(function() {
-                            $('#error-capacity').hide(); 
-                        }, 3000);
-                        valid = false; 
-                    }
-                }
-            
-                if (valid) {
-                    const selectedLocation = $('#filter-location').val();
-                    const selectedLocationText = $('#filter-location option:selected').text();
-                    appliedFilters.location = selectedLocation;
-                    appliedFilters.locationText = selectedLocationText;
-            
-                    const selectedStatuses = [];
-                    const selectedStatusesText = [];
-                    $('input[name="filter-status"]:checked').each(function () {
-                        selectedStatuses.push($(this).val());
-                        selectedStatusesText.push($(this).parent().text().trim());
-                    });
-                    appliedFilters.status = selectedStatuses; 
-                    appliedFilters.statusText = selectedStatusesText.join(', '); 
-            
-                    appliedFilters.eventType = $('#filter-type').val();
-            
-                    updateFiltersText();
-                    renderEvents();
-            
-                    $('#filterModal').modal('hide');
-                }
-            });
-            
-            
-            $('#reset-filters').on('click', function() {
-                resetModlaFilters()
-                
-            });
-            
-            function resetModlaFilters() {
-                appliedFilters = {}; 
-                $('#filter-date-start').val('');
-                $('#filter-date-end').val('');
-                $('#filter-location').val('none');
-                $('#filter-type').val('none');
-                $('input[name="filter-status"]').prop('checked', false);
-                $('#filter-min-capacity').val('');
-                $('#filter-max-capacity').val('');
-                $('input[name="filter-status"]').each(function () {
-                    $(this).parent().removeClass('active'); 
-                });
-            }
-            
-            $('#filters-text').on('click', () => {
-               resetModlaFilters()
+                $('#filters-text').html('<span>Sin filtros</span>');
+                appliedFilters = {}
         
                 renderEvents();
-                $('#filters-text').text('Sin filtros');
             });
             
             $(document).on('updateEvents', function (e, { eventId, enrollmentCount, capacity, enrollmentStatus }) {

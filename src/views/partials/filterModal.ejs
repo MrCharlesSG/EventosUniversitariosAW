@@ -1,6 +1,6 @@
-<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+<div class="modal fade" id="filterModal"  tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content"  >
             <div class="modal-header">
                 <h5 class="modal-title" id="filterModalLabel">Aplicar Filtros</h5>
             </div>
@@ -87,3 +87,175 @@
         </div>
     </div>
 </div>
+
+
+<div id="filters-section" class="filters-section mb-3 mt-3">
+    <button id="filter-button" class="btn btn-outline-primary">
+        <i class="bi bi-funnel"></i>
+    </button>
+
+    <div id="applied-filters" class="applied-filters">
+        <span id="filters-text">Sin filtros</span>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#filterModal').appendTo('body');
+        function updateFiltersText() {
+            const $filtersText = $('#filters-text');
+            const appliedFiltersHTML = [];
+        
+            if (appliedFilters.dateStart && appliedFilters.dateEnd) {
+                appliedFiltersHTML.push(`
+                    <span><i class="bi bi-calendar-event"></i> 
+                    Del ${new Date(appliedFilters.dateStart).toLocaleDateString()} al ${new Date(appliedFilters.dateEnd).toLocaleDateString()}
+                    </span>
+                `);
+            } else if (appliedFilters.dateStart) {
+                appliedFiltersHTML.push(`
+                    <span><i class="bi bi-calendar-event"></i> 
+                    Desde ${new Date(appliedFilters.dateStart).toLocaleDateString()}
+                    </span>
+                `);
+            } else if (appliedFilters.dateEnd) {
+                appliedFiltersHTML.push(`
+                    <span><i class="bi bi-calendar-event"></i> 
+                    Hasta ${new Date(appliedFilters.dateEnd).toLocaleDateString()}
+                    </span>
+                `);
+            }
+
+            if (appliedFilters.minCapacity || appliedFilters.maxCapacity) {
+                let capacityText = '';
+                
+                if (appliedFilters.minCapacity && appliedFilters.maxCapacity) {
+                    capacityText = `
+                        <span><i class="bi bi-hash"></i> Capacidad: Desde ${appliedFilters.minCapacity} hasta ${appliedFilters.maxCapacity}</span>
+                    `;
+                } 
+                else if (appliedFilters.minCapacity) {
+                    capacityText = `
+                        <span><i class="bi bi-hash"></i> Capacidad desde: ${appliedFilters.minCapacity}</span>
+                    `;
+                } 
+                else if (appliedFilters.maxCapacity) {
+                    capacityText = `
+                        <span><i class="bi bi-hash-fill"></i> Capacidad hasta: ${appliedFilters.maxCapacity}</span>
+                    `;
+                }
+        
+                appliedFiltersHTML.push(capacityText);
+            }
+        
+            if (appliedFilters.location && appliedFilters.location != 'none') {
+                appliedFiltersHTML.push(`
+                    <span><i class="bi bi-geo"></i> ${appliedFilters.locationText}</span>
+                `);
+            }
+        
+            if (appliedFilters.status && appliedFilters.status.length > 0) {
+                appliedFiltersHTML.push(`
+                    <span><i class="bi bi-check-circle"></i> Estado: ${appliedFilters.statusText}</span>
+                `);
+            }
+        
+            if (appliedFilters.eventType && appliedFilters.eventType != 'none') {
+                appliedFiltersHTML.push(`
+                    <span><i class="bi bi-tags"></i> Tipo: ${appliedFilters.eventType}</span>
+                `);
+            }
+        
+            
+        
+            $filtersText.html(
+                appliedFiltersHTML.length > 0
+                    ? appliedFiltersHTML.join(' ')
+                    : '<span>Sin filtros</span>'
+            );
+        }
+        
+        $('#filter-button').on('click', () => {
+            $('#filterModal').modal('show');
+        });
+    
+        $('#apply-filters').on('click', function () {
+            appliedFilters.dateStart = $('#filter-date-start').val();
+            appliedFilters.dateEnd = $('#filter-date-end').val();
+            appliedFilters.minCapacity = $('#filter-min-capacity').val();
+            appliedFilters.maxCapacity = $('#filter-max-capacity').val();
+        
+            let valid = true; 
+
+            if (appliedFilters.dateStart && appliedFilters.dateEnd) {
+                const startDate = new Date(appliedFilters.dateStart);
+                const endDate = new Date(appliedFilters.dateEnd);
+        
+                if (startDate > endDate) {
+                    $('#error-date').show(); 
+                    setTimeout(function() {
+                        $('#error-date').hide(); 
+                    }, 3000);
+                    valid = false;
+                }
+            }
+        
+            if (appliedFilters.minCapacity && appliedFilters.maxCapacity) {
+                const minCapacity = parseInt(appliedFilters.minCapacity);
+                const maxCapacity = parseInt(appliedFilters.maxCapacity);
+        
+                if (minCapacity > maxCapacity) {
+                    $('#error-capacity').show();
+                    setTimeout(function() {
+                        $('#error-capacity').hide(); 
+                    }, 3000);
+                    valid = false; 
+                }
+            }
+        
+            if (valid) {
+                const selectedLocation = $('#filter-location').val();
+                const selectedLocationText = $('#filter-location option:selected').text();
+                appliedFilters.location = selectedLocation;
+                appliedFilters.locationText = selectedLocationText;
+        
+                const selectedStatuses = [];
+                const selectedStatusesText = [];
+                $('input[name="filter-status"]:checked').each(function () {
+                    selectedStatuses.push($(this).val());
+                    selectedStatusesText.push($(this).parent().text().trim());
+                });
+                appliedFilters.status = selectedStatuses; 
+                appliedFilters.statusText = selectedStatusesText.join(', '); 
+        
+                appliedFilters.eventType = $('#filter-type').val();
+        
+                updateFiltersText();
+                $(document).trigger('filters:applied', appliedFilters);
+        
+                $('#filterModal').modal('hide');
+            }
+        });
+        
+        
+        $('#reset-filters').on('click', function() {
+            appliedFilters={}
+                $('#filter-date-start').val('');
+                $('#filter-date-end').val('');
+                $('#filter-location').val('none');
+                $('#filter-type').val('none');
+                $('input[name="filter-status"]').prop('checked', false);
+                $('#filter-min-capacity').val('');
+                $('#filter-max-capacity').val('');
+                $('input[name="filter-status"]').each(function () {
+                    $(this).parent().removeClass('active'); 
+                });
+            $(document).trigger('filters:reset');
+            
+        });
+        
+
+    });
+</script>

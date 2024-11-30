@@ -1,6 +1,6 @@
 
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
-
+    <h1>Calendario</h1>  
     <div id="loading" style="display: none; text-align: center; margin: 20px;">
         <i class="bi bi-arrow-clockwise"></i> Cargando eventos...
     </div>
@@ -8,6 +8,7 @@
     <%- include("partials/eventModal", { role: role, user: user }) %>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script>
         const currentUserId = '<%= user %>';
         $(document).ready(function () {
@@ -56,8 +57,10 @@
                 },
                 displayEventTime : false,
                 eventDidMount: function(info) {
+                    const startTime = moment(info.event.extendedProps.timeInit).format('YYYY-MM-DD HH:mm'); // Formateamos la hora de inicio
+                    const description = info.event.extendedProps.description;
                     $(info.el).tooltip({
-                        title: info.event.extendedProps.description,
+                        title: `${startTime}: ${description}`,
                         container: 'body',
                         delay: { "show": 50, "hide": 50 }
                     });
@@ -101,7 +104,6 @@
                 const event = calendar.getEventById(eventId);
                 
                 if (event) {
-                    // Actualizar los valores del evento
                     console.log(event)
                     event.setExtendedProp('enrollmentCount', enrollmentCount);
                     event.setExtendedProp('capacity', capacity);

@@ -52,7 +52,7 @@ app.post('/set-letter-theme', (req, res) => {
     console.log("saving theme ", req.body)
     const { theme } = req.body;
     req.session.theme = {
-        color: req.session.theme.color || '',
+        color: req.session.theme?.color || '',
         letter: theme
     }
     res.status(200).send({ message: 'Tema guardado' });

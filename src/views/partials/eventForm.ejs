@@ -47,8 +47,7 @@
                         <div class="form-group col-md-6">
                             <label for="duration">Duración</label>
                             <div class="d-flex">
-                                <div class="mr-2">
-                                    <label for="hours">Horas</label>
+                                <div class="d-flex align-items-center mr-3">
                                     <select class="form-control" id="hours" name="hours">
                                         <% 
                                             if (event) {
@@ -56,17 +55,14 @@
                                                 const timeEnd = new Date(event.TimeEnd);
                                                 const duration = (timeEnd - timeInit) / 1000 / 60; // Duración en minutos
                                                 const hours = Math.floor(duration / 60); // Calcular horas
-                                                const minutes = duration % 60; // Calcular minutos
-                    
-                                                for (let i = 0; i <= 12; i++) {
+                                                for (let i = 0; i <= 8; i++) {
                                                     const selected = (i === hours) ? 'selected' : '';
                                         %>
                                                     <option value="<%= i %>" <%= selected %>><%= i %></option>
                                         <% 
                                                 }
                                             } else {
-                                                // Si no hay evento, lo dejamos vacío
-                                                for (let i = 0; i <= 12; i++) {
+                                                for (let i = 0; i <= 8; i++) {
                                         %>
                                                     <option value="<%= i %>"><%= i %></option>
                                         <% 
@@ -74,18 +70,17 @@
                                             }
                                         %>
                                     </select>
+                                    <span class="ml-2 text-primary-font">h</span>
                                 </div>
-                                <div>
-                                    <label for="minutes">Minutos</label>
+                        
+                                <div class="d-flex align-items-center">
                                     <select class="form-control" id="minutes" name="minutes">
                                         <% 
                                             if (event) {
                                                 const timeInit = new Date(event.TimeInit);
                                                 const timeEnd = new Date(event.TimeEnd);
-                                                const duration = (timeEnd - timeInit) / 1000 / 60; // Duración en minutos
+                                                const duration = (timeEnd - timeInit) / 1000 / 60;
                                                 const minutes = duration % 60; // Calcular minutos
-                    
-                                                // Preseleccionar los minutos
                                                 const selectedMinutes = [0, 15, 30, 45].find(m => m === minutes) || 0;
                                         %>
                                                 <option value="0" <%= selectedMinutes === 0 ? 'selected' : '' %>>00</option>
@@ -94,7 +89,6 @@
                                                 <option value="45" <%= selectedMinutes === 45 ? 'selected' : '' %>>45</option>
                                         <% 
                                             } else {
-                                                // Si no hay evento, dejar todo vacío
                                         %>
                                                 <option value="0">00</option>
                                                 <option value="15">15</option>
@@ -104,6 +98,7 @@
                                             }
                                         %>
                                     </select>
+                                    <span class="ml-2 text-primary-font">m</span>
                                 </div>
                             </div>
                             <span id="durationError" class="error-text" style="display: none;"></span>
