@@ -1,0 +1,68 @@
+#calendar {
+    background-color: var(--background-secondary);
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    color: var(--primary-color) !important;
+}
+
+.tooltip-inner {
+    background-color: var(--primary-color) !important;  
+    color: var(--background-color) !important;  
+    border-radius: 4px;  
+    padding: 10px;  
+}
+.fc-button {
+    background-color: var(--primary-color-light) !important;
+    color: var(--background-color) !important;
+    border-color: var(--primary-color-light) !important;
+}
+
+.fc-button:hover {
+    background-color: var(--primary-color) !important;
+}
+
+.fc-button-primary {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: var(--background-color) !important;
+}
+
+.fc-button-primary:hover {
+    background-color: var(--primary-color-light) !important;
+}
+
+.fc-event {
+    border-radius: 5px;
+    font-size: var(--font-size-small);
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+}
+
+.fc-event.confirmed {
+    background-color: var(--success-color) !important;
+    border-color: var(--success-color-light) !important;
+    color: var(--background-color) !important;
+}
+
+
+.fc-event.waiting {
+    background-color: var(--warning-color);
+    border-color: var(--warning-color-light);
+    color: var(--background-color) !important;
+
+}
+
+.fc-event.cancelled {
+    background-color: var(--danger-color);
+    border-color: var(--danger-color-light);
+    color: var(--background-color) !important;
+
+}
+
+.fc-event.organized {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color-light);
+    color: var(--background-color) !important;
+}

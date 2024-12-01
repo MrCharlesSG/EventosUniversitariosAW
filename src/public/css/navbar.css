@@ -1,0 +1,32 @@
+.navbar-brand {
+    color: var(--primary-color) !important;
+    font-weight: bold;
+}
+
+.nav-item a {
+    color: var(--text-secondary-color) !important;
+}
+
+.nav-item a.active {
+    color: var(--text-primary-color) !important; 
+    font-weight: bold; 
+    border-bottom: 2px solid var(--text-primary-color); 
+}
+
+.dropdown-menu {
+    background-color: var(--background-secondary) !important;
+    border: none !important;
+}
+
+.dropdown-item {
+    color: var(--text-secondary-color)  !important;
+}
+
+.danger-text {
+    color: var(--danger-color) !important;
+}
+
+.back-button {
+    position: relative;
+    top: -40px;
+}

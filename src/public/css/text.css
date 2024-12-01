@@ -1,0 +1,54 @@
+.font-base {
+    font-size: var(--font-size-medium) !important;
+}
+
+.error-text {
+    color: var(--danger-color) !important;
+}
+
+
+
+.alert-success {
+    background-color: var(--success-color) !important;
+    color: var(--background-color) !important;
+}
+
+.alert-danger {
+    background-color: var(--danger-color) !important;
+    color: var(--background-color) !important;
+}
+
+.alert-warning {
+    background-color: var(--warning-color) !important;
+    color: var(--background-color) !important;
+}
+
+.logo-name {
+    color: var(--primary-color) !important;
+}
+
+
+
+.text-primary-font {
+    color: var(--text-color);
+    font-size: var(--font-size-small-heading) !important;
+    font-weight: bold;
+
+}
+.badge-success {
+    background-color: var(--success-color) !important;
+    color: var(--background-color) !important;
+    font-size: var(--font-size-medium) !important;
+}
+
+.badge-warning {
+    background-color: var(--warning-color) !important;
+    color: var(--background-color) !important;
+    font-size: var(--font-size-medium) !important;
+}
+
+.badge-danger {
+    background-color: var(--danger-color) !important;
+    color: var(--background-color) !important;
+    font-size: var(--font-size-medium) !important;
+}

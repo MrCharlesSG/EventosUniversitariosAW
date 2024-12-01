@@ -1,7 +1,7 @@
 import { Router } from "express";
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { pool } from "../config/db.js"; // Asegúrate de tener acceso a tu pool de base de datos
+import { pool } from "../config/db.js";
 import { isAuthenticated, isAuthenticatedOrganizer, redirectIfAuthenticated } from "../middleware/auth.js";
 import moment from 'moment-timezone'
 

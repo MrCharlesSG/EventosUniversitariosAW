@@ -37,23 +37,19 @@
 
         <script>
             $(document).ready(function () {
-                // Call fetchNotifications when the page loads
                 fetchNotifications();
         
                 function fetchNotifications() {
-                    const $notificationList = $("#notification-list"); // Use jQuery selector
-                    $notificationList.html("Cargando notificaciones..."); // Show loading message
-        
-                    // AJAX request using jQuery
+                    const $notificationList = $("#notification-list");
+                    $notificationList.html("Cargando notificaciones..."); 
+                    
                     $.ajax({
                         url: '/api/notifications',
                         method: 'GET',
                         dataType: 'json',
                         success: function (data) {
-                            $notificationList.empty(); // Clear the loading message
-        
+                            $notificationList.empty(); 
                             if (data && data.length > 0) {
-                                // Loop through notifications and append each to the list
                                 $.each(data, function (index, notification) {
                                     const notificationDate = new Date(notification.Date).toLocaleString("es-ES", {
                                         year: 'numeric',

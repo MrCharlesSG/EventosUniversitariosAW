@@ -194,7 +194,6 @@ export class EventsController {
                 return res.status(404).json({ error: "Evento no encontrado o no tienes permiso para editarlo" });
             }
     
-            // Verificar si la sala está ocupada en el nuevo horario
             const [existingEvents] = await pool.query(`
                 SELECT * FROM Event 
                 WHERE Location = ? 
@@ -212,7 +211,6 @@ export class EventsController {
                 return res.status(400).json({ error: 'La sala está ocupada en el rango de tiempo especificado.' });
             }
     
-            // Obtener capacidad de la nueva sala
             const [[newRoom]] = await pool.query("SELECT Capacity FROM Rooms WHERE RoomID = ?", [location]);
             if (!newRoom) {
                 return res.status(404).json({ error: "La sala seleccionada no existe" });
@@ -224,7 +222,6 @@ export class EventsController {
     
             if (newCapacity !== currentCapacity) {
                 console.log(`Capacity changed from ${currentCapacity} to ${newCapacity}`);
-                // Obtener usuarios inscritos actuales
                 const [currentEnrollments] = await pool.query(`
                     SELECT * FROM Enrollment 
                     WHERE EventID = ? 
@@ -233,7 +230,6 @@ export class EventsController {
                 `, [id]);
     
                 if (newCapacity < currentEnrollments.length) {
-                    // Mover usuarios excedentes a la cola
                     const excessUsers = currentEnrollments.slice(newCapacity);
                     for (const user of excessUsers) {
                         await pool.query("UPDATE Enrollment SET Status = 'waiting' WHERE EventID = ? AND UserEmail = ?", [id, user.UserEmail]);
@@ -242,7 +238,6 @@ export class EventsController {
                         await NotificationsController.sendNotificationToUser(eventOfDb.OrganizerID, user.UserEmail, userMessage);
                     }
                 } else if (newCapacity > currentEnrollments.length) {
-                    // Promover usuarios de la cola a inscritos
                     const slotsToFill = newCapacity - currentEnrollments.length;
                     const [queueUsers] = await pool.query(`
                         SELECT * FROM Enrollment 
@@ -261,7 +256,6 @@ export class EventsController {
                 }
             }
     
-            // Actualizar el evento con los nuevos datos
             const updateQuery = `
                 UPDATE Event
                 SET Title = ?, Description = ?, TimeInit = ?, TimeEnd = ?, Location = ?, EventTypeID = ?
@@ -367,7 +361,6 @@ export class EventsController {
                 )
             `;
             
-            // Si se pasa un `eventID`, lo usamos para excluir ese evento de la validación de disponibilidad de salas
             params.push(eventID, timeInit, timeEnd, timeInit, timeEnd, timeInit, timeEnd);
     
             const [rooms] = await pool.query(query, params);

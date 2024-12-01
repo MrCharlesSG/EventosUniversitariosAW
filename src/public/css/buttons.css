@@ -1,0 +1,103 @@
+
+.btn-primary {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color-light) !important;
+    font-size: var(--font-size-small-heading) !important;
+    color: var(--background-color) !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-color-light) !important;
+    border-color: var(--primary-color-light) !important;
+}
+
+.btn-outline-primary {
+    color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    background-color: transparent !important;
+    font-size: var(--font-size-small-heading) !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color) !important;
+    color: var(--background-color) !important; 
+    border-color: var(--primary-color) !important;
+}
+
+.btn-outline-primary.active {
+    background-color: var(--primary-color) !important; 
+    color: var(--background-color) !important; 
+    border-color: var(--primary-color) !important;
+}
+
+.btn-danger {
+    background-color: var(--danger-color) !important;
+    border-color: var(--danger-color-light) !important;
+    color: var(--background-color) !important;
+    font-size: var(--font-size-small-heading) !important;
+}
+
+.btn-danger:hover {
+    background-color: var(--danger-color-light) !important;
+    border-color: var(--danger-color-light) !important;
+}
+
+.btn-outline-danger {
+    color: var(--danger-color) !important;
+    border-color: var(--danger-color) !important;
+    background-color: transparent !important;
+    font-size: var(--font-size-small-heading) !important;
+}
+
+.btn-outline-danger:hover {
+    background-color: var(--danger-color) !important;
+    border-color: var(--danger-color-light) !important;
+    color: var(--background-color) !important;
+}
+
+.btn-outline-danger.active {
+    background-color: var(--danger-color) !important;
+    border-color: var(--danger-color-light) !important;
+    color: var(--background-color) !important;
+}
+
+.btn-success {
+    background-color: var(--success-color) !important;
+    border-color: var(--success-color-light) !important;
+    color: var(--background-color) !important;
+    font-size: var(--font-size-small-heading) !important;
+}
+
+.btn-success:hover {
+    background-color: var(--success-color-light) !important;
+    border-color: var(--success-color-light) !important;
+}
+
+.btn-outline-warning {
+    color: var(--warning-color) !important;
+    border-color: var(--warning-color) !important;
+    background-color: transparent !important;
+    font-size: var(--font-size-small-heading) !important;
+}
+
+.btn-outline-warning:hover {
+    background-color: var(--warning-color) !important;
+    color: var(--background-color) !important;
+    border-color: var(--warning-color-light) !important;
+}
+
+.btn-outline-warning.active {
+    background-color: var(--warning-color) !important;
+    color: var(--background-color) !important;
+    border-color: var(--warning-color-light) !important;
+}
+
+.btn-primary {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color-light) !important;
+}
+.btn-warning {
+    background-color: var(--warning-color) !important;
+    border-color: var(--warning-color-light) !important;
+    color: var(--background-color) !important;
+}

@@ -7,6 +7,9 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="/public/css/styles.css">
+    <link rel="stylesheet" href="/public/css/buttons.css">
+    <link rel="stylesheet" href="/public/css/containers.css">
+    <link rel="stylesheet" href="/public/css/text.css">
     <link rel="icon" type="image/x-icon" href="/public/img/logo.ico">
 </head>
 <body>
@@ -21,7 +24,6 @@
         <div class="d-flex justify-content-center mb-2">
             <div class="col-10 col-md-6 col-lg-6 p-4 list-container">
                 <h2 class="text-center mb-4">Registro de Usuario</h2>
-                <!-- Formulario de registro -->
                 <form id="registerForm">
                     <div class="form-group">
                         <label for="email">Correo Electrónico</label>
@@ -61,6 +63,11 @@
                         <input type="password" class="form-control" id="password" name="password" required>
                         <span id="passwordError" class="form-text text-danger"></span>
                     </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirmar Contraseña</label>
+                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                        <span id="passwordMatchMessage" class="form-text"></span>
+                    </div>
                     <button type="submit" class="btn btn-primary btn-block">Registrarse</button>
                     <div class="text-center mt-3">
                         <p>¿Ya tienes cuenta? <a href="/auth/login">Inicia sesión aquí</a></p>
@@ -80,90 +87,127 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        $('#registerForm').submit(function(event) {
-            event.preventDefault();
-            
-            $('#emailError').text('');
-            $('#fullNameError').text('');
-            $('#phoneError').text('');
-            $('#passwordError').text('');
+        $(document).ready(function () {
+            const passwordField = $('#password');
+            const confirmPasswordField = $('#confirmPassword');
+            const passwordMatchMessage = $('#passwordMatchMessage');
+            const submitButton = $('#submitButton');
 
-            let isValid = true;
-            let email = $('#email').val().trim();
-            let fullName = $('#fullName').val().trim();
-            let phone = $('#phone').val().trim();
-            let password = $('#password').val().trim();
-            let facultyID = $('#facultyID').val();
-            let roleID = $('#roleID').val();
+            function checkPasswordsMatch() {
+                const password = passwordField.val();
+                const confirmPassword = confirmPasswordField.val();
 
-            if (!email || !validateEmail(email)) {
-                $('#emailError').text('El correo tiene que ser válido');
-                isValid = false;
-            }
-
-            if (!password) {
-                $('#passwordError').text('La contraseña es obligatoria');
-                isValid = false;
-            }
-
-            if (!fullName) {
-                $('#fullNameError').text('El nombre y los apellidos son obligatorios.');
-                isValid = false;
-            }
-
-            if (!phone) {
-                $('#phoneError').text('El número de telefono es obligatorio.');
-                isValid = false;
-            }
-
-            if (!facultyID) {
-                $('#facultyError').text('La facultad es obligatoria');
-                isValid = false;
-            }
-
-            if (!roleID) {
-                $('#roleError').text('El rol es obligatorio.');
-                isValid = false;
-            }
-
-            if (isValid) {
-                $.ajax({
-                    url: '/api/auth/register',
-                    method: 'POST',
-                    data: {
-                        email: email,
-                        fullName: fullName,
-                        phone: phone,
-                        facultyID: facultyID,
-                        roleID: roleID,
-                        password: password
-                    },
-                    success: function(response) {
-                        console.log("Registro exitoso");
-                        if (response.success) {
-                            window.location.href = '/'; 
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        let errorMessage = '';
-
-                        if (xhr.status === 400 || xhr.status === 401) {
-                            errorMessage = xhr.responseJSON.error; 
-                        } else {
-                            errorMessage = 'Hubo un error inesperado. Intenta de nuevo.'; 
-                        }
-
-                        $('#toastMessage').text(errorMessage);
-                        $('#toast').toast('show');
+                if (password && confirmPassword) {
+                    if (password === confirmPassword) {
+                        passwordMatchMessage
+                            .text('Las contraseñas coinciden.')
+                            .removeClass('text-danger')
+                            .addClass('text-success');
+                        submitButton.prop('disabled', true); 
+                    } else {
+                        passwordMatchMessage
+                            .text('Las contraseñas no coinciden.')
+                            .removeClass('text-success')
+                            .addClass('text-danger');
+                        submitButton.prop('disabled', false); 
                     }
-                });
+                } else {
+                    passwordMatchMessage.text('').removeClass('text-success text-danger');
+                    submitButton.prop('disabled', false); 
+                }
+            }
+
+            passwordField.on('input', checkPasswordsMatch);
+            confirmPasswordField.on('input', checkPasswordsMatch);
+
+            $('#registerForm').submit(function(event) {
+                event.preventDefault();
+                
+                $('#emailError').text('');
+                $('#fullNameError').text('');
+                $('#phoneError').text('');
+                $('#passwordError').text('');
+
+                let isValid = true;
+                let email = $('#email').val().trim();
+                let fullName = $('#fullName').val().trim();
+                let phone = $('#phone').val().trim();
+                let password = $('#password').val().trim();
+                let confirmPassword = $('#confirmPassword').val().trim();
+                let facultyID = $('#facultyID').val();
+                let roleID = $('#roleID').val();
+
+                if (!email || !validateEmail(email)) {
+                    $('#emailError').text('El correo tiene que ser válido');
+                    isValid = false;
+                }
+
+                if (!password && !confirmPassword && password === confirmPassword) {
+                    $('#passwordError').text('La contraseña es obligatoria y deben coincidir');
+                    isValid = false;
+                }
+
+                if (!fullName) {
+                    $('#fullNameError').text('El nombre y los apellidos son obligatorios.');
+                    isValid = false;
+                }
+
+                if (!phone) {
+                    $('#phoneError').text('El número de telefono es obligatorio.');
+                    isValid = false;
+                }
+
+                if (!facultyID) {
+                    $('#facultyError').text('La facultad es obligatoria');
+                    isValid = false;
+                }
+
+                if (!roleID) {
+                    $('#roleError').text('El rol es obligatorio.');
+                    isValid = false;
+                }
+
+
+
+                if (isValid) {
+                    $.ajax({
+                        url: '/api/auth/register',
+                        method: 'POST',
+                        data: {
+                            email: email,
+                            fullName: fullName,
+                            phone: phone,
+                            facultyID: facultyID,
+                            roleID: roleID,
+                            password: password
+                        },
+                        success: function(response) {
+                            console.log("Registro exitoso");
+                            if (response.success) {
+                                window.location.href = '/'; 
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            let errorMessage = '';
+
+                            if (xhr.status === 400 || xhr.status === 401) {
+                                errorMessage = xhr.responseJSON.error; 
+                            } else {
+                                errorMessage = 'Hubo un error inesperado. Intenta de nuevo.'; 
+                            }
+
+                            $('#toastMessage').text(errorMessage);
+                            $('#toast').toast('show');
+                        }
+                    });
+                }
+            });
+
+            function validateEmail(email) {
+                const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+                return regex.test(email);
             }
         });
-
-        function validateEmail(email) {
-            const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-            return regex.test(email);
-        }
     </script>
 
 </body>

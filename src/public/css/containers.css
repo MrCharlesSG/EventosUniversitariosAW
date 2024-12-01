@@ -1,0 +1,97 @@
+.list-item-meta {
+    color: var(--text-secondary-color);
+    font-size: var(--font-size-small);
+}
+
+.list-item {
+    background-color: var(--background-secondary);
+}
+
+.list-item:hover {
+    background-color: var(--background-color);
+}
+
+.list-item-title{
+    color: var(--text-color);
+    font-size: var(--font-size-small-heading);
+}
+
+.list-item-important-title {
+    font-weight: bold;
+    font-size: var(--font-size-medium-heading);
+    color: var(--primary-color);
+}
+
+.list-item-important-meta {
+    color: var(--text-secondary-color);
+    font-size: var(--font-size-small-heading);
+}
+
+.modal-content{
+    background-color: var(--background-secondary) !important;
+    color: var(--text-color);
+}
+
+.list-container {
+    background-color: var(--background-secondary);
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.form {
+    margin-top: -25px;
+}
+
+.card-header {
+    background-color: var(--background-secondary) !important;
+    border:none !important;
+}
+
+.card-header-title {
+    color: var(--primary-color) !important;
+    font-size: var(--font-size-small-heading) !important;
+}
+
+.card {
+    background-color: var(--background-secondary) !important;
+    border:none !important;
+    border-radius: 8px !important;
+}
+
+.card-body {
+    background-color: var(--background-secondary) !important;
+    color: var(--text-secondary-color);
+}
+
+.list-group-item {
+    background-color: var(--background-secondary) !important;
+    border-color: var(--background-color) !important;
+}
+
+.form-container {
+    background-color: var(--background-secondary);
+    border-radius: 8px;
+}
+
+
+.form-group label {
+    font-weight: bold;
+}
+
+.toast-error {
+    background-color: var(--danger-color) !important;
+    color: var(--background-color) !important;
+}
+
+.danger-zone {
+    border-radius: 5px;
+    border: 1px solid var(--danger-color);
+    background-color: var(--danger-color-light-xl);
+}
+
+.warning-zone {
+    border-radius: 5px;
+    border: 1px solid var(--warning-color);
+    background-color: var(--warning-color-light-xl);
+}
