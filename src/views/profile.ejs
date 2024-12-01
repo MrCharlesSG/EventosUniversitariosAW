@@ -53,7 +53,7 @@
                         <span class="error-text" id="facultyError"></span>
                     </div>
                     <div class="d-flex">
-                        <button type="button" class="btn btn-primary flex-fill mr-1" id="editButton">Editar</button>
+                        <button type="button" class="btn btn-primary flex-fill mr-1" id="editProfileButton">Editar</button>
                         <button type="button" class="btn btn-danger flex-fill mr-1" id="cancelButton" style="display:none;">Cancelar</button>
                         <button type="submit" class="btn btn-primary flex-fill mx-1" id="saveButton" style="display:none;">Guardar Cambios</button>
                     </div>
@@ -170,9 +170,9 @@
                 facultyID: $('#facultyID').val()
             };
     
-            $('#editButton').click(function () {
+            $('#editProfileButton').click(function () {
                 $('#profileForm input:not(#email), #profileForm select').prop('disabled', false);
-                $('#editButton').hide();
+                $('#editProfileButton').hide();
                 $('#saveButton, #cancelButton').show();
             });
     
@@ -181,7 +181,7 @@
                 $('#phone').val(originalValues.phone);
                 $('#facultyID').val(originalValues.facultyID);
                 $('#profileForm input:not(#email), #profileForm select').prop('disabled', true);
-                $('#editButton').show();
+                $('#editProfileButton').show();
                 $('#saveButton, #cancelButton').hide();
             });
     
@@ -219,7 +219,7 @@
                             $('#toastMessage').text("Cssd");
                             $('#toast').toast('show');
                             $('#profileForm input:not(#email), #profileForm select').prop('disabled', true);
-                            $('#editButton').show();
+                            $('#editProfileButton').show();
                             $('#saveButton, #cancelButton').hide();
                         },
                         error: function (jqXHR, textStatus, errorThrown) {
