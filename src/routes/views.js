@@ -125,6 +125,39 @@ viewsRouter.get("/profile/change-password", isAuthenticated, (req, res) => {
 viewsRouter.get("/profile", isAuthenticated, async (req, res) => {
     try {
         const email = req.session.user.email;
+        const getUserEventsQuery = `
+            SELECT 
+                e.Title, 
+                e.Description, 
+                e.TimeInit,
+                e.TimeEnd, 
+                e.ID AS ID, 
+                f.ID AS FacultyID, 
+                f.Name AS FacultyName, 
+                f.University AS FacultyUniversity, 
+                r.Capacity AS Capacity, 
+                r.Name AS RoomName, 
+                e.OrganizerID, 
+                enr.Status AS Status,
+                et.Name AS EventType
+            FROM 
+                Event e
+            LEFT JOIN 
+                Rooms r ON e.Location = r.RoomID
+            LEFT JOIN 
+                Faculty f ON r.FacultyID = f.ID
+            LEFT JOIN 
+                Enrollment enr ON e.ID = enr.EventID AND enr.UserEmail = ?
+            LEFT JOIN 
+                EventType et ON et.ID = e.EventTypeID
+            WHERE 
+                e.Active = 1 
+                AND enr.Status IN ('confirmed', 'waiting')
+            ORDER BY 
+                e.TimeInit ASC;
+        `;
+    
+        const [events] = await pool.query(getUserEventsQuery, [email]);
 
         const [faculties] = await pool.query("SELECT * FROM Faculty");
         console.log("The faculties attributes ", faculties);
@@ -136,13 +169,20 @@ viewsRouter.get("/profile", isAuthenticated, async (req, res) => {
         console.log("The profile attributes ", result);
 
         const user = result[0];
-        res.render("profile", { user, faculties, role: req.user.role,
-            theme: getTheme(req) });
+        
+        res.render("profile", { 
+            user, 
+            faculties, 
+            role: req.user.role, 
+            theme: getTheme(req),
+            events
+        });
     } catch (err) {
         console.error("Error al obtener datos del perfil:", err);
         res.status(500).send("Error al obtener datos del perfil");
     }
 });
+
 
 
 viewsRouter.get("/events/info", isAuthenticatedOrganizer, async (req, res) => {
