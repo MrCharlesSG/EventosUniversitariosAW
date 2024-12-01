@@ -67,8 +67,8 @@ export class NotificationsController {
             const getUsersQuery = "SELECT UserEmail FROM Enrollment WHERE EventID = ?";
             const [users] = await pool.query(getUsersQuery, [event]);
     
-            if (users.length === 0) return true; // Si no hay usuarios, simplemente se resuelve la promesa.
-    
+            if (users.length === 0) return true; 
+            
             const notificationQuery = "INSERT INTO Notifications (Sender, Date, Message) VALUES (?, NOW(), ?)";
             const [result] = await pool.query(notificationQuery, [sender, message]);
     
@@ -104,39 +104,5 @@ export class NotificationsController {
             console.error("Error al crear o asociar la notificación:", err);
             throw new Error("Error al crear o asociar la notificación: " + err.message); 
         }
-    }
-    
-    
-
-    static async sendOrganizerNotification(eventId, sender, message) {
-        console.log("Sending Notification to Organizer: ", message);
-    
-        try {
-            const getOrganizerQuery = "SELECT OrganizerID AS OrganizerEmail FROM Event WHERE ID = ?";
-            const [result] = await pool.query(getOrganizerQuery, [eventId]);
-    
-            if (result.length === 0) {
-                throw new Error("No se encontró organizador para el evento especificado.");
-            }
-    
-            const organizerEmail = result[0].OrganizerEmail;
-    
-            const notificationQuery = "INSERT INTO Notifications (Sender, Date, Message) VALUES (?, NOW(), ?)";
-            const [notificationResult] = await pool.query(notificationQuery, [sender, message]);
-    
-            const notificationId = notificationResult.insertId;
-    
-            const insertOrganizerNotificationQuery = "INSERT INTO UserNotifications (UserEmail, NotificationID, Checked) VALUES (?, ?, 0)";
-            await pool.query(insertOrganizerNotificationQuery, [organizerEmail, notificationId]);
-    
-            console.log(`Notificación enviada al organizador: ${organizerEmail}`);
-        } catch (err) {
-            console.error("Error al enviar la notificación al organizador:", err);
-            throw new Error("Error al enviar la notificación al organizador: " + err.message); // Lanzamos el error
-        }
-    }
-    
-    
-    
-    
+    } 
 }

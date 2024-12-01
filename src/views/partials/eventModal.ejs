@@ -1,4 +1,4 @@
-<div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModalLabel" aria-hidden="true">
+<div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModalLabel" aria-hidden="false">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -79,14 +79,18 @@
             const $editButton = $('#editButton');
             const $signUpButton = $('#signUpButton');
             const $dropOutButton = $('#dropOutButton');
-    
+            const isPastEvent = new Date(eventData.initTime) < new Date();
             if (isOrganizer) {
                 $("#modalFooter").show();
                 $editButton.show().attr('href', `/events/info?eventID=${eventData.eventId}`);
                 $signUpButton.hide();
                 $dropOutButton.hide();
+                if(isPastEvent){
+                    $editButton.text("Ver Evento")
+                }else{
+                    $editButton.text("Editar Evento")
+                }
             } else {
-                const isPastEvent = new Date(eventData.initTime) < new Date();
                 if(isPastEvent){
                     $("#modalFooter").hide();
                 }else{

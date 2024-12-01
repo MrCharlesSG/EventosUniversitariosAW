@@ -91,7 +91,7 @@ viewsRouter.get("/auth/login", redirectIfAuthenticated, (req, res) => {
 });
 
 viewsRouter.get("/auth/forgot-password", redirectIfAuthenticated, (req, res) => {
-    res.render('forgot-password',{ layout: false })
+    res.sendFile(path.join(__dirname, '../views/forgot-password.html'));
  });
 
  viewsRouter.get("/auth/reset-password/:email", (req, res) => {
@@ -99,7 +99,7 @@ viewsRouter.get("/auth/forgot-password", redirectIfAuthenticated, (req, res) => 
     if (!email) {
         return res.status(403).json({ error: "Correo electrónico no proporcionado" });
     }
-    res.render('reset-password', { email , layout: false});
+    res.render('reset-password', { email, title:"Restablecer Contraseña",urlRedirect :"/auth/login" ,layout: false});
 });
 
 viewsRouter.get("/auth/register", redirectIfAuthenticated, async (req, res) => {
@@ -115,6 +115,12 @@ viewsRouter.get("/auth/register", redirectIfAuthenticated, async (req, res) => {
     }
 });
 
+viewsRouter.get("/profile/change-password", isAuthenticated, (req, res) => {
+    
+    const email = req.session.user.email; 
+    
+    res.render('reset-password', { email,urlRedirect :"/profile",role: req.user.role ,theme: getTheme(req), title:"Nueva Contraseña"});
+});
 
 viewsRouter.get("/profile", isAuthenticated, async (req, res) => {
     try {

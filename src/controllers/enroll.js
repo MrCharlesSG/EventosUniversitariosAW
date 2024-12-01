@@ -124,20 +124,17 @@ export class EnrollController {
     
             await pool.query(updateEnrollmentQuery, ['cancelled', idEvent, email]);
     
-            // Notify organizer
             const organizerMessage = `El usuario ${email} se ha desapuntado del evento ${event.Title}.`;
-            await NotificationsController.sendOrganizerNotification(idEvent, email, organizerMessage);
+            await NotificationsController.sendNotificationToUser(email, event.OrganizerID, organizerMessage);
     
             const [queueResult] = await pool.query(promoteQuery, [idEvent]);
     
             if (queueResult.length > 0) {
-                // Promote user from the queue
                 console.log("There is a queue");
                 const promoteUser = queueResult[0].UserEmail;
                 await pool.query(updateEnrollmentQuery, ['confirmed', idEvent, promoteUser]);
                 console.log("Promoting ", promoteUser);
     
-                // Notify the user that they have been promoted
                 const userMessage = `Te has movido de la cola a inscrito en el evento ${event.Title}.`;
                 await NotificationsController.sendNotificationToUser(
                     event.OrganizerID, promoteUser, userMessage

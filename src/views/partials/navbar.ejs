@@ -108,58 +108,61 @@
     </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const notificationsButton = document.getElementById('notificationsButton');
-        notificationsButton.addEventListener('click', fetchNotificationsAndCheck);
-    });
-    
-    function fetchNotificationsAndCheck() {
-        const notificationsContent = document.getElementById('notificationsContent');
-        notificationsContent.innerHTML = 'Cargando notificaciones...';
-        console.log("To fetch notifications ")
-        fetch('/api/notifications/andCheck') 
-            .then(response => response.json())
-            .then(data => {
-                notificationsContent.innerHTML = '';
-    
-                if (data) {
-                    console.log("the notifications ", data)
-                    if (data.length > 0) {
-                        data.forEach(notification => {
+    $(document).ready(function () {
+        $('#notificationsButton').on('click', function () {
+            fetchNotificationsAndCheck();
+        });
+
+        function fetchNotificationsAndCheck() {
+            const $notificationsContent = $('#notificationsContent');
+            $notificationsContent.html('Cargando notificaciones...');
+
+            console.log("To fetch notifications");
+            
+            $.ajax({
+                url: '/api/notifications/andCheck',
+                method: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    $notificationsContent.html(''); 
+                    if (data && data.length > 0) {
+                        console.log("the notifications ", data);
+                        
+                        $.each(data, function (index, notification) {
                             const notificationDate = new Date(notification.Date).toLocaleDateString('es-ES', {
                                 year: 'numeric',
                                 month: 'long',
                                 day: 'numeric'
                             });
-    
+
                             const notificationItem = `
-                                <div class="list-item ${notification.Checked ? 'read' : 'unread'}">
-                                    <div class="d-flex align-items-center">
-                                        <div class="list-item-title">
-                                            <strong>${notification.Message}</strong> 
-                                        </div>
-                                    </div>
-                                    <div class="list-item-meta d-flex flex-wrap justify-content-between">
-                                        <span><strong>Remitente:</strong> ${notification.Sender}</span>
-                                        <span><strong>Fecha:</strong> ${notificationDate}</span>
-                                    </div>
-                                </div>
+                                <li class="list-item">
+                                            <div class="d-flex align-items-center">
+                                                <div>
+                                                    <h5 class="list-title">${notification.Message}</h5>
+                                                    <div class="list-details d-flex flex-wrap justify-content-between">
+                                                        <span><strong>De:</strong> ${notification.Sender}</span>
+                                                        <span><strong>Fecha:</strong> ${notificationDate}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
                             `;
-                            notificationsContent.innerHTML += notificationItem;
-                            console.log("The notification  inserted ", notification)
+
+                            $notificationsContent.append(notificationItem); 
+                            console.log("The notification inserted ", notification);
                         });
                     } else {
-                        notificationsContent.innerHTML = '<p>No tienes notificaciones sin ver.</p>';
+                        $notificationsContent.html('<p>No tienes notificaciones sin ver.</p>');
                     }
-                } else {
-                    notificationsContent.innerHTML = '<p>Error al cargar las notificaciones.</p>';
+                },
+                error: function (error) {
+                    console.error('Error al cargar las notificaciones:', error);
+                    $notificationsContent.html('<p>Error al cargar las notificaciones.</p>');
                 }
-            })
-            .catch(error => {
-                console.error('Error al cargar las notificaciones:', error);
-                notificationsContent.innerHTML = '<p>Error al cargar las notificaciones.</p>';
             });
-    }
-    
+        }
+    });
 </script>

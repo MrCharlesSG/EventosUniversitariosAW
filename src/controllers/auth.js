@@ -115,7 +115,7 @@ export class AuthController {
 
             updateValues.push(email);
 
-            console.log("Modifying user, this are the values to update ", updateValues)
+            console.log("Modifying user, values ", updateValues)
 
             const [result] = await pool.query(updateQuery, updateValues);
 

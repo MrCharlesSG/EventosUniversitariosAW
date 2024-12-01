@@ -59,6 +59,9 @@
                     </form>
                     
                 </div>
+                <div class="warning-zone border border-danger mt-3 p-3 w-100" id="logoutForm" action="/api/auth/logout" method="POST">
+                    <a href="/profile/change-password" class="btn w-100 btn-warning">Cambiar Contraseña</a>
+                </div>
                 <form class="danger-zone border border-danger mt-3 p-3 w-100" id="logoutForm" action="/api/auth/logout" method="POST">
                     <h5 class=" w-100 text-danger text-center">Zona de Peligro</h5>
                     <button  type="submit" class="btn w-100 btn-danger">Cerrar Sesión</button>
@@ -146,7 +149,6 @@
                 }
             });
     
-            // Función para mostrar el toast de notificación
             function showToast(message) {
                 $('#toast .toast-body').text(message);
                 $('#toast').fadeIn().delay(3000).fadeOut();

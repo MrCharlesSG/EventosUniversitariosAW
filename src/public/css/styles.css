@@ -8,6 +8,7 @@
     --success-color-light:#10b981;
     --warning-color:#f59e0b;
     --warning-color-light:#fbbf24;
+    --warning-color-light-xl:#f7e8c0;
 
     --background-color: #f1f5f9; 
     --background-secondary: #f8fafc;
@@ -33,6 +34,7 @@
     --success-color-light: #03dac6;
     --warning-color: #ffb74d;
     --warning-color-light: #ffcc80;
+    --warning-color-light-xl:#f7e8c0;
     --danger-color-light-xl:#ffe4e6;
 }
 
@@ -49,6 +51,7 @@
     --success-color-light: #a5d6a7;
     --warning-color: #ff9800;  
     --warning-color-light: #ffcc80;
+    --warning-color-light-xl:#f1ede1;
 }
 
 :root {
@@ -190,6 +193,11 @@ a {
 .btn-primary {
     background-color: var(--primary-color) !important;
     border-color: var(--primary-color-light) !important;
+}
+.btn-warning {
+    background-color: var(--warning-color) !important;
+    border-color: var(--warning-color-light) !important;
+    color: var(--background-color) !important;
 }
 
 .logo-name {
@@ -455,6 +463,12 @@ OTHERS
     border-radius: 5px;
     border: 1px solid var(--danger-color);
     background-color: var(--danger-color-light-xl);
+}
+
+.warning-zone {
+    border-radius: 5px;
+    border: 1px solid var(--warning-color);
+    background-color: var(--warning-color-light-xl);
 }
 
 

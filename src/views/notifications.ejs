@@ -1,43 +1,7 @@
 
 <style>
 
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #343a40;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .list-container {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-        }
-        .list-item {
-            border-bottom: 1px solid #ddd;
-            padding: 15px;
-            cursor: pointer;
-            display: flex;
-            border-radius: 8px;
-            flex-direction: column;
-            margin-bottom: 5px;
-        }
-        .list-item:hover {
-            background-color: #f1f1f1;
-        }
-        .list-title {
-            font-weight: bold;
-            color: #007bff;
-            font-size: 1.25rem;
-        }
-
-        
-        .list-details {
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
+       
 
         .read {
             background-color: #e9ecef;
@@ -71,50 +35,60 @@
             </div>
         </div>
 
-    <script>
-        function fetchNotifications() {
-            const notificationList = document.getElementById("notification-list");
-            notificationList.innerHTML = "Cargando notificaciones..."; 
-            fetch('/api/notifications') 
-            .then(response => response.json())
-            .then(data => {
-                notificationList.innerHTML = '';
-                if(data){
-                    if (data.length === 0) {
-                        notificationList.innerHTML = '<li class="text-center">No tienes notificaciones.</li>';
-                    } else {
-                        data.forEach(notification => {
-                            const notificationDate = new Date(notification.Date).toLocaleString("es-ES", {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            });
-    
-                            const notificationItem = `
-                                <li class="list-item">
-                                    <div class="d-flex align-items-center">
-                                        <div>
-                                            <h5 class="list-title text-primary">${notification.Message}</h5>
-                                            <div class="list-details d-flex flex-wrap justify-content-between">
-                                                <span><strong>De:</strong> ${notification.Sender}</span>
-                                                <span><strong>Fecha:</strong> ${notificationDate}</span>
+        <script>
+            $(document).ready(function () {
+                // Call fetchNotifications when the page loads
+                fetchNotifications();
+        
+                function fetchNotifications() {
+                    const $notificationList = $("#notification-list"); // Use jQuery selector
+                    $notificationList.html("Cargando notificaciones..."); // Show loading message
+        
+                    // AJAX request using jQuery
+                    $.ajax({
+                        url: '/api/notifications',
+                        method: 'GET',
+                        dataType: 'json',
+                        success: function (data) {
+                            $notificationList.empty(); // Clear the loading message
+        
+                            if (data && data.length > 0) {
+                                // Loop through notifications and append each to the list
+                                $.each(data, function (index, notification) {
+                                    const notificationDate = new Date(notification.Date).toLocaleString("es-ES", {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    });
+        
+                                    const notificationItem = `
+                                        <li class="list-item">
+                                            <div class="d-flex align-items-center">
+                                                <div>
+                                                    <h5 class="list-title">${notification.Message}</h5>
+                                                    <div class="list-item-important-meta  d-flex flex-wrap justify-content-between">
+                                                        <span><strong>De:</strong> ${notification.Sender}</span>
+                                                        <span><strong>Fecha:</strong> ${notificationDate}</span>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                </li>
-                            `;
-    
-                            notificationList.innerHTML += notificationItem;
-                        });
-                
-                    }
-                }else {
-                    notificationsContent.innerHTML = '<p>Error al cargar las notificaciones.</p>';
+                                        </li>
+                                    `;
+        
+                                    $notificationList.append(notificationItem); 
+                                });
+                            } else {
+                                $notificationList.html('<li class="text-center">No tienes notificaciones.</li>');
+                            }
+                        },
+                        error: function (error) {
+                            console.error("Error al cargar las notificaciones:", error);
+                            $notificationList.html('<li class="text-center">Error al cargar las notificaciones.</li>');
+                        }
+                    });
                 }
-            })
-        }
-
-        window.onload = fetchNotifications;
-    </script>
+            });
+        </script>
+        
