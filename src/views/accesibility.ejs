@@ -1,6 +1,6 @@
 <div>
     <header class="mb-4 text-center">
-        <h1 >Opciones de Accesibilidad</h1>
+        <h1>Opciones de Accesibilidad</h1>
         <p class="lead text-muted">
             Personaliza tu experiencia de navegación para que sea más cómoda y accesible.
         </p>
@@ -13,13 +13,13 @@
                 Elige el tema que mejor se adapte a tus necesidades de visualización.
             </p>
             <div class="btn-group" role="group" aria-label="Seleccionar tema">
-                <button class="btn btn-primary {{ theme === '' ? 'active' : '' }}" onclick="changeTheme('')">
+                <button class="btn btn-primary theme-button" data-theme="">
                     Predeterminado
                 </button>
-                <button class="btn btn-dark {{ theme === 'theme-dark' ? 'active' : '' }}" onclick="changeTheme('theme-dark')">
+                <button class="btn btn-dark theme-button" data-theme="theme-dark">
                     Oscuro
                 </button>
-                <button class="btn btn-success {{ theme === 'theme-daltonic' ? 'active' : '' }}" onclick="changeTheme('theme-daltonic')">
+                <button class="btn btn-success theme-button" data-theme="theme-daltonic">
                     Daltónico
                 </button>
             </div>
@@ -28,18 +28,18 @@
 
     <section class="card shadow-sm list-container">
         <div class="card-body">
-            <h2 >Ajustar Tamaño del Texto</h2>
+            <h2>Ajustar Tamaño del Texto</h2>
             <p class="card-text text-muted">
                 Ajusta el tamaño del texto para mejorar la legibilidad.
             </p>
             <div class="btn-group" role="group" aria-label="Seleccionar tamaño de texto">
-                <button class="btn btn-primary {{ letter === 'theme-small' ? 'active' : '' }}" onclick="changeLetterTheme('theme-small')">
+                <button class="btn btn-primary font-button" data-font="theme-small">
                     Pequeño
                 </button>
-                <button class="btn btn-secondary {{ letter === '' ? 'active' : '' }}" onclick="changeLetterTheme('')">
+                <button class="btn btn-secondary font-button" data-font="">
                     Predeterminado
                 </button>
-                <button class="btn btn-success {{ letter === 'theme-large' ? 'active' : '' }}" onclick="changeLetterTheme('theme-large')">
+                <button class="btn btn-success font-button" data-font="theme-large">
                     Grande
                 </button>
             </div>
@@ -53,11 +53,11 @@
                 <li><strong>Ctrl + E</strong>: Ir a <a href="/events">Eventos</a></li>
                 <% if(role == 1){ %>
                     <li><strong>Ctrl + M</strong>: Ir a <a href="/myevents">Mis Eventos</a> (solo para organizadores)</li>
-                <% } %>  
+                <% } %>
                 <li><strong>Ctrl + P</strong>: Ir a <a href="/profile">Perfil</a></li>
                 <li><strong>Ctrl + C</strong>: Ir al <a href="/calendar">Calendario</a></li>
                 <li><strong>Ctrl + A</strong>: Ir a <a href="/accesibility">Accesibilidad</a></li>
-                <li><strong>Ctrl + O</strong>: Ir a <a href="/notifications">Notifications</a></li>
+                <li><strong>Ctrl + O</strong>: Ir a <a href="/notifications">Notificaciones</a></li>
                 <li><strong>Ctrl + I</strong>: Inscribirse al evento seleccionado</li>
                 <li><strong>Ctrl + U</strong>: Desinscribirse del evento seleccionado</li>
                 <li><strong>Ctrl + D</strong>: Ver los detalles del evento seleccionado</li>
@@ -66,22 +66,59 @@
     </section>
 </div>
 
-<script>
-    async function changeTheme(theme) {
-        await fetch('/set-theme', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ theme })
-        });
-        location.reload();
-    }
+<!-- Toast de error -->
+<div class="toast position-fixed bottom-0 end-0 p-3" id="errorToast" role="alert" aria-live="assertive" aria-atomic="true" style="z-index: 1055;">
+    <div class="toast-header bg-danger text-white">
+        <strong class="me-auto">Error</strong>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body text-danger">
+        Ha ocurrido un error. Por favor, inténtalo nuevamente.
+    </div>
+</div>
 
-    async function changeLetterTheme(theme) {
-        await fetch('/set-letter-theme', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ theme })
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('.theme-button').on('click', function () {
+            const theme = $(this).data('theme'); 
+            $.ajax({
+                url: '/api/theme/color',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ theme }),
+                success: function () {
+                    location.reload(); 
+                },
+                error: function () {
+                    showToast('Error al cambiar el tema de colores.');
+                }
+            });
         });
-        location.reload();
-    }
+
+        $('.font-button').on('click', function () {
+            const fontSize = $(this).data('font'); 
+            $.ajax({
+                url: '/api/theme/font-size',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ theme: fontSize }),
+                success: function () {
+                    location.reload(); 
+                },
+                error: function () {
+                    showToast('Error al cambiar el tamaño del texto.');
+                }
+            });
+        });
+
+        function showToast(message) {
+            const toast = $('#errorToast');
+            toast.find('.toast-body').text(message);
+            const toastInstance = new bootstrap.Toast(toast[0]); 
+            toastInstance.show();
+        }
+    });
 </script>
