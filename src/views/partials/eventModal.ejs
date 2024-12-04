@@ -23,10 +23,13 @@
                 <a href="#" type="button" id="editButton" class="btn btn-primary w-100" style="display: none;">Editar Evento</a>
                 <a href="#" type="button" id="signUpButton" class="btn btn-success w-100" style="display: none;">Apuntarse al Evento</a>
                 <a href="#" type="button" id="dropOutButton" class="btn btn-danger w-100" style="display: none;">Desapuntarse del Evento</a>
+                <div id="errorMessage" class="alert alert-danger w-100" style="display: none; margin-top: 10px;"></div>
+
             </div>
         </div>
     </div>
 </div>
+
 
 
 
@@ -112,6 +115,14 @@
             $('#eventModal').modal('show');
         }
 
+        function showError(message) {
+            $('#errorMessage').text(message).show();
+        
+            setTimeout(function() {
+                $('#errorMessage').fadeOut();
+            }, 5000);
+        }
+
         function enrollEvent(eventData) {
             console.log("Enrolling...", eventData);
             $.ajax({
@@ -139,8 +150,13 @@
                         });
                     }
                 },
-                error: function (error) {
+                error: function (xhr, status, error) {
                     console.error('Error al inscribirse en el evento:', error);
+                    if (xhr.status === 400 && xhr.responseJSON && xhr.responseJSON.error) {
+                        showError(xhr.responseJSON.error);
+                    } else {
+                        showError("Hubo un error al inscribirse en el evento. Por favor, inténtalo de nuevo.");
+                    }
                 }
             });
         }
@@ -170,8 +186,13 @@
                         });
                     }
                 },
-                error: function (error) {
+                error: function (xhr, status, error) {
                     console.error('Error al cancelar la inscripción del evento:', error);
+                    if (xhr.status === 400 && xhr.responseJSON && xhr.responseJSON.error) {
+                        showError(xhr.responseJSON.error);
+                    } else {
+                        showError("Hubo un error al cancelar la inscripción del evento. Por favor, inténtalo de nuevo.");
+                    }
                 }
             });
         }

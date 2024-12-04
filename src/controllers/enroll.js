@@ -30,7 +30,8 @@ export class EnrollController {
                     E.OrganizerID, 
                     R.Capacity, 
                     E.Title, 
-                    E.TimeInit
+                    E.TimeInit,
+                    E.TimeEnd
                 FROM 
                     Event E
                 JOIN 
@@ -51,6 +52,33 @@ export class EnrollController {
             const event = eventResult[0];
             console.log("Enrolling ", email, "to event ", event.Title);
     
+            const checkOverlapQuery = `
+            SELECT 
+                E.ID, 
+                E.Title, 
+                E.TimeInit, 
+                E.TimeEnd 
+            FROM 
+                Event E
+            JOIN 
+                Enrollment EN 
+            ON 
+                E.ID = EN.EventID
+            WHERE 
+                EN.UserEmail = ? 
+                AND EN.Status IN ('confirmed', 'waiting')
+                AND (
+                    (E.TimeInit < ?) AND
+                    (E.TimeEnd > ?)
+                );
+        `;
+
+            const [overlapResult] = await pool.query(checkOverlapQuery, [email, event.TimeEnd, event.TimeInit]);
+
+            if (overlapResult.length > 0) {
+                return res.status(400).json({ error: "Ya estás inscrito en otro evento durante este horario." });
+            }
+
             const [enrollmentResult] = await pool.query("SELECT * FROM Enrollment WHERE EventID = ? AND UserEmail = ?", [idEvent, email]);
     
             if (enrollmentResult.length !== 0) {

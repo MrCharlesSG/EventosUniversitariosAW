@@ -119,8 +119,14 @@ viewsRouter.get("/profile/change-password", isAuthenticated, (req, res) => {
     
     const email = req.session.user.email; 
     
-    res.render('reset-password', { email,urlRedirect :"/profile",role: req.user.role ,theme: getTheme(req), title:"Nueva Contraseña"});
+    res.render('reset-password', { token:null, email,urlRedirect :"/profile",role: req.user.role ,theme: getTheme(req), title:"Nueva Contraseña"});
 });
+
+viewsRouter.get("/reset-password/:token", (req, res) => {
+    const { token } = req.params;
+    res.render("reset-password", { token, title: "Restablecer Contraseña", layout:false, urlRedirect: '/auth/login' });
+});
+
 
 viewsRouter.get("/profile", isAuthenticated, async (req, res) => {
     try {

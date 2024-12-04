@@ -12,4 +12,5 @@ authRouter.post("/logout", isAuthenticated, AuthController.logout)
 authRouter.post("/modifyUserInfo", isAuthenticated, AuthController.modifyUserInfo)
 
 authRouter.post('/request-password-reset', ResetPasswordController.requestPasswordReset);
-authRouter.post('/reset-password', ResetPasswordController.resetPassword);
+authRouter.post('/change-password', isAuthenticated,ResetPasswordController.changePassword);
+authRouter.post('/reset-password/:token', ResetPasswordController.resetPassword);

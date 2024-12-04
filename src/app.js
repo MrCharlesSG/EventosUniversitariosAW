@@ -51,10 +51,11 @@ const PORT = 3000;
 app.use("/", viewsRouter);
 app.use("/api", apiRouter);
 
+app.use((req, res, next) => {
+    res.status(404).render('errors/404',{ layout: false });
+});
+
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
 
-app.use((req, res, next) => {
-    res.status(404).render('errors/404',{ layout: false });
-});
