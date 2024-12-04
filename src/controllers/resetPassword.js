@@ -89,8 +89,8 @@ export class ResetPasswordController {
                 host: 'smtp.gmail.com',
                 port: 465,
                 auth: {
-                    user: "recuperadordecontrasenasparaaw@gmail.com",
-                    pass: "lmsm wabq hgde btos",
+                    user: address,
+                    pass,
                 },
                 tls: {
                     rejectUnauthorized: false 
