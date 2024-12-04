@@ -1,4 +1,5 @@
 import { pool } from "../config/db.js";
+import cron from 'node-cron'
 
 export class NotificationsController {
     static async getAllNotCheckedAndCheck(req, res) {
@@ -85,7 +86,48 @@ export class NotificationsController {
             throw new Error(err.message); 
         }
     }
+        static async notifyUsersAboutUpcomingEvents() {
+            try {
+                const query = `
+                    SELECT 
+                        e.ID AS EventID,
+                        e.Title AS EventTitle,
+                        e.TimeInit,
+                        e.OrganizerID,
+                        GROUP_CONCAT(DISTINCT u.UserEmail) AS EnrolledUsers
+                    FROM Event e
+                    LEFT JOIN Enrollment u ON e.ID = u.EventID AND (u.Status = 'confirmed' or u.Status = 'waiting')
+                    WHERE 
+                        e.Active = 1 AND 
+                        e.TimeInit > NOW() AND 
+                        e.TimeInit <= DATE_ADD(NOW(), INTERVAL 24 HOUR)
+                    GROUP BY e.ID
+                `;
+                const [events] = await pool.query(query);
     
+                if (events.length === 0) {
+                    console.log("No hay eventos próximos en las próximas 24 horas.");
+                    return;
+                }
+    
+                events.forEach(async (event) => {
+                    const { EventTitle, TimeInit, OrganizerID, EnrolledUsers } = event;
+    
+                    const timeRemaining = Math.ceil((new Date(TimeInit) - new Date()) / 3600000); 
+                    const message = `Recuerda que el evento "${EventTitle}" empieza en menos de ${timeRemaining} horas.`;
+    
+                    if (EnrolledUsers) {
+                        const users = EnrolledUsers.split(',');
+                        users.forEach(async (user) => {
+                            await this.sendNotificationToUser(OrganizerID, user, message); 
+                        });
+                    }
+    
+                });
+            } catch (err) {
+                console.error("Error al enviar notificaciones automáticas:", err);
+            }
+        }
     
 
     static async sendNotificationToUser(sender, receiver, message) {
@@ -106,3 +148,8 @@ export class NotificationsController {
         }
     } 
 }
+
+cron.schedule('0 8 * * *', () => {
+    console.log("Iniciando tarea de notificaciones automáticas...");
+    NotificationsController.notifyUsersAboutUpcomingEvents();
+});
