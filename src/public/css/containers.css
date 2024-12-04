@@ -85,6 +85,11 @@
     color: var(--background-color) !important;
 }
 
+.toast-success {
+    background-color: var(--success-color) !important;
+    color: var(--background-color) !important;
+}
+
 .danger-zone {
     border-radius: 5px;
     border: 1px solid var(--danger-color);

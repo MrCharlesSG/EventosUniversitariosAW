@@ -165,11 +165,9 @@
         </form>
     </div>
 </div>
-<div aria-live="polite" aria-atomic="true" style="position: fixed; bottom: 10px; right: 10px; z-index: 100;">
-    <div id="toast" class="toast toast-error">
-        <div class="toast-body" id="toastMessage"></div>
-    </div>
-</div>
+
+
+<%- include("toast") %>
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -257,8 +255,8 @@
                         errorMessage = xhr.responseJSON.error;
                     }
                     console.log(errorMessage)
-                    $('#toastMessage').text(errorMessage);
-                    $('#toast').toast('show');
+                    
+                    showToast(errorMessage, "danger");
                 }
             });
         });

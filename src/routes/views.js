@@ -87,20 +87,12 @@ viewsRouter.get("/accesibility", isAuthenticated, (req, res) => {
 
 
 viewsRouter.get("/auth/login", redirectIfAuthenticated, (req, res) => {
-    res.sendFile(path.join(__dirname, '../views/login.html'));
+    res.render('login', {layout:false})
 });
 
 viewsRouter.get("/auth/forgot-password", redirectIfAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, '../views/forgot-password.html'));
  });
-
- viewsRouter.get("/auth/reset-password/:email", (req, res) => {
-    const email  = req.params.email; 
-    if (!email) {
-        return res.status(403).json({ error: "Correo electrónico no proporcionado" });
-    }
-    res.render('reset-password', { email, title:"Restablecer Contraseña",urlRedirect :"/auth/login" ,layout: false});
-});
 
 viewsRouter.get("/auth/register", redirectIfAuthenticated, async (req, res) => {
     try {

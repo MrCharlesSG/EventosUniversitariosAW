@@ -1,0 +1,25 @@
+<div aria-live="polite" aria-atomic="true"style="position: fixed; bottom: 10px; right: 10px; z-index: 1100;">
+    <div id="toast" class="toast toast-error" >
+        <div class="toast-body" id="toastMessage">
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function showToast(message, type = 'success') {
+        const toastClasses = {
+            success: 'toast-success', 
+            danger: 'toast-error',     
+        };
+    
+        const toastClass = toastClasses[type] || 'toast-success';
+        console.log(toastClass)
+        const $toast = $('#toast');
+        $toast.removeClass('toast-success toast-error toast-warning toast-info').addClass(toastClass);
+    
+        $('#toastMessage').text(message);
+    
+        $toast.toast('show');
+    }
+</script>

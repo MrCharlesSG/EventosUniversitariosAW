@@ -30,10 +30,13 @@
     </div>
 </div>
 
+<%- include("toast") %>
+
 
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 
 <script>
     $(document).ready(function () {
@@ -115,13 +118,10 @@
             $('#eventModal').modal('show');
         }
 
-        function showError(message) {
-            $('#errorMessage').text(message).show();
         
-            setTimeout(function() {
-                $('#errorMessage').fadeOut();
-            }, 5000);
-        }
+        
+        
+        
 
         function enrollEvent(eventData) {
             console.log("Enrolling...", eventData);
@@ -148,14 +148,16 @@
                             capacity,
                             enrollmentStatus,
                         });
+                        showToast("Apuntado con éxito");
+
                     }
                 },
                 error: function (xhr, status, error) {
                     console.error('Error al inscribirse en el evento:', error);
                     if (xhr.status === 400 && xhr.responseJSON && xhr.responseJSON.error) {
-                        showError(xhr.responseJSON.error);
+                        showToast(xhr.responseJSON.error, 'danger');
                     } else {
-                        showError("Hubo un error al inscribirse en el evento. Por favor, inténtalo de nuevo.");
+                        showToast("Hubo un error al inscribirse en el evento. Por favor, inténtalo de nuevo.", "danger");
                     }
                 }
             });
@@ -184,14 +186,15 @@
                             capacity: eventData.capacity,
                             enrollmentStatus: 'cancelled',
                         });
+                        showToast("Desapuntado con éxito");
                     }
                 },
                 error: function (xhr, status, error) {
                     console.error('Error al cancelar la inscripción del evento:', error);
                     if (xhr.status === 400 && xhr.responseJSON && xhr.responseJSON.error) {
-                        showError(xhr.responseJSON.error);
+                        showToast(xhr.responseJSON.error, 'danger');
                     } else {
-                        showError("Hubo un error al cancelar la inscripción del evento. Por favor, inténtalo de nuevo.");
+                        showToast("Hubo un error al cancelar la inscripción en el evento. Por favor, inténtalo de nuevo.", "danger");
                     }
                 }
             });

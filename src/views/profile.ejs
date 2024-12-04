@@ -153,11 +153,8 @@
     <%- include("partials/eventModal", { role: role, user: user }) %>
     
 
-    <div aria-live="polite" aria-atomic="true" style="position: fixed; bottom: 10px; right: 10px; z-index: 100;">
-        <div id="toast" class="toast toast-error">
-            <div class="toast-body" id="toastMessage"></div>
-        </div>
-    </div>
+    
+    <%- include("partials/toast") %>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
@@ -216,15 +213,15 @@
                         data: $(this).serialize(), 
                         success: function (response) {
                             console.log("Correct")
-                            $('#toastMessage').text("Cssd");
-                            $('#toast').toast('show');
+
+                            showToast("Perfil actualizado con éxito");
+
                             $('#profileForm input:not(#email), #profileForm select').prop('disabled', true);
                             $('#editProfileButton').show();
                             $('#saveButton, #cancelButton').hide();
                         },
-                        error: function (jqXHR, textStatus, errorThrown) {
-                            $('#toastMessage').text("Hubo un problema al actualizar el perfil");
-                            $('#toast').toast('show');
+                        error: function () {
+                            showToast("Hubo un problema al actualizar el perfil", "danger");
                         }
                     });
                 }
