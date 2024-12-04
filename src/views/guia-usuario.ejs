@@ -1,0 +1,700 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Guía de Usuario</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/public/css/styles.css">
+    <link rel="stylesheet" href="/public/css/buttons.css">
+    <link rel="stylesheet" href="/public/css/text.css">
+    <link rel="icon" type="image/x-icon" href="/public/img/logo.ico">
+
+	
+	<style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+    margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.highlight-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.block-color-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: rgba(35, 131, 226, .07); }
+.select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
+.select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
+.select-value-color-green { background-color: rgba(219, 237, 219, 1); }
+.select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
+.select-value-color-transparentGray { background-color: rgba(227, 226, 224, 0); }
+.select-value-color-translucentGray { background-color: rgba(0, 0, 0, 0.06); }
+.select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
+.select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
+.select-value-color-red { background-color: rgba(255, 226, 221, 1); }
+.select-value-color-yellow { background-color: rgba(253, 236, 200, 1); }
+.select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body style="margin-top: -200px; padding:10px">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    
+	<%- include("partials/scrollToTop") %>
+	<a class=" btn btn-primary" style="position: fixed; left:10px; top: 10px; " href="/auth/login">Volver a la Aplicacion</a>
+	<article id="15211021-929a-80bb-8b2b-df6f4a9fb40b" class="page sans"><header><h1 class="page-title">Guía de Usuario</h1><p class="page-description"></p></header><div class="page-body"><nav id="15211021-929a-8060-aa80-f1676b690b54" class="block-color-gray table_of_contents"><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#15211021-929a-802f-bd0c-cee42cb934b0">Introducción</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#15211021-929a-8054-881a-ed1e6d86275e">Roles y Funciones de Usuario</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#15211021-929a-80cc-9859-ec252872dfa4">Funciones Generales</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#15211021-929a-80dc-af69-dc646087710d">Personalización y Navegación</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#15211021-929a-8020-bdd4-c85bb7183fc0"><strong>Autenticación</strong></a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#15211021-929a-8036-99a8-d702e9f6372a"><strong>Registro</strong></a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#15211021-929a-80c0-bc87-eae9ec2bc6c2"><strong>Inicio de Sesión</strong></a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#15211021-929a-8024-986e-fcaf1bcf7d0a"><strong>Cambio de Contraseña</strong></a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#15211021-929a-8049-b496-ee51f8bff1c9">Opción 1: Desde el perfil del usuario</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#15211021-929a-801f-b158-e6a778abe14d">Opción 2: Recuperar contraseña desde el inicio de sesión</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#15211021-929a-803c-8f02-ecda2b78a1ff">Ataques</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#15211021-929a-80d5-93d7-e87b2881a9df">Aplicación</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#15211021-929a-8038-a726-e87aed353ec7">Inicio</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#15211021-929a-8002-9416-db7fa3cd4633">Organizar Evento (Organizador)</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#15211021-929a-80d5-96aa-e53b22e49fa8">Mis Eventos (Organizador)</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#15211021-929a-8042-87c6-edbddb9816e3">Editar Evento (Organizador)</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#15211021-929a-8001-aa12-e428ed84f7d6">Calendario</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#15211021-929a-80ca-afcc-f20fe0a2ad89">Inscripción y Desinscripción</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#15211021-929a-8062-9fbe-d6c35398c1d3">Inscripción y Desinscripción sin modal</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#15211021-929a-8061-90ec-dd055cdbe035">Notificaciones</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#15211021-929a-80bf-a7cb-ccf22287daaf">Perfil de Usuario</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#15211021-929a-80bc-827e-c187f3de3216">Accesibilidad</a></div></nav><h2 id="15211021-929a-802f-bd0c-cee42cb934b0" class="">Introducción</h2><p id="15211021-929a-8061-b2d8-cab087b30f22" class="">Bienvenido a nuestra plataforma, diseñada para ofrecer una experiencia fluida y accesible para todos los usuarios. En esta plataforma, los usuarios pueden interactuar con eventos, gestionar su perfil y ajustar diversas configuraciones para personalizar su experiencia según sus necesidades. Existen diferentes roles dentro de la plataforma, y las funcionalidades varían según el tipo de usuario, ya sea un participante o un organizador.</p><h3 id="15211021-929a-8054-881a-ed1e6d86275e" class="">Roles y Funciones de Usuario</h3><ol type="1" id="15211021-929a-803d-932d-c6a2100d302c" class="numbered-list" start="1"><li><strong>Usuarios Participantes</strong>:<p id="15211021-929a-803e-985f-f5491f42d70e" class="">Los usuarios participantes pueden registrarse en eventos, consultar los detalles de los mismos y gestionar sus inscripciones. Tienen la posibilidad de ver su perfil y modificar aspectos como la contraseña. Además, pueden ajustar su configuración de accesibilidad, como el tema visual (oscuro, daltónico, predeterminado) o el tamaño de la fuente, para mejorar su experiencia de navegación.</p></li></ol><ol type="1" id="15211021-929a-8006-8e73-e50fdd87e06a" class="numbered-list" start="2"><li><strong>Organizadores</strong>:<p id="15211021-929a-8058-ae65-d44be8640b18" class="">Los organizadores tienen acceso adicional a la plataforma, ya que no solo pueden participar en eventos, sino que también tienen la capacidad de crear y gestionar eventos. Esto incluye establecer fechas, descripciones, y administrar las inscripciones de los participantes. Además, pueden acceder a su propio perfil para editar sus datos y realizar ajustes en su cuenta.</p></li></ol><h3 id="15211021-929a-80cc-9859-ec252872dfa4" class="">Funciones Generales</h3><ul id="15211021-929a-80a4-9dd0-d8d6712f1b67" class="bulleted-list"><li style="list-style-type:disc"><strong>Calendario</strong>: Los usuarios pueden consultar un calendario de eventos, donde se muestran los próximos eventos a los que pueden inscribirse. Este calendario es accesible desde varias secciones de la plataforma, como la página de inicio y el perfil de usuario.</li></ul><ul id="15211021-929a-802c-bb18-e9dd4994280e" class="bulleted-list"><li style="list-style-type:disc"><strong>Perfil de Usuario</strong>: Cada usuario tiene su propio perfil, donde puede editar información personal (excepto el correo electrónico), cambiar la contraseña, ver los eventos en los que está inscrito y gestionar su sesión (cerrar sesión, editar datos, etc.).</li></ul><ul id="15211021-929a-80e1-b36e-d111fcefd41f" class="bulleted-list"><li style="list-style-type:disc"><strong>Accesibilidad</strong>: La plataforma ofrece diversas opciones de accesibilidad, como temas de color personalizados (oscuro, daltónico) y el tamaño de la fuente. También incluye atajos de teclado para facilitar la navegación, especialmente útil para personas con discapacidades visuales o motrices.</li></ul><h3 id="15211021-929a-80dc-af69-dc646087710d" class="">Personalización y Navegación</h3><p id="15211021-929a-8040-ad19-c9280fa60a86" class="">A través de la plataforma, los usuarios pueden personalizar su experiencia de usuario, desde el diseño visual hasta las configuraciones de fuente. Esto se logra mediante ajustes fáciles de acceder en el menú de <strong>Accesibilidad</strong>. Además, los atajos de teclado hacen que la navegación sea más rápida y sencilla, permitiendo a los usuarios realizar acciones como inscribirse en eventos o ver detalles con solo presionar una combinación de teclas.</p><h1 id="15211021-929a-8020-bdd4-c85bb7183fc0" class=""><strong>Autenticación</strong></h1><h2 id="15211021-929a-8036-99a8-d702e9f6372a" class=""><strong>Registro</strong></h2><p id="15211021-929a-8087-a12a-d7de0f4431a6" class="">El proceso de registro permite a los nuevos usuarios crear una cuenta siguiendo estos pasos:</p><ol type="1" id="15211021-929a-8008-9fe7-c0fd80816147" class="numbered-list" start="1"><li><strong>Campos obligatorios</strong>:<ul id="15211021-929a-803b-8d4f-f667c31847f4" class="bulleted-list"><li style="list-style-type:disc"><strong>Correo electrónico</strong>: Debe ser único y no estar registrado previamente.</li></ul><ul id="15211021-929a-803e-b655-cb5f604e7b92" class="bulleted-list"><li style="list-style-type:disc"><strong>Nombre completo</strong>: Nombre y apellido del usuario.</li></ul><ul id="15211021-929a-8032-b313-e559114fd596" class="bulleted-list"><li style="list-style-type:disc"><strong>Teléfono</strong>: Número de contacto.</li></ul><ul id="15211021-929a-80c3-b552-c677ff81d4b2" class="bulleted-list"><li style="list-style-type:disc"><strong>Facultad</strong>: Seleccione la facultad a la que pertenece.</li></ul><ul id="15211021-929a-80ee-b99f-ea73c692016b" class="bulleted-list"><li style="list-style-type:disc"><strong>Rol</strong>: Especifique si será <strong>Organizador</strong> o <strong>Usuario Normal</strong>.</li></ul><ul id="15211021-929a-80be-aab4-fc28bf7c6438" class="bulleted-list"><li style="list-style-type:disc"><strong>Contraseña</strong>: Establezca una contraseña segura.</li></ul></li></ol><ol type="1" id="15211021-929a-8023-9d41-d634002180ea" class="numbered-list" start="2"><li><strong>Validación de datos</strong>:<p id="15211021-929a-80e7-a19a-e68432c877db" class="">Si los datos ingresados no son válidos, se mostrará una alerta indicando los campos con errores.</p></li></ol><ol type="1" id="15211021-929a-800a-9dd3-f057d116e58c" class="numbered-list" start="3"><li><strong>Finalización del registro</strong>:<ul id="15211021-929a-802f-a9d6-f887945336a0" class="bulleted-list"><li style="list-style-type:disc">Pulse el botón <strong>Registrar</strong>.</li></ul><ul id="15211021-929a-8017-bfab-ee915d48d401" class="bulleted-list"><li style="list-style-type:disc">Una vez registrado exitosamente, el usuario será redirigido automáticamente a la aplicación, sin necesidad de volver a iniciar sesión.</li></ul></li></ol><ol type="1" id="15211021-929a-80d7-b2c9-e700f365e2d5" class="numbered-list" start="4"><li><strong>Opciones adicionales</strong>:<p id="15211021-929a-80f8-9547-f1a137d2b17f" class="">Desde la pantalla de registro, es posible regresar a la página de inicio de sesión utilizando la opción correspondiente.</p></li></ol><figure id="15211021-929a-80b5-9a3c-faf18ea6107d" class="image"><a href="/public/img/guia/3ce34a3d-5925-40bc-b893-eb955ad6ab3d.png"><img src="/public/img/guia/3ce34a3d-5925-40bc-b893-eb955ad6ab3d.png"/></a><figcaption><em>Pantalla de registro</em></figcaption></figure><h2 id="15211021-929a-80c0-bc87-eae9ec2bc6c2" class=""><strong>Inicio de Sesión</strong></h2><p id="15211021-929a-8046-ab76-d135fd1e6f5c" class="">Para acceder a la aplicación, siga estos pasos:</p><ol type="1" id="15211021-929a-803d-8fdc-ff2258d65951" class="numbered-list" start="1"><li><strong>Introduzca sus datos</strong>:<ul id="15211021-929a-80c2-81f6-f3bf8a309f29" class="bulleted-list"><li style="list-style-type:disc"><strong>Correo electrónico</strong>: El registrado previamente.</li></ul><ul id="15211021-929a-80f8-8a79-d4e89b4e6dc5" class="bulleted-list"><li style="list-style-type:disc"><strong>Contraseña</strong>: La establecida durante el registro.</li></ul></li></ol><ol type="1" id="15211021-929a-80c8-8527-e2f3acc81a80" class="numbered-list" start="2"><li><strong>Acceso exitoso</strong>:<p id="15211021-929a-802c-b0e2-fd65bcc330c4" class="">Si los datos son correctos, será redirigido a la página principal de la aplicación.</p></li></ol><ol type="1" id="15211021-929a-807e-b798-f39542e9902f" class="numbered-list" start="3"><li><strong>Opciones adicionales</strong>:<ul id="15211021-929a-8086-921d-e5bdd2109450" class="bulleted-list"><li style="list-style-type:disc"><strong>¿Olvidaste tu contraseña?</strong>: Recuperar el acceso en caso de olvidar su contraseña.</li></ul><ul id="15211021-929a-808f-b87d-dc7c2845980f" class="bulleted-list"><li style="list-style-type:disc"><strong>Regístrate aquí</strong>: Acceso directo al formulario de registro para nuevos usuarios.</li></ul></li></ol><figure id="15211021-929a-80c4-93b3-d1f348ae4b74" class="image"><a href="/public/img/guia/image.png"><img src="/public/img/guia/image.png"/></a><figcaption><em>Pantalla de inicio de sesión</em></figcaption></figure><h2 id="15211021-929a-8024-986e-fcaf1bcf7d0a" class=""><strong>Cambio de Contraseña</strong></h2><h3 id="15211021-929a-8049-b496-ee51f8bff1c9" class="">Opción 1: Desde el perfil del usuario</h3><ol type="1" id="15211021-929a-80d5-aa6e-e7dff06d93e2" class="numbered-list" start="1"><li>Acceda a la <strong>página de perfil</strong>.</li></ol><ol type="1" id="15211021-929a-8079-b3ee-d6e78f8b85e4" class="numbered-list" start="2"><li>Pulse el botón <strong>Cambiar Contraseña</strong>.</li></ol><figure id="15211021-929a-802a-8812-e3000e4b471e" class="image"><a href="/public/img/guia/perfil.png"><img src="/public/img/guia/perfil.png"/></a><figcaption>Página de perfil del usuario (Botón de cambio de contraseña indicado)</figcaption></figure><ol type="1" id="15211021-929a-805a-b21b-f1b506b31044" class="numbered-list" start="1"><li>Será redirigido a una nueva página donde deberá:<ul id="15211021-929a-8044-89d6-c75df58801d6" class="bulleted-list"><li style="list-style-type:disc">Introducir la nueva contraseña dos veces.</li></ul><ul id="15211021-929a-80c3-91ae-f05a79d3ebb8" class="bulleted-list"><li style="list-style-type:disc">Asegurarse de que ambas coincidan.</li></ul><ul id="15211021-929a-800e-896d-c548979a6d35" class="bulleted-list"><li style="list-style-type:disc">Pulsar el botón <strong>Restablecer Contraseña</strong>.</li></ul></li></ol><ol type="1" id="15211021-929a-801c-87a8-c2291e169ce2" class="numbered-list" start="2"><li>Una vez completado, será redirigido nuevamente a la página de perfil.</li></ol><figure id="15211021-929a-8062-a875-c9e3ac9b4d97" class="image"><a href="/public/img/guia/image%201.png"><img src="/public/img/guia/image%201.png"/></a><figcaption>Página de restablecimiento de nueva contraseña</figcaption></figure><h3 id="15211021-929a-801f-b158-e6a778abe14d" class="">Opción 2: Recuperar contraseña desde el inicio de sesión</h3><ol type="1" id="15211021-929a-8016-8825-cab3b7a13066" class="numbered-list" start="1"><li>En la pantalla de inicio de sesión, pulse <strong>¿Olvidaste tu contraseña?</strong>.</li></ol><figure id="15211021-929a-807a-83b1-f8eb7adec595" class="image"><a href="/public/img/guia/log.png"><img src="/public/img/guia/log.png"/></a><figcaption>Botón de recuperación de contraseña en la pantalla de inicio de sesión</figcaption></figure><ol type="1" id="15211021-929a-80a9-8563-ddfd8f35ad82" class="numbered-list" start="2"><li>Ingrese su correo electrónico registrado en el formulario de recuperación.</li></ol><figure id="15211021-929a-8051-9933-d2bbffa71da8" class="image"><a href="/public/img/guia/image%202.png"><img src="/public/img/guia/image%202.png"/></a><figcaption><em>Formulario de recuperación de contraseña</em></figcaption></figure><ol type="1" id="15211021-929a-8099-af9f-f67e3ed13f48" class="numbered-list" start="3"><li>Recibirá un correo electrónico con un enlace para restablecer su contraseña.</li></ol><figure id="15211021-929a-80f3-a8e4-e84004df69d1" class="image"><a href="/public/img/guia/image%203.png"><img src="/public/img/guia/image%203.png"/></a><figcaption>Ejemplo de correo de recuperación</figcaption></figure><ol type="1" id="15211021-929a-8076-bc3f-c4ad1b625ee3" class="numbered-list" start="4"><li>Acceda al enlace recibido, donde podrá:<ul id="15211021-929a-801f-842b-c2edf7f2b269" class="bulleted-list"><li style="list-style-type:disc">Introducir la nueva contraseña dos veces.</li></ul><ul id="15211021-929a-8076-9903-e890640fd457" class="bulleted-list"><li style="list-style-type:disc">Pulsar el botón <strong>Restablecer Contraseña</strong>.</li></ul></li></ol><ol type="1" id="15211021-929a-802a-a67f-c09e5b969706" class="numbered-list" start="5"><li>Finalmente, será redirigido a la página de inicio de sesión. Use sus nuevas credenciales para acceder.</li></ol><figure id="15211021-929a-8075-bb88-e7c52f5fc786" class="image"><a href="/public/img/guia/image%204.png"><img src="/public/img/guia/image%204.png"/></a><figcaption>Página de restablecimiento de contraseña</figcaption></figure><h2 id="15211021-929a-803c-8f02-ecda2b78a1ff" class="">Ataques</h2><p id="15211021-929a-8078-911a-f98ed4cb71ef" class="">En caso de que el usuario intente atacar la web, se le <em>baneará</em> y no podrá acceder más veces a la aplicación.</p><figure id="15211021-929a-8059-bf13-ea5ff74e3361" class="image"><a href="/public/img/guia/image%205.png"><img style="width:707.986083984375px" src="/public/img/guia/image%205.png"/></a><figcaption>Mensaje de bloqueo</figcaption></figure><h1 id="15211021-929a-80d5-93d7-e87b2881a9df" class="">Aplicación</h1><h2 id="15211021-929a-8038-a726-e87aed353ec7" class="">Inicio</h2><p id="15211021-929a-805c-8093-c52e46a167fd" class="">En la página de inicio, el usuario podrá visualizar todos los eventos disponibles, tanto los organizados por él mismo como los de otros organizadores. Para acceder a esta página desde cualquier parte de la aplicación, puede usar la barra de navegación o el atajo de teclado Ctrl+E.</p><figure id="15211021-929a-8022-9325-c1428b6511a2" class="image"><a href="/public/img/guia/init-pint.png"><img src="/public/img/guia/init-pint.png"/></a><figcaption>Pantalla de inicio. Las flechas son para poder explicar mejor cada sección.</figcaption></figure><p id="15211021-929a-80fe-83bb-d0578cffab48" class="">Las flechas indican lo siguiente:</p><ul id="15211021-929a-8064-a60e-d61084751abd" class="bulleted-list"><li style="list-style-type:disc"><strong>Flecha Roja</strong>: Apunta al botón <strong>Organizar Evento</strong> (solo visible para organizadores). Al pulsarlo, el usuario será redirigido a la página para crear un nuevo evento.</li></ul><ul id="15211021-929a-8027-b0d0-df231068d8ca" class="bulleted-list"><li style="list-style-type:disc"><strong>Flecha Marrón</strong>: Apunta a un evento. Al hacer clic en un evento, se abrirá una ventana con las opciones para editarlo (si es el evento del organizador) o para inscribirse o desapuntarse, dependiendo del estado del usuario.</li></ul><ul id="15211021-929a-801c-98f5-d2f63b49eb3b" class="bulleted-list"><li style="list-style-type:disc"><strong>Flecha Morada</strong>: Apunta al estado del usuario en el evento (inscrito, en cola o no inscrito). Si no se muestra ningún estado, significa que el usuario es un organizador.</li></ul><ul id="15211021-929a-805c-94cc-da5057479dc4" class="bulleted-list"><li style="list-style-type:disc"><strong>Flecha Naranja</strong>: Apunta a la sección de <strong>Eventos transcurridos</strong>. Al hacer clic, el usuario podrá ver los eventos pasados, sin opción de inscribirse, desapuntarse o editarlos.</li></ul><ul id="15211021-929a-80be-9792-f0e85df80c3d" class="bulleted-list"><li style="list-style-type:disc"><strong>Flecha Amarilla</strong>: Apunta al icono de <strong>notificaciones</strong>. Al hacer clic, el usuario podrá ver las notificaciones no leídas.</li></ul><ul id="15211021-929a-8036-85bf-df6a5bc015ea" class="bulleted-list"><li style="list-style-type:disc"><strong>Flecha Azul</strong>: Apunta al icono de <strong>perfil</strong>. Al hacer clic, el usuario puede acceder a su perfil o cerrar sesión.</li></ul><ul id="15211021-929a-80e8-8203-ed4ccc87348d" class="bulleted-list"><li style="list-style-type:disc"><strong>Flecha Gris</strong>: Apunta a la <strong>barra de navegación</strong>. Desde allí, el usuario puede acceder a las siguientes secciones:<ul id="15211021-929a-8048-be92-cdeda237e5b1" class="bulleted-list"><li style="list-style-type:circle"><strong>Inicio</strong> (página actual)</li></ul><ul id="15211021-929a-803c-ac6a-d88f2fe331ec" class="bulleted-list"><li style="list-style-type:circle"><strong>Mis eventos</strong> (solo accesible para organizadores), donde el organizador podrá ver sus eventos. Accesible con Ctrl + M.</li></ul><ul id="15211021-929a-8021-8ed2-c0f23fde24cd" class="bulleted-list"><li style="list-style-type:circle"><strong>Calendario</strong>, donde el usuario podrá ver los eventos organizados. Accesible con Ctrl + C.</li></ul><ul id="15211021-929a-806c-a6c2-f81671e6c04c" class="bulleted-list"><li style="list-style-type:circle"><strong>Accesibilidad</strong>, donde podrá cambiar el tema (predeterminado, oscuro, daltónico), ajustar el tamaño de la fuente (pequeño, predeterminado, grande) y consultar los comandos de la aplicación.</li></ul></li></ul><ul id="15211021-929a-808d-8bd1-fcfffd279acf" class="bulleted-list"><li style="list-style-type:disc"><strong>Flecha Rosa</strong>: Apunta a un texto que muestra todos los <strong>filtros</strong> aplicados en ese momento, como la ubicación, el estado del usuario (inscrito, en cola, no inscrito) y el tipo de evento (por ejemplo, conferencia).</li></ul><ul id="15211021-929a-80e0-aa14-e73846d3ccce" class="bulleted-list"><li style="list-style-type:disc"><strong>Flecha Verde</strong>: Apunta al botón de <strong>Filtros</strong>. Al hacer clic, el usuario podrá aplicar filtros para buscar eventos según la fecha, capacidad, ubicación, tipo de evento y estado del usuario.<ul id="15211021-929a-8040-8644-f556b98fe668" class="bulleted-list"><li style="list-style-type:circle">Al pulsar <strong>Reiniciar</strong>, se eliminarán todos los filtros aplicados.</li></ul><ul id="15211021-929a-8016-bc5c-e443479d3125" class="bulleted-list"><li style="list-style-type:circle">Al pulsar <strong>Aplicar filtros</strong>, se aplicarán los filtros seleccionados.</li></ul></li></ul><figure id="15211021-929a-807e-96fa-f86f6f82de74" class="image"><a href="/public/img/guia/image%206.png"><img src="/public/img/guia/image%206.png"/></a><figcaption>Ventana de filtros</figcaption></figure><h2 id="15211021-929a-8002-9416-db7fa3cd4633" class="">Organizar Evento (Organizador)</h2><p id="15211021-929a-80c6-afa6-ee2e511c02ff" class="">Al hacer clic en el botón <strong>Organizar evento</strong> desde la página de <strong>Inicio</strong> o <strong>Mis eventos</strong>, el usuario (si es organizador) accederá al formulario para crear un evento. Es importante destacar que un organizador no podrá crear un evento si hay otro evento programado en el mismo espacio y horario. El formulario requiere completar los siguientes campos:</p><ul id="15211021-929a-8013-943a-f842a4245778" class="bulleted-list"><li style="list-style-type:disc">Título del evento</li></ul><ul id="15211021-929a-804d-9d45-c9f1e2725d47" class="bulleted-list"><li style="list-style-type:disc">Descripción</li></ul><ul id="15211021-929a-80c9-a15a-e33abac281e1" class="bulleted-list"><li style="list-style-type:disc">Fecha de inicio</li></ul><ul id="15211021-929a-80ec-a12e-ccc010568510" class="bulleted-list"><li style="list-style-type:disc">Duración estimada</li></ul><ul id="15211021-929a-8016-b901-c85c79efe9a4" class="bulleted-list"><li style="list-style-type:disc">Facultad y sala</li></ul><ul id="15211021-929a-802b-8fb8-d1ab88959731" class="bulleted-list"><li style="list-style-type:disc">Tipo de evento</li></ul><figure id="15211021-929a-805a-8edf-f8be2e145926" class="image"><a href="/public/img/guia/image%207.png"><img src="/public/img/guia/image%207.png"/></a><figcaption>Formulario de creación de evento</figcaption></figure><h2 id="15211021-929a-80d5-96aa-e53b22e49fa8" class="">Mis Eventos (Organizador)</h2><p id="15211021-929a-8099-b114-f0dea03d340a" class="">En la sección <strong>Mis eventos</strong> (accesible con Ctrl+M o desde la barra de navegación), el organizador podrá ver todos los eventos que ha creado. Podrá aplicar filtros y ver los eventos ya transcurridos.</p><figure id="15211021-929a-8070-a609-f61bb4d4b046" class="image"><a href="/public/img/guia/image%208.png"><img src="/public/img/guia/image%208.png"/></a><figcaption>Página de Mis Eventos</figcaption></figure><p id="15211021-929a-806f-b677-d9192921d28f" class="">Al hacer clic en un evento que no haya transcurrido, el organizador tendrá la opción de <strong>editar</strong> el evento.</p><figure id="15211021-929a-806f-938c-e109d74527ec" class="image"><a href="/public/img/guia/image%209.png"><img src="/public/img/guia/image%209.png"/></a><figcaption>Ventana para editar el evento</figcaption></figure><h2 id="15211021-929a-8042-87c6-edbddb9816e3" class="">Editar Evento (Organizador)</h2><p id="15211021-929a-80dd-bc2f-f3f6d028e045" class="">En la página de <strong>editar evento</strong>, el organizador podrá modificar los campos del evento (título, descripción, lugar, fecha, duración, tipo), eliminar el evento o ver los usuarios inscritos y en cola.</p><p id="15211021-929a-8097-a63e-d603d5cb2002" class="">Si se realiza alguna modificación, los usuarios serán notificados. Si se aumenta la capacidad del evento, los usuarios en cola pasarán a ser confirmados, y si se reduce la capacidad, los usuarios confirmados más tarde serán movidos a la cola.</p><figure id="15211021-929a-8013-9961-c993c6ae4924" class="image"><a href="/public/img/guia/image%2010.png"><img src="/public/img/guia/image%2010.png"/></a><figcaption>Página de edición de evento</figcaption></figure><h2 id="15211021-929a-8001-aa12-e428ed84f7d6" class="">Calendario</h2><p id="15211021-929a-80ab-8985-da38e6402917" class="">En la vista de <strong>calendario</strong>, los eventos se muestran organizados por fecha. Al hacer clic en un evento, el usuario podrá ver la misma información que en la lista de eventos.</p><figure id="15211021-929a-80cd-98d7-ea437dfe5b17" class="image"><a href="/public/img/guia/image%2011.png"><img src="/public/img/guia/image%2011.png"/></a><figcaption>Vista Calendario</figcaption></figure><h2 id="15211021-929a-80ca-afcc-f20fe0a2ad89" class="">Inscripción y Desinscripción</h2><p id="15211021-929a-8063-aee9-fe7b80b6fff2" class="">Cualquier usuario podrá inscribirse en los eventos, salvo los organizadores, que no pueden inscribirse en sus propios eventos. Para inscribirse, el usuario debe hacer clic en un evento (ya sea en <strong>Inicio</strong> o <strong>Calendario</strong>) y seleccionar la opción <strong>Apuntarse</strong>. Si ya está inscrito, podrá elegir <strong>Desapuntarse</strong>.</p><figure id="15211021-929a-808e-b85d-c10df4a7eef9" class="image"><a href="/public/img/guia/image%2012.png"><img src="/public/img/guia/image%2012.png"/></a><figcaption>Detalles de evento desde lista, con opción de inscribirse.</figcaption></figure><figure id="15211021-929a-8084-991e-cf87e347934e" class="image"><a href="/public/img/guia/image%2013.png"><img style="width:707.986083984375px" src="/public/img/guia/image%2013.png"/></a><figcaption>Detalles de evento desde lista, con opción de desinscribirse.</figcaption></figure><p id="15211021-929a-80d2-bb80-ee7773efb273" class="">Si el usuario intenta inscribirse en un evento que se solapa con otro al que ya está inscrito, se mostrará un mensaje de error.</p><figure id="15211021-929a-806e-b482-dbac2c735322" class="image"><a href="/public/img/guia/image%2014.png"><img src="/public/img/guia/image%2014.png"/></a><figcaption>Detalles de evento desde calendario, con mensaje de error.</figcaption></figure><h3 id="15211021-929a-8062-9fbe-d6c35398c1d3" class="">Inscripción y Desinscripción sin modal</h3><p id="15211021-929a-80bc-9a76-c948db0cbe9a" class="">Otra opción para inscribirse o desinscribirse es utilizar el teclado. Para inscribirse, seleccione el evento con <strong>Tab</strong> y pulse <strong>Ctrl + I</strong>. Para desinscribirse, utilice <strong>Ctrl + U</strong>. También podrá ver mensajes de confirmación o error, sin necesidad de usar el ratón.</p><figure id="15211021-929a-80e6-a447-f5f92f7c8b93" class="image"><a href="/public/img/guia/image%2015.png"><img src="/public/img/guia/image%2015.png"/></a><figcaption>Error al intentar inscribirse a evento con Ctrl + I</figcaption></figure><figure id="15211021-929a-8092-b241-f4cd8e6c681b" class="image"><a href="/public/img/guia/image%2016.png"><img style="width:707.986083984375px" src="/public/img/guia/image%2016.png"/></a><figcaption>Mensaje de confirmación al inscribirse a evento con Ctrl + I</figcaption></figure><h2 id="15211021-929a-8061-90ec-dd055cdbe035" class="">Notificaciones</h2><p id="15211021-929a-807f-8275-f5599fed9df0" class="">Al hacer clic en el icono de <strong>notificaciones</strong>, el usuario podrá ver las notificaciones no leídas. Estas se marcarán automáticamente como leídas. Para ver las notificaciones ya leídas, podrá hacer clic en <strong>Ver todas</strong>.</p><figure id="15211021-929a-8024-8d2f-e2d85633df70" class="image"><a href="/public/img/guia/image%2017.png"><img style="width:707.986083984375px" src="/public/img/guia/image%2017.png"/></a><figcaption>Ventana de notificaciones.</figcaption></figure><figure id="15211021-929a-8052-99a3-f9b516c354aa" class="image"><a href="/public/img/guia/image%2018.png"><img style="width:707.986083984375px" src="/public/img/guia/image%2018.png"/></a><figcaption>Página de notificaciones.</figcaption></figure><h2 id="15211021-929a-80bf-a7cb-ccf22287daaf" class="">Perfil de Usuario</h2><p id="15211021-929a-803e-9cc3-fd12d5c0d122" class="">En esta página, el usuario podrá editar sus datos (excepto el correo electrónico), ver los eventos a los que está apuntado, cambiar su contraseña o cerrar sesión.</p><ul id="15211021-929a-8031-9b69-e162e0fdb657" class="bulleted-list"><li style="list-style-type:disc"><strong>Flecha Marrón</strong>: Apunta a los eventos en los que el usuario está apuntado. Esta sección se despliega por defecto, pero puede ser plegada. Al pulsar sobre un evento, se obtiene la misma información que al seleccionarlo desde la página de <strong>Inicio</strong> o <strong>Calendario</strong>.</li></ul><ul id="15211021-929a-80e1-99e7-c883b23a1aaf" class="bulleted-list"><li style="list-style-type:disc"><strong>Flecha Roja</strong>: Apunta a la zona de peligro, donde al pulsar el botón <strong>Cerrar sesión</strong>, el usuario será desconectado y deberá ingresar sus credenciales nuevamente para acceder.</li></ul><ul id="15211021-929a-8061-8829-cc7eca4cd559" class="bulleted-list"><li style="list-style-type:disc"><strong>Flecha Amarilla</strong>: Apunta al botón <strong>Cambiar contraseña</strong>. Este procedimiento ha sido explicado en la opción 1 de cambio de contraseña.</li></ul><ul id="15211021-929a-803e-aa61-f9ad02443237" class="bulleted-list"><li style="list-style-type:disc"><strong>Flecha Morada</strong>: Apunta al botón de <strong>Editar perfil</strong>. Al pulsar este botón, el usuario podrá modificar los campos de su perfil que anteriormente no eran editables.</li></ul><figure id="15211021-929a-80d4-b025-e0b11b03ff11" class="image"><a href="/public/img/guia/perfil%201.png"><img style="width:707.9744873046875px" src="/public/img/guia/perfil%201.png"/></a><figcaption>Página de perfil de usuario</figcaption></figure><figure id="15211021-929a-8077-923f-c6a7eded4bb2" class="image"><a href="/public/img/guia/image%2019.png"><img style="width:707.9976806640625px" src="/public/img/guia/image%2019.png"/></a><figcaption>Pagina de perfil de usuario en modo edición</figcaption></figure><h2 id="15211021-929a-80bc-827e-c187f3de3216" class="">Accesibilidad</h2><p id="15211021-929a-801f-8432-f289c297ba68" class="">En esta página, el usuario puede cambiar el tema (daltónico, oscuro o predeterminado) y ajustar el tamaño de la fuente (grande, pequeño, predeterminado). También podrá consultar los comandos de teclado disponibles.</p><p id="15211021-929a-80be-b450-de1b306d555e" class="">Comandos de teclado:</p><ul id="15211021-929a-8063-a5ef-eb8c64f39760" class="bulleted-list"><li style="list-style-type:disc"><strong>Ctrl + E</strong>: Ir a <strong>Eventos</strong></li></ul><ul id="15211021-929a-8095-8d51-e85b11e98727" class="bulleted-list"><li style="list-style-type:disc"><strong>Ctrl + M</strong>: Ir a <strong>Mis Eventos</strong> (solo para organizadores)</li></ul><ul id="15211021-929a-8089-81fd-d7ad47b485fd" class="bulleted-list"><li style="list-style-type:disc"><strong>Ctrl + P</strong>: Ir a <strong>Perfil</strong></li></ul><ul id="15211021-929a-80b8-965b-f2c911c60030" class="bulleted-list"><li style="list-style-type:disc"><strong>Ctrl + C</strong>: Ir al <strong>Calendario</strong></li></ul><ul id="15211021-929a-80cd-a93b-c18ed7b041c4" class="bulleted-list"><li style="list-style-type:disc"><strong>Ctrl + A</strong>: Ir a <strong>Accesibilidad</strong></li></ul><ul id="15211021-929a-80f1-8c7d-ce532fa582d1" class="bulleted-list"><li style="list-style-type:disc"><strong>Ctrl + O</strong>: Ir a <strong>Notificaciones</strong></li></ul><ul id="15211021-929a-80fa-b849-e6ecf7cb5545" class="bulleted-list"><li style="list-style-type:disc"><strong>Ctrl + I</strong>: Inscribirse al evento seleccionado</li></ul><ul id="15211021-929a-80c2-8bae-e1a5f9a55b90" class="bulleted-list"><li style="list-style-type:disc"><strong>Ctrl + U</strong>: Desinscribirse del evento seleccionado</li></ul><ul id="15211021-929a-8045-99dc-e3ebb40d01ca" class="bulleted-list"><li style="list-style-type:disc"><strong>Ctrl + D</strong>: Ver los detalles del evento seleccionado</li></ul><figure id="15211021-929a-8079-a38d-f815fb7d5b30" class="image"><a href="/public/img/guia/image%2020.png"><img style="width:707.9744873046875px" src="/public/img/guia/image%2020.png"/></a><figcaption>Página de accesibilidad</figcaption></figure><figure id="15211021-929a-80b0-83fe-fb3bd3aa8397" class="image"><a href="/public/img/guia/image%2021.png"><img style="width:707.9744873046875px" src="/public/img/guia/image%2021.png"/></a><figcaption>Tema oscuro con letra grande, vista de Inicio</figcaption></figure><figure id="15211021-929a-800e-b29e-f684b0af1cbc" class="image"><a href="/public/img/guia/image%2022.png"><img style="width:707.9629516601562px" src="/public/img/guia/image%2022.png"/></a><figcaption>Tema daltónico con letra pequeña, página de Inicio.</figcaption></figure><figure id="15211021-929a-8024-aa4b-eee610636f8c" class="image"><a href="/public/img/guia/image%2023.png"><img style="width:707.986083984375px" src="/public/img/guia/image%2023.png"/></a><figcaption>Tema daltónico con letra pequeña, página de calendario</figcaption></figure><figure id="15211021-929a-8024-a082-ec7e6b739b2c" class="image"><a href="/public/img/guia/image%2024.png"><img style="width:707.9744873046875px" src="/public/img/guia/image%2024.png"/></a><figcaption>Tema oscuro con letra grande, página de calendario</figcaption></figure><figure id="15211021-929a-80ff-a35c-f89cf6198f3e" class="image"><a href="/public/img/guia/image%2011.png"><img style="width:707.9744873046875px" src="/public/img/guia/image%2011.png"/></a><figcaption>Tema predeterminado con letra predeteminsada, página de calendario</figcaption></figure></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

@@ -8,7 +8,7 @@ export const isAuthenticated = (req, res, next) => {
         console.log("No active session");
         return res.redirect('/auth/login');
     }
-
+    console.log("AASSA")
     req.user = req.session.user;
     next();
 };

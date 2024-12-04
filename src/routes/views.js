@@ -119,6 +119,11 @@ viewsRouter.get("/reset-password/:token", (req, res) => {
     res.render("reset-password", { token, title: "Restablecer Contraseña", layout:false, urlRedirect: '/auth/login' });
 });
 
+viewsRouter.get("/user-guide", (req, res) => {
+    console.log("LA guia")
+    res.render("guia-usuario", { layout: false });
+});
+
 
 viewsRouter.get("/profile", isAuthenticated, async (req, res) => {
     try {
