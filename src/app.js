@@ -54,6 +54,9 @@ app.use("/api", apiRouter);
 app.use((req, res, next) => {
     res.status(404).render('errors/404',{ layout: false });
 });
+app.use((req, res, next) => {
+    res.status(403).render('errors/403',{ layout: false });
+});
 
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
