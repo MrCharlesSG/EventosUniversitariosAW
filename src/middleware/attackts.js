@@ -3,17 +3,15 @@ import { pool } from '../config/db.js';
 const sqlInjectionPattern = /(\b(select|insert|update|delete|drop|alter|union|script|eval|exec|truncate|database|table|column)\b|\%27|\%22|--|#|\b(drop|rename|grant|revoke)\b|;|--|\b(select|insert|update|delete)\b)/i;
 
 export const sqlInjectionMiddleware = (req, res, next) => {
-    for (let key in req.body) {
-        if (req.body.hasOwnProperty(key)) {
-            const value = req.body[key];
+    Object.keys(req.body).forEach((key) => {
+        const value = req.body[key];
 
-            if (typeof value === 'string' && sqlInjectionPattern.test(value)) {
-                console.log(`Posible inyección SQL detectada en el campo: ${key}`);
-                saveAttack(req)
-                return res.status(400).json({ error: "Solicitud no válida, posible inyección SQL detectada." });
-            }
+        if (typeof value === 'string' && sqlInjectionPattern.test(value)) {
+            console.log(`Posible inyección SQL detectada en el campo: ${key}`);
+            saveAttack(req);
+            return res.status(400).json({ error: "Solicitud no válida, posible inyección SQL detectada." });
         }
-    }
+    });
     next();
 };
 
